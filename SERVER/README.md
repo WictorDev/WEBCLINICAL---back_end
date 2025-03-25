@@ -23,10 +23,11 @@ Webclinical é um sistema web para clínicas, onde o próprio usuário pode pré
 ## Execução do Projeto
 1. Para iniciar a aplicação:
    ```bash
-  npm run start
+    npm run start
+  
 2. Para iniciar a aplicação em modo de desenvolvimento
    ```bash
-  npm run start:dev
+   npm run start:dev
 
 ## Estrutura de Pastas
 A organização do projeto segue os princípios da Clean Architecture, com a separação clara entre os módulos, controllers, services, etc. Isso facilita a manutenção e a escalabilidade da aplicação.
