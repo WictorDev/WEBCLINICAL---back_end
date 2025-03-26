@@ -29,7 +29,7 @@ O backend será desenvolvido dentro da pasta server, evitando conflitos com o fr
 
 Estrutura de Pastas
 
-O código seguirá a arquitetura Clean Architecture. Devido ao prazo curto, todavia os teste unitarios serão utilizados afim de realizar um boa estrutura do código. 
+O código seguirá a arquitetura Clean Architecture. Devido ao prazo curto, todavia os teste unitarios serão utilizados para garantir que o sistema seja robusto e confiável. Desta forma a implementação será apartir de testes com Jest, seguindo boas práticas de desenvolvimento. 
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
