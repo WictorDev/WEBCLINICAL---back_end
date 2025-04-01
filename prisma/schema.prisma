@@ -8,148 +8,71 @@ datasource db {
 }
 
 
-enum UserType {
-  PROFESSIONAL
-  RECEPTIONIST
-  ADMIN
-  PATIENT
-}
-
-
-enum AppointmentStatus {
-  PENDING
-  CONFIRMED
-  CANCELED
-  COMPLETED
-}
-
-
-enum PaymentStatus {
-  PENDING
-  PAID
-  CANCELED
-}
-
 model Company {
-  cnpj      String  @id @default(uuid())
-  name     String  @unique
-  users    User[]
-  rooms    Room[]
-  schedules Schedule[]
-  ProfessionalRecord ProfessionalRecord[]
+  Cnpj  String  @unique
+  name  String
+  phone String
+  email String
+  users User[]
 }
 
 model User {
-  cpf       String  @id
+  cpf       String  @unique
+  email     String  @unique
+  password  String
+  name      String
+  companyId String
+  company   Company @relation(fields: [companyId], references: [Cnpj])
+  type      Type?  @relation(fields: [typeId], references: [id])
+  typeId    String
+}
+
+model Adimin{
+  Cpf  String  @unique
+  name String
+  typeId String 
+  type  Type @relation(fields: [typeId], references: [id])
+  
+}
+
+model Type {
+  id      String  @id @default(uuid())
+  name    String
+  users   User[]
+  employees Employee[]
+  Admins  Adimin[]
+  patients Patient[]
+}
+
+// Funcionario
+model Employee {
+  cpf           String  @unique
+  advice        String? //CRM ou CRO ou etc...
+  name          String
+  typeId        String
+  type          Type    @relation(fields: [typeId], references: [id])
+  employeeType  EmployeeType? @relation(fields: [employeeTypeId], references: [id])
+  employeeTypeId String
+  
+}
+
+//tipo do funcionario 
+model EmployeeType {
+  id         String   @id @default(uuid())
+  name       String
+  employees  Employee[]
+}
+
+
+//paciente
+model Patient {
+  cpf       String  @unique
   name      String
   email     String  @unique
   password  String
-  userType  UserType
-  companyId String
-
-  company   Company @relation(fields: [companyId], references: [cnpj], onDelete: Cascade)
-  professional Professional? 
-  patient   Patient? 
-  roles     User_Role[]
-}
-
-model Profession {
-  id   String  @id @default(uuid())
-  name String  @unique
-  professionals Professional[]
+  type      Type?  @relation(fields: [typeId], references: [id])
+  typeId    String
 }
 
 
 
-
-model Professional {
-  id             String  @id @default(uuid())
-  userCpf        String  @unique
-  professionId   String
-  schedules      Schedule[]
-  ProfessionalRecord ProfessionalRecord[]
-
-  user       User       @relation(fields: [userCpf], references: [cpf], onDelete: Cascade)
-  profession Profession @relation(fields: [professionId], references: [id], onDelete: Cascade)
-}
-
-model Patient {
-  id        String   @id @default(uuid())
-  userCpf   String   @unique
-  history   ProfessionalRecord[]
-  schedules Schedule[]
-
-  user User @relation(fields: [userCpf], references: [cpf], onDelete: Cascade)
-}
-
-model Room {
-  id        String @id @default(uuid())
-  name      String
-  companyId String
-  schedules Schedule[]
-
-  company   Company @relation(fields: [companyId], references: [cnpj], onDelete: Cascade)
-}
-
-model Schedule {
-  id             String          @id @default(uuid())
-  date           DateTime
-  status         AppointmentStatus @default(PENDING)
-  paymentStatus  PaymentStatus  @default(PENDING)
-  professionalId String
-  patientId      String
-  companyId      String
-  roomId         String?
-
-  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-  patient      Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  company      Company      @relation(fields: [companyId], references: [cnpj], onDelete: Cascade)
-  room         Room?        @relation(fields: [roomId], references: [id], onDelete: SetNull)
-}
-
-model ProfessionalRecord {
-  id             String  @id @default(uuid())
-  patientId      String
-  professionalId String
-  companyId      String
-  anamnesis      String
-  comorbidities  String
-  createdAt      DateTime @default(now())
-
-  patient      Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-  company      Company      @relation(fields: [companyId], references: [cnpj], onDelete: Cascade)
-}
-
-model Role {
-  id    String  @id @default(uuid())
-  name  String  @unique
-  users User_Role[]
-  permissions Role_Permission[]
-  userType UserType
-}
-
-model Permission {
-  id   String @id @default(uuid())
-  name String @unique
-  roles Role_Permission[]
-}
-
-model User_Role {
-  userCpf String
-  roleId  String
-
-  user User @relation(fields: [userCpf], references: [cpf], onDelete: Cascade)
-  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-
-  @@id([userCpf, roleId]) 
-}
-
-model Role_Permission {
-  roleId       String
-  permissionId String
-  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@id([roleId, permissionId]) 
-}
