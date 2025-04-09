@@ -28,7 +28,7 @@ export class AuthService {
       throw new Error('Senha incorreta');
     }
 
-    const payload = { id: user.id };
+    const payload = { cpf: user.cpf };
 
     const secret = this.configService.get<string>('JWT_SECRET');
     const expiresIn = Number(this.configService.get<string>('JWT_EXPIRES_IN')) || 36000;

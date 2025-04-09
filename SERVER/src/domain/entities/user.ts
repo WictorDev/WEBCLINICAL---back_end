@@ -5,15 +5,16 @@ export interface UserData {
   name: string;
   email: string;
   password: string;
-  company: string;
+  companyId: string;
   typeId: string;
+  active?: boolean;
 }
 
 export class User {
   constructor(private data: UserData) {}
 
-  get cpf(): string | undefined {
-    return this.data.cpf.toString();
+  get cpf(): UniqueEntityCPF{
+    return this.data.cpf;
   }
 
   set cpf(cpf: string) {
@@ -21,7 +22,7 @@ export class User {
     this.data.cpf = new UniqueEntityCPF(cpf);
   }
 
-  get name(): string | undefined {
+  get name(): string{
     return this.data.name;
   }
 
@@ -30,7 +31,7 @@ export class User {
     this.data.name = name;
   }
 
-  get email(): string | undefined {
+  get email(): string{
     return this.data.email;
   }
 
@@ -39,7 +40,7 @@ export class User {
     this.data.email = email;
   }
 
-  get password(): string | undefined {
+  get password(): string {
     return this.data.password;
   }
 
@@ -48,16 +49,16 @@ export class User {
     this.data.password = password;
   }
 
-  get company(): string | undefined {
-    return this.data.company;
+  get companyId(): string{
+    return this.data.companyId;
   }
 
-  set company(company: string) {
-    if (!company) throw new Error("Empresa é obrigatório.");
-    this.data.company = company;
+  set companyId(companyId: string) {
+    if (!companyId) throw new Error("Empresa é obrigatório.");
+    this.data.companyId = companyId;
   }
 
-  get typeId(): string | undefined {
+  get typeId(): string {
     return this.data.typeId;
   }
 
@@ -65,5 +66,14 @@ export class User {
     if (!typeId) throw new Error("Tipo é obrigatório.");
     this.data.typeId = typeId;
   }
+
+  get active(): boolean | undefined {
+    return this.data.active;
+  }
+  
+  set active(value: boolean) {
+    this.data.active = value;
+  }
+  
 
 }

@@ -5,6 +5,8 @@ import {
     OnModuleInit,
   } from '@nestjs/common';
   import { PrismaClient } from '@prisma/client';
+import Login from 'src/domain/entities/login';
+import { UserData } from 'src/domain/entities/user';
   
   @Global()
   @Injectable()
@@ -12,7 +14,8 @@ import {
     extends PrismaClient
     implements OnModuleInit, OnModuleDestroy
   {
-    Login: any;
+    Login: Login;
+    User: UserData;
 
 
     async onModuleInit() {
