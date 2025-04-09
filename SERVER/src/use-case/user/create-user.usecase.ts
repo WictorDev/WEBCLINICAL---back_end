@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import UniqueEntitycpf from "src/core/entities/unique-entity-cpf";
 import { User } from "src/domain/entities/user";
-import { UserRepository } from "src/repositories/user.repository";
+import { UserRepository } from "src/domain/repositories/user.repository";
 
 @Injectable()
 export class CreateUserUseCase {
