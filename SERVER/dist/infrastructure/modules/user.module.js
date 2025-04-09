@@ -1,0 +1,65 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserModule = void 0;
+const common_1 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
+const config_1 = require("@nestjs/config");
+const user_controller_1 = require("../controllers/user.controller");
+const prisma_module_1 = require("./prisma.module");
+const prisma_user_repository_1 = require("../db/repositories/prisma-user.repository");
+const user_repository_1 = require("../../domain/repositories/user.repository");
+const create_user_usecase_1 = require("../../use-case/user/create-user.usecase");
+const findByCpf_user_usecase_1 = require("../../use-case/user/findByCpf-user.usecase");
+const findByEmail_user_usecase_1 = require("../../use-case/user/findByEmail-user.usecase");
+const find_user_usecase_1 = require("../../use-case/user/find-user.usecase");
+const update_user_usecase_1 = require("../../use-case/user/update-user.usecase");
+let UserModule = class UserModule {
+};
+exports.UserModule = UserModule;
+exports.UserModule = UserModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            prisma_module_1.PrismaModule,
+            config_1.ConfigModule,
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (configService) => ({
+                    secret: configService.get('JWT_SECRET'),
+                    signOptions: {
+                        expiresIn: configService.get('JWT_EXPIRATION') || '1h',
+                    },
+                }),
+            }),
+        ],
+        controllers: [user_controller_1.UserController],
+        providers: [
+            {
+                provide: user_repository_1.UserRepository,
+                useClass: prisma_user_repository_1.PrismaUserRepository,
+            },
+            prisma_user_repository_1.PrismaUserRepository,
+            create_user_usecase_1.CreateUserUseCase,
+            find_user_usecase_1.FindUserUseCase,
+            findByCpf_user_usecase_1.FindUserByCpfUseCase,
+            findByEmail_user_usecase_1.FindUserByEmailUseCase,
+            update_user_usecase_1.UpdateUserUseCase,
+        ],
+        exports: [
+            user_repository_1.UserRepository,
+            prisma_user_repository_1.PrismaUserRepository,
+            create_user_usecase_1.CreateUserUseCase,
+            find_user_usecase_1.FindUserUseCase,
+            findByCpf_user_usecase_1.FindUserByCpfUseCase,
+            findByEmail_user_usecase_1.FindUserByEmailUseCase,
+            update_user_usecase_1.UpdateUserUseCase,
+        ],
+    })
+], UserModule);
+//# sourceMappingURL=user.module.js.map
