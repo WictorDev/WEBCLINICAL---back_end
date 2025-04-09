@@ -10,7 +10,7 @@ export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(user: User): Promise<User> {
-    const hashedPassword = await bcrypt.hash(user.password, 4);
+    const hashedPassword = await bcrypt.hash(user.password, 10); // força recomendada
   
     const createdUser = await this.prismaService.user.create({
       data: {
@@ -18,15 +18,17 @@ export class PrismaUserRepository implements UserRepository {
         email: user.email,
         password: hashedPassword,
         cpf: user.cpf.toString(),
-        companyId: user.companyId,
-        typeId: user.typeId,
+        companyId: user.companyId ?? undefined,
+        typeId: user.typeId ?? undefined,
         active: user.active ?? true,
-      }
-    })
+      },
+    });
   
     return new User({
       ...createdUser,
       cpf: new UniqueEntityCpf(createdUser.cpf),
+      companyId: createdUser.companyId ?? undefined,
+      typeId: createdUser.typeId ?? undefined,
     });
   }
 
@@ -43,15 +45,17 @@ export class PrismaUserRepository implements UserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
-      companyId: user.companyId,
-      typeId: user.typeId,
+      companyId: user.companyId ?? undefined,
+      typeId: user.typeId ?? undefined,
       active: user.active ?? true
     }
   })
 
   return new User({
     ...updatedUser,
-    cpf: new UniqueEntityCpf(updatedUser.cpf),
+    cpf: new UniqueEntityCpf(updatedUser.cpf.toString()),
+    companyId: updatedUser.companyId ?? undefined as string | undefined,
+    typeId: updatedUser.typeId ?? undefined as string | undefined,
   });
 }
 
@@ -65,8 +69,8 @@ async findAll(): Promise<User[]> {
       name: user.name,
       email: user.email,
       password: user.password,
-      companyId: user.companyId,
-      typeId: user.typeId,
+      companyId: user.companyId ?? undefined,
+      typeId: user.typeId ?? undefined,
       active: user.active,
     });
   });
@@ -85,8 +89,8 @@ async findByEmail(email: string): Promise<User | null> {
     name: user.name,
     email: user.email,
     password: user.password,
-    companyId: user.companyId,
-    typeId: user.typeId,
+    companyId: user.companyId ?? undefined,
+    typeId: user.typeId ?? undefined,
     active: user.active,
     
   });
@@ -104,8 +108,8 @@ async findByCpf(cpf: string): Promise<User | null> {
     name: user.name,
     email: user.email,
     password: user.password,
-    companyId: user.companyId,
-    typeId: user.typeId,
+    companyId: user.companyId ?? undefined,
+    typeId: user.typeId ?? undefined,
     active: user.active,
     
   });

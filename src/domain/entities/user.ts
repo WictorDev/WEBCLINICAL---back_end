@@ -5,8 +5,8 @@ export interface UserData {
   name: string;
   email: string;
   password: string;
-  companyId: string;
-  typeId: string;
+  companyId?: string;
+  typeId?: string;
   active?: boolean;
 }
 
@@ -49,7 +49,7 @@ export class User {
     this.data.password = password;
   }
 
-  get companyId(): string{
+  get companyId(): string | undefined {
     return this.data.companyId;
   }
 
@@ -58,12 +58,12 @@ export class User {
     this.data.companyId = companyId;
   }
 
-  get typeId(): string {
+  get typeId(): string | undefined {
     return this.data.typeId;
   }
 
-  set typeId(typeId: string) {
-    if (!typeId) throw new Error("Tipo é obrigatório.");
+  set typeId(typeId: string | undefined) {
+    
     this.data.typeId = typeId;
   }
 

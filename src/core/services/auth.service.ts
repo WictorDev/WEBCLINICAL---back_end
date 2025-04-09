@@ -4,12 +4,14 @@ import * as jwt from 'jsonwebtoken';
 import { PrismaService } from 'src/core/services/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import Login from 'src/domain/entities/login';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
+    private readonly jwtService: JwtService
   ) {}
 
   async Login(Login: Login): Promise<{ accessToken: string }> {
