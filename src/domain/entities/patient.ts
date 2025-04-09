@@ -11,7 +11,7 @@ export interface PatientData {
 export class Patient {
   constructor(private data: PatientData) {}
 
-  get cpf(): string | undefined {
+  get cpf(): string {
     return this.data.cpf.toString();
   }
 
@@ -20,7 +20,7 @@ export class Patient {
     this.data.cpf = new UniqueEntityCPF(cpf.toString());
   }
 
-  get name(): string | undefined {
+  get name(): string {
     return this.data.name;
   }
 
@@ -29,7 +29,7 @@ export class Patient {
     this.data.name = name;
   }
 
-  get email(): string | undefined {
+  get email(): string {
     return this.data.email;
   }
 
@@ -38,7 +38,7 @@ export class Patient {
     this.data.email = email;
   }
 
-  get password(): string | undefined {
+  get password(): string {
     return this.data.password;
   }
 
@@ -47,7 +47,7 @@ export class Patient {
     this.data.password = password;
   }
 
-  get typeId(): string | undefined {
+  get typeId(): string {
     return this.data.typeId;
   }
 

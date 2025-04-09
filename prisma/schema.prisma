@@ -7,9 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Company {
-  Cnpj  String  @unique
+  Cnpj  String @unique
   name  String
   phone String
   email String
@@ -23,56 +22,51 @@ model User {
   name      String
   companyId String
   company   Company @relation(fields: [companyId], references: [Cnpj])
-  type      Type?  @relation(fields: [typeId], references: [id])
+  type      Type?   @relation(fields: [typeId], references: [id])
   typeId    String
+  active    Boolean
 }
 
-model Adimin{
-  Cpf  String  @unique
-  name String
-  typeId String 
-  type  Type @relation(fields: [typeId], references: [id])
-  
+model Adimin {
+  Cpf    String @unique
+  name   String
+  typeId String
+  type   Type   @relation(fields: [typeId], references: [id])
 }
 
 model Type {
-  id      String  @id @default(uuid())
-  name    String
-  users   User[]
+  id        String     @id @default(uuid())
+  name      String
+  users     User[]
   employees Employee[]
-  Admins  Adimin[]
-  patients Patient[]
+  Admins    Adimin[]
+  patients  Patient[]
 }
 
 // Funcionario
 model Employee {
-  cpf           String  @unique
-  advice        String? //CRM ou CRO ou etc...
-  name          String
-  typeId        String
-  type          Type    @relation(fields: [typeId], references: [id])
-  employeeType  EmployeeType? @relation(fields: [employeeTypeId], references: [id])
+  cpf            String        @unique
+  advice         String? //CRM ou CRO ou etc...
+  name           String
+  typeId         String
+  type           Type          @relation(fields: [typeId], references: [id])
+  employeeType   EmployeeType? @relation(fields: [employeeTypeId], references: [id])
   employeeTypeId String
-  
 }
 
 //tipo do funcionario 
 model EmployeeType {
-  id         String   @id @default(uuid())
-  name       String
-  employees  Employee[]
+  id        String     @id @default(uuid())
+  name      String
+  employees Employee[]
 }
-
 
 //paciente
 model Patient {
-  cpf       String  @unique
-  name      String
-  email     String  @unique
-  password  String
-  type      Type?  @relation(fields: [typeId], references: [id])
-  typeId    String
+  cpf      String @unique
+  name     String
+  email    String @unique
+  password String
+  type     Type?  @relation(fields: [typeId], references: [id])
+  typeId   String
 }
-
-
-
