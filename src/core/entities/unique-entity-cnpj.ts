@@ -1,52 +1,49 @@
-export class UniqueEntitycnpj {
-    private value: string;
-  
-    constructor(value: string) {
-      if (!this.isValidCNPJ(value)) {
-        throw new Error('Invalid CNPJ provided.');
-      }
-      this.value =this.cleanCNPJ(value);
+export class UniqueEntityCnpj {
+  private readonly value: string;
+
+  constructor(value: string) {
+    const cleanCNPJ = value.replace(/\D/g, '');
+
+    if (!this.isValidFormat(cleanCNPJ)) {
+      throw new Error('Formato de CNPJ inválido. Deve conter 14 dígitos numéricos.');
     }
-  
-    toString(): string {
-      return this.value;
+
+    if (!this.isValidCNPJ(cleanCNPJ)) {
+      throw new Error('CNPJ inválido.');
     }
-  
-    private cleanCNPJ(cnpj: string): string {
-      return cnpj.replace(/\D/g, ''); // Remove caracteres não numéricos
-    }
-  
-    private isValidCNPJ(cnpj: string): boolean {
-      cnpj = this.cleanCNPJ(cnpj);
-      
-      if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
-  
-      let size = cnpj.length - 2;
-      let numbers = cnpj.substring(0, size);
-      let digits = cnpj.substring(size);
-      let sum = 0;
-      let pos = size - 7;
-  
-      for (let i = size; i >= 1; i--) {
-        sum += Number(numbers[size - i]) * pos--;
-        if (pos < 2) pos = 9;
-      }
-  
-      let result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
-      if (result !== Number(digits[0])) return false;
-  
-      size = size + 1;
-      numbers = cnpj.substring(0, size);
-      sum = 0;
-      pos = size - 7;
-  
-      for (let i = size; i >= 1; i--) {
-        sum += Number(numbers[size - i]) * pos--;
-        if (pos < 2) pos = 9;
-      }
-  
-      result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
-      return result === Number(digits[1]);
-    }
+
+    this.value = cleanCNPJ; // salva SEM formatação
   }
-  
+
+  toString(): string {
+    return this.value;
+  }
+
+  private isValidFormat(cnpj: string): boolean {
+    return /^\d{14}$/.test(cnpj);
+  }
+
+  private isValidCNPJ(cnpj: string): boolean {
+    if (/^(\d)\1{13}$/.test(cnpj)) return false;
+
+    const calcCheckDigit = (cnpj: string, length: number): number => {
+      const weights = length === 12
+        ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+      const sum = cnpj
+        .slice(0, length)
+        .split('')
+        .reduce((acc, digit, index) => acc + parseInt(digit) * weights[index], 0);
+
+      const remainder = sum % 11;
+      return remainder < 2 ? 0 : 11 - remainder;
+    };
+
+    const digit1 = calcCheckDigit(cnpj, 12);
+    const digit2 = calcCheckDigit(cnpj, 13);
+
+    return digit1 === parseInt(cnpj[12]) && digit2 === parseInt(cnpj[13]);
+  }
+}
+export default UniqueEntityCnpj;

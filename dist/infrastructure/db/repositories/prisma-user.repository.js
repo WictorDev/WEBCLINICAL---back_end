@@ -66,7 +66,7 @@ let PrismaUserRepository = class PrismaUserRepository {
         const users = await this.prismaService.user.findMany();
         return users.map((user) => {
             return new user_1.User({
-                cpf: new unique_entity_cpf_1.default(user.cpf.toString()),
+                cpf: new unique_entity_cpf_1.default(user.cpf),
                 name: user.name,
                 email: user.email,
                 password: user.password,

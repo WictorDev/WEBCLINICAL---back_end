@@ -9,6 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../../core/services/auth.service");
+const prisma_module_1 = require("./prisma.module");
+const jwt_1 = require("@nestjs/jwt");
+const config_1 = require("@nestjs/config");
 const auth_controller_1 = require("../controllers/auth.controller");
 const prisma_service_1 = require("../../core/services/prisma.service");
 let AuthModule = class AuthModule {
@@ -16,8 +19,14 @@ let AuthModule = class AuthModule {
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            prisma_module_1.PrismaModule,
+            config_1.ConfigModule,
+            jwt_1.JwtModule.register({}),
+        ],
+        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService],
+        exports: [auth_service_1.AuthService],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

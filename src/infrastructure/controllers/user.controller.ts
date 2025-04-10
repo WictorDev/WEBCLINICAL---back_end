@@ -15,9 +15,11 @@ import {
   import { FindUserUseCase } from 'src/use-case/user/find-user.usecase';
   import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
   import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
+import { ApiTags } from '@nestjs/swagger';
   
+  @ApiTags('users')
   @Controller('/api/users')
- /*@UseGuards(JwtAuthGuard)*/
+  @UseGuards(JwtAuthGuard)
   export class UserController {
     constructor(
       private readonly createUserUseCase: CreateUserUseCase,
