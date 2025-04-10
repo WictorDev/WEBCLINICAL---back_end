@@ -65,7 +65,7 @@ async findAll(): Promise<User[]> {
 
   return users.map((user) => {
     return new User({
-      cpf: new UniqueEntityCpf(user.cpf.toString()),
+      cpf: new UniqueEntityCpf(user.cpf),
       name: user.name,
       email: user.email,
       password: user.password,

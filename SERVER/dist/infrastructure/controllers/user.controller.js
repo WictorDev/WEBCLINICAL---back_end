@@ -19,7 +19,9 @@ const update_user_usecase_1 = require("../../use-case/user/update-user.usecase")
 const findByCpf_user_usecase_1 = require("../../use-case/user/findByCpf-user.usecase");
 const findByEmail_user_usecase_1 = require("../../use-case/user/findByEmail-user.usecase");
 const find_user_usecase_1 = require("../../use-case/user/find-user.usecase");
+const jwt_guard_1 = require("../auth/jwt.guard");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
+const swagger_1 = require("@nestjs/swagger");
 let UserController = class UserController {
     createUserUseCase;
     updateUserUseCase;
@@ -96,7 +98,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "delete", null);
 exports.UserController = UserController = __decorate([
+    (0, swagger_1.ApiTags)('users'),
     (0, common_1.Controller)('/api/users'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_user_usecase_1.CreateUserUseCase,
         update_user_usecase_1.UpdateUserUseCase,
         findByCpf_user_usecase_1.FindUserByCpfUseCase,

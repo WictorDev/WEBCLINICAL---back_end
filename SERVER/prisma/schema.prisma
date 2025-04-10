@@ -11,7 +11,7 @@ model Company {
   Cnpj  String @unique
   name  String
   phone String
-  email String
+  email String @unique
   users User[]
 }
 

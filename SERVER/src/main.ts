@@ -9,7 +9,7 @@ async function bootstrap() {
     .setTitle('WebClinical api')
     .setDescription('The webclinical api documentation')
     .setVersion('1.0')
-    .addTag('user, login')
+    .addTag('users')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
