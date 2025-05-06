@@ -23,13 +23,13 @@ class Admin {
             throw new Error("Nome é obrigatório.");
         this.data.name = name;
     }
-    get typeId() {
-        return this.data.typeId;
+    get type() {
+        return this.data.type;
     }
-    set typeId(typeId) {
-        if (!typeId)
+    set type(type) {
+        if (!type)
             throw new Error("ID do Tipo é obrigatório.");
-        this.data.typeId = typeId;
+        this.data.type = type;
     }
 }
 exports.Admin = Admin;

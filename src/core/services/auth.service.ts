@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from 'src/core/services/prisma.service';
@@ -14,28 +14,65 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async Login(Login: Login): Promise<{ accessToken: string }> {
-    const { cpf, password } = Login;
-
-    const user = await this.prismaService.user.findUnique({
-      where: { cpf },
-    });
+  async Login(login: Login): Promise<{ accessToken: string, userType: string }> {
+    const { identifier, password, isPatient } = login;
+    
+    // Verificar se o identificador é CPF ou email
+    const isCpf = !identifier.includes('@');
+    
+    let user;
+    let userType = isPatient ? 'patient' : 'user';
+    
+    if (isPatient) {
+      // Buscar na tabela de pacientes
+      if (isCpf) {
+        user = await this.prismaService.patient.findUnique({
+          where: { cpf: identifier },
+          include: { type: true },
+        });
+      } else {
+        user = await this.prismaService.patient.findUnique({
+          where: { email: identifier },
+          include: { type: true },
+        });
+      }
+    } else {
+      // Buscar na tabela de usuários
+      if (isCpf) {
+        user = await this.prismaService.user.findUnique({
+          where: { cpf: identifier },
+          include: { type: true },
+        });
+      } else {
+        user = await this.prismaService.user.findUnique({
+          where: { email: identifier },
+          include: { type: true },
+        });
+      }
+    }
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new UnauthorizedException('Usuário não encontrado');
     }
 
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
-      throw new Error('Senha incorreta');
+      throw new UnauthorizedException('Senha incorreta');
     }
 
-    const payload = { cpf: user.cpf };
+    // Verificar se o usuário está ativo (apenas para usuários, não pacientes)
+    if (!isPatient && !user.active) {
+      throw new UnauthorizedException('Usuário inativo');
+    }
+
+    const payload = { 
+      id: user.cpf,
+      type: user.type?.name || 'unknown',
+      userType // 'user' ou 'patient'
+    };
 
     const secret = this.configService.get<string>('JWT_SECRET');
     const expiresIn = Number(this.configService.get<string>('JWT_EXPIRES_IN')) || 36000;
-
-
 
     if (!secret) {
       throw new Error('JWT_SECRET não definido no .env');
@@ -43,6 +80,9 @@ export class AuthService {
 
     const accessToken = jwt.sign(payload, secret, { expiresIn });
 
-    return { accessToken };
+    return { 
+      accessToken,
+      userType
+    };
   }
 }

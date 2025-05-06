@@ -4,8 +4,8 @@ export interface UserData {
     name: string;
     email: string;
     password: string;
-    companyId?: string;
-    typeId?: string;
+    companyId: string;
+    type: string;
     active?: boolean;
 }
 export declare class User {
@@ -19,10 +19,10 @@ export declare class User {
     set email(email: string);
     get password(): string;
     set password(password: string);
-    get companyId(): string | undefined;
+    get companyId(): string;
     set companyId(companyId: string);
-    get typeId(): string | undefined;
-    set typeId(typeId: string | undefined);
+    get type(): string;
+    set type(type: string);
     get active(): boolean | undefined;
     set active(value: boolean);
 }

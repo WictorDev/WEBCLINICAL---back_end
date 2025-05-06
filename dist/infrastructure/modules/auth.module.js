@@ -14,6 +14,8 @@ const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const auth_controller_1 = require("../controllers/auth.controller");
 const prisma_service_1 = require("../../core/services/prisma.service");
+const jwt_guard_1 = require("../auth/jwt.guard");
+const core_1 = require("@nestjs/core");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -22,10 +24,19 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             prisma_module_1.PrismaModule,
             config_1.ConfigModule,
-            jwt_1.JwtModule.register({}),
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (configService) => ({
+                    secret: configService.get('JWT_SECRET'),
+                    signOptions: {
+                        expiresIn: configService.get('JWT_EXPIRATION') || '1h',
+                    },
+                }),
+            }),
         ],
-        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService],
-        exports: [auth_service_1.AuthService],
+        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService, jwt_guard_1.JwtAuthGuard, core_1.Reflector],
+        exports: [auth_service_1.AuthService, jwt_guard_1.JwtAuthGuard],
         controllers: [auth_controller_1.AuthController],
     })
 ], AuthModule);

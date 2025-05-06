@@ -19,6 +19,8 @@ const findByCpf_user_usecase_1 = require("../../use-case/user/findByCpf-user.use
 const findByEmail_user_usecase_1 = require("../../use-case/user/findByEmail-user.usecase");
 const find_user_usecase_1 = require("../../use-case/user/find-user.usecase");
 const update_user_usecase_1 = require("../../use-case/user/update-user.usecase");
+const type_repository_1 = require("../../domain/repositories/type.repository");
+const prisma_type_repository_1 = require("../db/repositories/prisma-type.repository");
 let UserModule = class UserModule {
 };
 exports.UserModule = UserModule;
@@ -45,6 +47,11 @@ exports.UserModule = UserModule = __decorate([
                 useClass: prisma_user_repository_1.PrismaUserRepository,
             },
             prisma_user_repository_1.PrismaUserRepository,
+            {
+                provide: type_repository_1.TypeRepository,
+                useClass: prisma_type_repository_1.PrismaTypeRepository,
+            },
+            prisma_type_repository_1.PrismaTypeRepository,
             create_user_usecase_1.CreateUserUseCase,
             find_user_usecase_1.FindUserUseCase,
             findByCpf_user_usecase_1.FindUserByCpfUseCase,
@@ -54,6 +61,8 @@ exports.UserModule = UserModule = __decorate([
         exports: [
             user_repository_1.UserRepository,
             prisma_user_repository_1.PrismaUserRepository,
+            type_repository_1.TypeRepository,
+            prisma_type_repository_1.PrismaTypeRepository,
             create_user_usecase_1.CreateUserUseCase,
             find_user_usecase_1.FindUserUseCase,
             findByCpf_user_usecase_1.FindUserByCpfUseCase,

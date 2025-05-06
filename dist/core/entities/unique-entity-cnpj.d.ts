@@ -1,7 +1,8 @@
-export declare class UniqueEntitycnpj {
-    private value;
+export declare class UniqueEntityCnpj {
+    private readonly value;
     constructor(value: string);
     toString(): string;
-    private cleanCNPJ;
+    private isValidFormat;
     private isValidCNPJ;
 }
+export default UniqueEntityCnpj;

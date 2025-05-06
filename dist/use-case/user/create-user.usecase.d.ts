@@ -9,8 +9,8 @@ export declare class CreateUserUseCase {
         cpf: UniqueEntitycpf;
         email: string;
         password: string;
-        companyId?: string;
-        typeId?: string;
+        companyId: string;
+        type: string;
         active: boolean;
     }): Promise<User>;
 }

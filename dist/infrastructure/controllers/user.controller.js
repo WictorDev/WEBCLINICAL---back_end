@@ -22,18 +22,22 @@ const find_user_usecase_1 = require("../../use-case/user/find-user.usecase");
 const jwt_guard_1 = require("../auth/jwt.guard");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const swagger_1 = require("@nestjs/swagger");
+const public_decorator_1 = require("../auth/public.decorator");
+const type_repository_1 = require("../../domain/repositories/type.repository");
 let UserController = class UserController {
     createUserUseCase;
     updateUserUseCase;
     findUserByCpfUseCase;
     findUserByEmailUseCase;
     findUserUseCase;
-    constructor(createUserUseCase, updateUserUseCase, findUserByCpfUseCase, findUserByEmailUseCase, findUserUseCase) {
+    typeRepository;
+    constructor(createUserUseCase, updateUserUseCase, findUserByCpfUseCase, findUserByEmailUseCase, findUserUseCase, typeRepository) {
         this.createUserUseCase = createUserUseCase;
         this.updateUserUseCase = updateUserUseCase;
         this.findUserByCpfUseCase = findUserByCpfUseCase;
         this.findUserByEmailUseCase = findUserByEmailUseCase;
         this.findUserUseCase = findUserUseCase;
+        this.typeRepository = typeRepository;
     }
     async findAll() {
         return this.findUserUseCase.execute();
@@ -45,7 +49,23 @@ let UserController = class UserController {
         return this.findUserByCpfUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf));
     }
     async create(body) {
-        return this.createUserUseCase.execute(body);
+        try {
+            const type = await this.typeRepository.findByName(body.type);
+            if (!type) {
+                throw new common_1.BadRequestException('Tipo de usuário não encontrado.');
+            }
+            return this.createUserUseCase.execute({
+                ...body,
+                cpf: new unique_entity_cpf_1.UniqueEntityCpf(body.cpf),
+                type: type.id
+            });
+        }
+        catch (error) {
+            if (error.message && error.message.includes('CPF')) {
+                throw new common_1.BadRequestException(error.message);
+            }
+            throw error;
+        }
     }
     async update(cpf, body) {
         return this.updateUserUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf), body);
@@ -76,6 +96,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findByCpf", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/create_user'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -105,6 +126,7 @@ exports.UserController = UserController = __decorate([
         update_user_usecase_1.UpdateUserUseCase,
         findByCpf_user_usecase_1.FindUserByCpfUseCase,
         findByEmail_user_usecase_1.FindUserByEmailUseCase,
-        find_user_usecase_1.FindUserUseCase])
+        find_user_usecase_1.FindUserUseCase,
+        type_repository_1.TypeRepository])
 ], UserController);
 //# sourceMappingURL=user.controller.js.map

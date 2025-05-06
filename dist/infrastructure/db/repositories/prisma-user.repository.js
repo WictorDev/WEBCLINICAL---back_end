@@ -15,6 +15,7 @@ const prisma_service_1 = require("../../../core/services/prisma.service");
 const bcrypt = require("bcryptjs");
 const user_1 = require("../../../domain/entities/user");
 const unique_entity_cpf_1 = require("../../../core/entities/unique-entity-cpf");
+const library_1 = require("@prisma/client/runtime/library");
 let PrismaUserRepository = class PrismaUserRepository {
     prismaService;
     constructor(prismaService) {
@@ -22,23 +23,49 @@ let PrismaUserRepository = class PrismaUserRepository {
     }
     async create(user) {
         const hashedPassword = await bcrypt.hash(user.password, 10);
-        const createdUser = await this.prismaService.user.create({
-            data: {
-                name: user.name,
-                email: user.email,
-                password: hashedPassword,
-                cpf: user.cpf.toString(),
-                companyId: user.companyId ?? undefined,
-                typeId: user.typeId ?? undefined,
-                active: user.active ?? true,
-            },
-        });
-        return new user_1.User({
-            ...createdUser,
-            cpf: new unique_entity_cpf_1.default(createdUser.cpf),
-            companyId: createdUser.companyId ?? undefined,
-            typeId: createdUser.typeId ?? undefined,
-        });
+        try {
+            const createdUser = await this.prismaService.user.create({
+                data: {
+                    name: user.name,
+                    email: user.email,
+                    password: hashedPassword,
+                    cpf: user.cpf.toString(),
+                    companyId: user.companyId,
+                    typeId: user.type,
+                    active: user.active ?? true,
+                },
+            });
+            return new user_1.User({
+                ...createdUser,
+                cpf: new unique_entity_cpf_1.default(createdUser.cpf),
+                companyId: createdUser.companyId ?? '',
+                type: createdUser.typeId ?? '',
+            });
+        }
+        catch (error) {
+            if (error instanceof library_1.PrismaClientKnownRequestError &&
+                error.code === 'P2002') {
+                const target = error.meta?.target;
+                if (Array.isArray(target)) {
+                    if (target.includes('email')) {
+                        throw new common_1.ConflictException('E-mail já cadastrado.');
+                    }
+                    if (target.includes('cpf')) {
+                        throw new common_1.ConflictException('CPF já cadastrado.');
+                    }
+                }
+                else if (typeof target === 'string') {
+                    if (target.includes('email')) {
+                        throw new common_1.ConflictException('E-mail já cadastrado.');
+                    }
+                    if (target.includes('cpf')) {
+                        throw new common_1.ConflictException('CPF já cadastrado.');
+                    }
+                }
+                throw new common_1.ConflictException('E-mail ou CPF já cadastrado.');
+            }
+            throw error;
+        }
     }
     async update(cpf, user) {
         if (user.password) {
@@ -50,16 +77,16 @@ let PrismaUserRepository = class PrismaUserRepository {
                 name: user.name,
                 email: user.email,
                 password: user.password,
-                companyId: user.companyId ?? undefined,
-                typeId: user.typeId ?? undefined,
+                companyId: user.companyId,
+                typeId: user.type,
                 active: user.active ?? true
             }
         });
         return new user_1.User({
             ...updatedUser,
             cpf: new unique_entity_cpf_1.default(updatedUser.cpf.toString()),
-            companyId: updatedUser.companyId ?? undefined,
-            typeId: updatedUser.typeId ?? undefined,
+            companyId: updatedUser.companyId ?? '',
+            type: updatedUser.typeId ?? '',
         });
     }
     async findAll() {
@@ -70,8 +97,8 @@ let PrismaUserRepository = class PrismaUserRepository {
                 name: user.name,
                 email: user.email,
                 password: user.password,
-                companyId: user.companyId ?? undefined,
-                typeId: user.typeId ?? undefined,
+                companyId: user.companyId ?? '',
+                type: user.typeId ?? '',
                 active: user.active,
             });
         });
@@ -88,8 +115,8 @@ let PrismaUserRepository = class PrismaUserRepository {
             name: user.name,
             email: user.email,
             password: user.password,
-            companyId: user.companyId ?? undefined,
-            typeId: user.typeId ?? undefined,
+            companyId: user.companyId ?? '',
+            type: user.typeId ?? '',
             active: user.active,
         });
     }
@@ -104,8 +131,8 @@ let PrismaUserRepository = class PrismaUserRepository {
             name: user.name,
             email: user.email,
             password: user.password,
-            companyId: user.companyId ?? undefined,
-            typeId: user.typeId ?? undefined,
+            companyId: user.companyId ?? '',
+            type: user.typeId ?? '',
             active: user.active,
         });
     }

@@ -16,12 +16,21 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../../core/services/auth.service");
 const login_1 = require("../../domain/entities/login");
+const swagger_1 = require("@nestjs/swagger");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
         this.authService = authService;
     }
-    async login(login) {
+    async login(loginProps) {
+        const login = new login_1.default(loginProps);
+        return this.authService.Login(login);
+    }
+    async loginPatient(loginProps) {
+        const login = new login_1.default({
+            ...loginProps,
+            isPatient: true
+        });
         return this.authService.Login(login);
     }
 };
@@ -30,10 +39,18 @@ __decorate([
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [login_1.default]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('login/patient'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "loginPatient", null);
 exports.AuthController = AuthController = __decorate([
+    (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('/api/auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);

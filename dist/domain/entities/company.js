@@ -21,7 +21,7 @@ class Company {
     set cnpj(cnpj) {
         if (!cnpj)
             throw new Error("CNPJ é obrigatório.");
-        this.data.cnpj = new unique_entity_cnpj_1.UniqueEntitycnpj(cnpj);
+        this.data.cnpj = new unique_entity_cnpj_1.UniqueEntityCnpj(cnpj);
     }
     get email() {
         return this.data.email;

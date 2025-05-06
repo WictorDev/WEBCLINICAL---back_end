@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { UserRepository } from 'src/domain/repositories/user.repository';
 import { PrismaService } from 'src/core/services/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/domain/entities/user';
 import UniqueEntityCpf from 'src/core/entities/unique-entity-cpf';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
@@ -11,25 +12,50 @@ export class PrismaUserRepository implements UserRepository {
 
   async create(user: User): Promise<User> {
     const hashedPassword = await bcrypt.hash(user.password, 10); // força recomendada
-  
-    const createdUser = await this.prismaService.user.create({
-      data: {
-        name: user.name,
-        email: user.email,
-        password: hashedPassword,
-        cpf: user.cpf.toString(),
-        companyId: user.companyId ?? undefined,
-        typeId: user.typeId ?? undefined,
-        active: user.active ?? true,
-      },
-    });
-  
-    return new User({
-      ...createdUser,
-      cpf: new UniqueEntityCpf(createdUser.cpf),
-      companyId: createdUser.companyId ?? undefined,
-      typeId: createdUser.typeId ?? undefined,
-    });
+    try {
+      const createdUser = await this.prismaService.user.create({
+        data: {
+          name: user.name,
+          email: user.email,
+          password: hashedPassword,
+          cpf: user.cpf.toString(),
+          companyId: user.companyId,
+          typeId: user.type,
+          active: user.active ?? true,
+        },
+      });
+      return new User({
+        ...createdUser,
+        cpf: new UniqueEntityCpf(createdUser.cpf),
+        companyId: createdUser.companyId ?? '',
+        type: createdUser.typeId ?? '',
+      });
+    } catch (error) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        // Pode ser array ou string, dependendo do banco/versão do Prisma
+        const target = error.meta?.target;
+        if (Array.isArray(target)) {
+          if (target.includes('email')) {
+            throw new ConflictException('E-mail já cadastrado.');
+          }
+          if (target.includes('cpf')) {
+            throw new ConflictException('CPF já cadastrado.');
+          }
+        } else if (typeof target === 'string') {
+          if (target.includes('email')) {
+            throw new ConflictException('E-mail já cadastrado.');
+          }
+          if (target.includes('cpf')) {
+            throw new ConflictException('CPF já cadastrado.');
+          }
+        }
+        throw new ConflictException('E-mail ou CPF já cadastrado.');
+      }
+      throw error;
+    }
   }
 
   async update(
@@ -45,8 +71,8 @@ export class PrismaUserRepository implements UserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
-      companyId: user.companyId ?? undefined,
-      typeId: user.typeId ?? undefined,
+      companyId: user.companyId,
+      typeId: user.type,
       active: user.active ?? true
     }
   })
@@ -54,8 +80,8 @@ export class PrismaUserRepository implements UserRepository {
   return new User({
     ...updatedUser,
     cpf: new UniqueEntityCpf(updatedUser.cpf.toString()),
-    companyId: updatedUser.companyId ?? undefined as string | undefined,
-    typeId: updatedUser.typeId ?? undefined as string | undefined,
+    companyId: updatedUser.companyId ?? '',
+    type: updatedUser.typeId ?? '',
   });
 }
 
@@ -69,8 +95,8 @@ async findAll(): Promise<User[]> {
       name: user.name,
       email: user.email,
       password: user.password,
-      companyId: user.companyId ?? undefined,
-      typeId: user.typeId ?? undefined,
+      companyId: user.companyId ?? '',
+      type: user.typeId ?? '',
       active: user.active,
     });
   });
@@ -89,8 +115,8 @@ async findByEmail(email: string): Promise<User | null> {
     name: user.name,
     email: user.email,
     password: user.password,
-    companyId: user.companyId ?? undefined,
-    typeId: user.typeId ?? undefined,
+    companyId: user.companyId ?? '',
+    type: user.typeId ?? '',
     active: user.active,
     
   });
@@ -108,8 +134,8 @@ async findByCpf(cpf: string): Promise<User | null> {
     name: user.name,
     email: user.email,
     password: user.password,
-    companyId: user.companyId ?? undefined,
-    typeId: user.typeId ?? undefined,
+    companyId: user.companyId ?? '',
+    type: user.typeId ?? '',
     active: user.active,
     
   });

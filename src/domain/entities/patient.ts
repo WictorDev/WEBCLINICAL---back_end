@@ -1,23 +1,23 @@
-import UniqueEntityCPF from "src/core/entities/unique-entity-cpf";
+import { UniqueEntityCpf } from "src/core/entities/unique-entity-cpf";
 
 export interface PatientData {
-  cpf: UniqueEntityCPF;
+  cpf: UniqueEntityCpf;
   name: string;
   email: string;
   password: string;
-  typeId: string;
+  type: string; 
 }
 
 export class Patient {
   constructor(private data: PatientData) {}
 
-  get cpf(): string {
-    return this.data.cpf.toString();
+  get cpf(): UniqueEntityCpf {
+    return this.data.cpf;
   }
 
   set cpf(cpf: string) {
     if (!cpf) throw new Error("CPF é obrigatório.");
-    this.data.cpf = new UniqueEntityCPF(cpf.toString());
+    this.data.cpf = new UniqueEntityCpf(cpf);
   }
 
   get name(): string {
@@ -43,16 +43,16 @@ export class Patient {
   }
 
   set password(password: string) {
-    if (!password) throw new Error("Senha é obrigatório.");
+    if (!password) throw new Error("Senha é obrigatória.");
     this.data.password = password;
   }
 
-  get typeId(): string {
-    return this.data.typeId;
+  get type(): string {
+    return this.data.type;
   }
 
-  set typeId(typeId: string) {
-    if (!typeId) throw new Error("Tipo é obrigatório.");
-    this.data.typeId = typeId;
+  set type(type: string) {
+    if (!type) throw new Error("Tipo é obrigatório.");
+    this.data.type = type;
   }
 }

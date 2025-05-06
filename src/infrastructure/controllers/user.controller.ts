@@ -7,6 +7,7 @@ import {
     Put,
     Post,
     UseGuards,
+    BadRequestException
   } from '@nestjs/common';
   import { CreateUserUseCase } from 'src/use-case/user/create-user.usecase';
   import { UpdateUserUseCase } from 'src/use-case/user/update-user.usecase';
@@ -16,6 +17,8 @@ import {
   import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
   import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/infrastructure/auth/public.decorator';
+import { TypeRepository } from 'src/domain/repositories/type.repository';
   
   @ApiTags('users')
   @Controller('/api/users')
@@ -26,7 +29,8 @@ import { ApiTags } from '@nestjs/swagger';
       private readonly updateUserUseCase: UpdateUserUseCase,
       private readonly findUserByCpfUseCase: FindUserByCpfUseCase,
       private readonly findUserByEmailUseCase: FindUserByEmailUseCase,
-      private readonly findUserUseCase: FindUserUseCase
+      private readonly findUserUseCase: FindUserUseCase,
+      private readonly typeRepository: TypeRepository
     ) {}
   
     @Get()
@@ -44,22 +48,37 @@ import { ApiTags } from '@nestjs/swagger';
       return this.findUserByCpfUseCase.execute(new UniqueEntityCpf(cpf));
     }
   
-@Post('/create_user')
-async create(
-  @Body() body: { 
-    name: string; 
-    cpf: UniqueEntityCpf; 
-    email: string; 
-    password: string; 
-    companyId?: string; 
-    typeId?: string; 
-    active: boolean; 
-  }
-) {
-  return this.createUserUseCase.execute(body);
-}
+    @Public()
+    @Post('/create_user')
+    async create(
+      @Body() body: { 
+        name: string; 
+        cpf: string; 
+        email: string; 
+        password: string; 
+        companyId: string;
+        type: string;
+        active: boolean; 
+      }
+    ) {
+      try {
+        const type = await this.typeRepository.findByName(body.type);
+        if (!type) {
+          throw new BadRequestException('Tipo de usuário não encontrado.');
+        }
+        return this.createUserUseCase.execute({
+          ...body,
+          cpf: new UniqueEntityCpf(body.cpf),
+          type: type.id
+        });
+      } catch (error) {
+        if (error.message && error.message.includes('CPF')) {
+          throw new BadRequestException(error.message);
+        }
+        throw error;
+      }
+    }
   
-   
     @Put(':cpf')
     async update(@Param('cpf') cpf: string, @Body() body: any) {
       return this.updateUserUseCase.execute(new UniqueEntityCpf(cpf), body);

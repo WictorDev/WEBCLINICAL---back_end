@@ -8,12 +8,12 @@ class Patient {
         this.data = data;
     }
     get cpf() {
-        return this.data.cpf.toString();
+        return this.data.cpf;
     }
     set cpf(cpf) {
         if (!cpf)
             throw new Error("CPF é obrigatório.");
-        this.data.cpf = new unique_entity_cpf_1.default(cpf.toString());
+        this.data.cpf = new unique_entity_cpf_1.UniqueEntityCpf(cpf);
     }
     get name() {
         return this.data.name;
@@ -36,16 +36,16 @@ class Patient {
     }
     set password(password) {
         if (!password)
-            throw new Error("Senha é obrigatório.");
+            throw new Error("Senha é obrigatória.");
         this.data.password = password;
     }
-    get typeId() {
-        return this.data.typeId;
+    get type() {
+        return this.data.type;
     }
-    set typeId(typeId) {
-        if (!typeId)
+    set type(type) {
+        if (!type)
             throw new Error("Tipo é obrigatório.");
-        this.data.typeId = typeId;
+        this.data.type = type;
     }
 }
 exports.Patient = Patient;

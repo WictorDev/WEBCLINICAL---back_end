@@ -10,7 +10,8 @@ import { FindUserByCpfUseCase } from 'src/use-case/user/findByCpf-user.usecase';
 import { FindUserByEmailUseCase } from 'src/use-case/user/findByEmail-user.usecase';
 import { FindUserUseCase } from 'src/use-case/user/find-user.usecase';
 import { UpdateUserUseCase } from 'src/use-case/user/update-user.usecase';
-
+import { TypeRepository } from 'src/domain/repositories/type.repository';
+import { PrismaTypeRepository } from '../db/repositories/prisma-type.repository';
 
 @Module({
   imports: [
@@ -33,30 +34,30 @@ import { UpdateUserUseCase } from 'src/use-case/user/update-user.usecase';
       provide: UserRepository,
       useClass: PrismaUserRepository,
     },
-    // Repositório concreto
     PrismaUserRepository,
-
+    {
+      provide: TypeRepository,
+      useClass: PrismaTypeRepository,
+    },
+    PrismaTypeRepository,
     // UseCases
     CreateUserUseCase,
     FindUserUseCase,
-    
     FindUserByCpfUseCase,
     FindUserByEmailUseCase,
     UpdateUserUseCase,
-    
   ],
   exports: [
     // Exporta tudo que pode ser útil em outros módulos
     UserRepository,
     PrismaUserRepository,
-
+    TypeRepository,
+    PrismaTypeRepository,
     CreateUserUseCase,
     FindUserUseCase,
-    
     FindUserByCpfUseCase,
     FindUserByEmailUseCase,
     UpdateUserUseCase,
-    
   ],
 })
 export class UserModule {}

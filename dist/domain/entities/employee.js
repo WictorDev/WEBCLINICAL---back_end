@@ -1,26 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Employee = void 0;
-const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 class Employee {
     data;
     constructor(data) {
         this.data = data;
     }
     get cpf() {
-        return this.data.cpf.toString();
-    }
-    set cpf(cpf) {
-        if (!cpf)
-            throw new Error("CPF é obrigatório.");
-        this.data.cpf = new unique_entity_cpf_1.default(cpf);
+        return this.data.cpf;
     }
     get name() {
         return this.data.name;
     }
     set name(name) {
         if (!name)
-            throw new Error("Nome é obrigatório.");
+            throw new Error('Nome é obrigatório.');
         this.data.name = name;
     }
     get advice() {
@@ -34,7 +28,7 @@ class Employee {
     }
     set typeId(typeId) {
         if (!typeId)
-            throw new Error("ID do Tipo é obrigatório.");
+            throw new Error('typeId é obrigatório.');
         this.data.typeId = typeId;
     }
     get employeeTypeId() {
@@ -42,7 +36,7 @@ class Employee {
     }
     set employeeTypeId(employeeTypeId) {
         if (!employeeTypeId)
-            throw new Error("ID do Tipo de Funcionário é obrigatório.");
+            throw new Error('employeeTypeId é obrigatório.');
         this.data.employeeTypeId = employeeTypeId;
     }
 }
