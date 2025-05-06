@@ -5,7 +5,7 @@ import { CompanyRepository } from "src/domain/repositories/company.repository";
 @Injectable()
 export class FindCompanyByCnpjUseCase {
     constructor(private CompanyRepository: CompanyRepository) {}
-    execute(cpf: UniqueEntityCnpj) {
-        return this.CompanyRepository.findByCnpj(cpf.toString());
+    execute(Cnpj: UniqueEntityCnpj) {
+        return this.CompanyRepository.findByCnpj(Cnpj.toString());
     }
 }

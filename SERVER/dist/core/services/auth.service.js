@@ -25,26 +25,64 @@ let AuthService = class AuthService {
         this.configService = configService;
         this.jwtService = jwtService;
     }
-    async Login(Login) {
-        const { cpf, password } = Login;
-        const user = await this.prismaService.user.findUnique({
-            where: { cpf },
-        });
+    async Login(login) {
+        const { identifier, password, isPatient } = login;
+        const isCpf = !identifier.includes('@');
+        let user;
+        let userType = isPatient ? 'patient' : 'user';
+        if (isPatient) {
+            if (isCpf) {
+                user = await this.prismaService.patient.findUnique({
+                    where: { cpf: identifier },
+                    include: { type: true },
+                });
+            }
+            else {
+                user = await this.prismaService.patient.findUnique({
+                    where: { email: identifier },
+                    include: { type: true },
+                });
+            }
+        }
+        else {
+            if (isCpf) {
+                user = await this.prismaService.user.findUnique({
+                    where: { cpf: identifier },
+                    include: { type: true },
+                });
+            }
+            else {
+                user = await this.prismaService.user.findUnique({
+                    where: { email: identifier },
+                    include: { type: true },
+                });
+            }
+        }
         if (!user) {
-            throw new Error('Usuário não encontrado');
+            throw new common_1.UnauthorizedException('Usuário não encontrado');
         }
         const passwordMatches = await bcrypt.compare(password, user.password);
         if (!passwordMatches) {
-            throw new Error('Senha incorreta');
+            throw new common_1.UnauthorizedException('Senha incorreta');
         }
-        const payload = { cpf: user.cpf };
+        if (!isPatient && !user.active) {
+            throw new common_1.UnauthorizedException('Usuário inativo');
+        }
+        const payload = {
+            id: user.cpf,
+            type: user.type?.name || 'unknown',
+            userType
+        };
         const secret = this.configService.get('JWT_SECRET');
         const expiresIn = Number(this.configService.get('JWT_EXPIRES_IN')) || 36000;
         if (!secret) {
             throw new Error('JWT_SECRET não definido no .env');
         }
         const accessToken = jwt.sign(payload, secret, { expiresIn });
-        return { accessToken };
+        return {
+            accessToken,
+            userType
+        };
     }
 };
 exports.AuthService = AuthService;

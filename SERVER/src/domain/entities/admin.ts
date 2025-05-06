@@ -3,7 +3,8 @@ import UniqueEntityCPF from "src/core/entities/unique-entity-cpf";
 export interface AdminData {
   cpf: UniqueEntityCPF;
   name: string;
-  typeId: string;
+  type: string;
+  password: string;
 }
 
 export class Admin {
@@ -27,12 +28,12 @@ export class Admin {
     this.data.name = name;
   }
 
-  get typeId(): string {
-    return this.data.typeId;
+  get type(): string {
+    return this.data.type;
   }
 
-  set typeId(typeId: string) {
-    if (!typeId) throw new Error("ID do Tipo é obrigatório.");
-    this.data.typeId = typeId;
+  set type(type: string) {
+    if (!type) throw new Error("ID do Tipo é obrigatório.");
+    this.data.type = type;
   }
 }

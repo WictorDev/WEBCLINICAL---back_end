@@ -44,14 +44,16 @@ class User {
     }
     set companyId(companyId) {
         if (!companyId)
-            throw new Error("Empresa é obrigatório.");
+            throw new Error("Empresa é obrigatória.");
         this.data.companyId = companyId;
     }
-    get typeId() {
-        return this.data.typeId;
+    get type() {
+        return this.data.type;
     }
-    set typeId(typeId) {
-        this.data.typeId = typeId;
+    set type(type) {
+        if (!type)
+            throw new Error("Tipo é obrigatório.");
+        this.data.type = type;
     }
     get active() {
         return this.data.active;

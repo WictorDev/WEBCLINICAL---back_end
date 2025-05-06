@@ -1,8 +1,8 @@
-import { UniqueEntitycnpj } from "src/core/entities/unique-entity-cnpj";
+import { UniqueEntityCnpj } from "src/core/entities/unique-entity-cnpj";
 
 export interface CompanyData {
   name: string;
-  cnpj: UniqueEntitycnpj;
+  cnpj: UniqueEntityCnpj;
   email: string;
   phone: string;
 }
@@ -25,7 +25,7 @@ export class Company {
 
   set cnpj(cnpj: string) {
     if (!cnpj) throw new Error("CNPJ é obrigatório.");
-    this.data.cnpj = new UniqueEntitycnpj(cnpj);
+    this.data.cnpj = new UniqueEntityCnpj(cnpj);
   }
 
   get email(): string {

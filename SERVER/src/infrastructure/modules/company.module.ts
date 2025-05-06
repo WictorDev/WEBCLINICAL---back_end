@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaModule } from 'src/infrastructure/modules/prisma.module';
 
-import { CompanyController } from 'src/infrastructure/controllers/company.controller';
+import { CompanyController } from '../controllers/company.controller';
 import { PrismaCompanyRepository } from '../db/repositories/prisma-company.repository';
 import { CompanyRepository } from 'src/domain/repositories/company.repository';
 
@@ -11,6 +11,7 @@ import { CreateCompanyUseCase } from 'src/use-case/company/create-company.usecas
 import { FindCompanyByEmailUseCase } from 'src/use-case/company/findByEmail.usecase';
 import { FindCompanyUseCase } from 'src/use-case/company/find-company.usecase';
 import { FindCompanyByCnpjUseCase } from 'src/use-case/company/findByCnpj-company.usecase';
+import { UpdateCompanyUseCase } from 'src/use-case/company/update-company.usecase';
 
 @Module({
   imports: [
@@ -34,8 +35,9 @@ import { FindCompanyByCnpjUseCase } from 'src/use-case/company/findByCnpj-compan
       useClass: PrismaCompanyRepository,
     },
     PrismaCompanyRepository,
-    // UseCases
+
     CreateCompanyUseCase,
+    UpdateCompanyUseCase,
     FindCompanyUseCase,
     FindCompanyByEmailUseCase,
     FindCompanyByCnpjUseCase
@@ -44,6 +46,7 @@ import { FindCompanyByCnpjUseCase } from 'src/use-case/company/findByCnpj-compan
     CompanyRepository,
     PrismaCompanyRepository,
     CreateCompanyUseCase,
+    UpdateCompanyUseCase,
     FindCompanyUseCase,
     FindCompanyByEmailUseCase,
   ],

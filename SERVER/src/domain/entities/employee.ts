@@ -1,7 +1,8 @@
-import UniqueEntityCPF from "src/core/entities/unique-entity-cpf";
+import { Type } from './type';
+import { EmployeeType } from './employee-type';
 
 export interface EmployeeData {
-  cpf: UniqueEntityCPF;
+  cpf: string;
   name: string;
   advice?: string;
   typeId: string;
@@ -12,12 +13,7 @@ export class Employee {
   constructor(private data: EmployeeData) {}
 
   get cpf(): string {
-    return this.data.cpf.toString();
-  }
-
-  set cpf(cpf: string) {
-    if (!cpf) throw new Error("CPF é obrigatório.");
-    this.data.cpf = new UniqueEntityCPF(cpf);
+    return this.data.cpf;
   }
 
   get name(): string {
@@ -25,7 +21,7 @@ export class Employee {
   }
 
   set name(name: string) {
-    if (!name) throw new Error("Nome é obrigatório.");
+    if (!name) throw new Error('Nome é obrigatório.');
     this.data.name = name;
   }
 
@@ -42,7 +38,7 @@ export class Employee {
   }
 
   set typeId(typeId: string) {
-    if (!typeId) throw new Error("ID do Tipo é obrigatório.");
+    if (!typeId) throw new Error('typeId é obrigatório.');
     this.data.typeId = typeId;
   }
 
@@ -51,7 +47,7 @@ export class Employee {
   }
 
   set employeeTypeId(employeeTypeId: string) {
-    if (!employeeTypeId) throw new Error("ID do Tipo de Funcionário é obrigatório.");
+    if (!employeeTypeId) throw new Error('employeeTypeId é obrigatório.');
     this.data.employeeTypeId = employeeTypeId;
   }
 }

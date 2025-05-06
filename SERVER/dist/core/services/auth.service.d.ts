@@ -7,7 +7,8 @@ export declare class AuthService {
     private readonly configService;
     private readonly jwtService;
     constructor(prismaService: PrismaService, configService: ConfigService, jwtService: JwtService);
-    Login(Login: Login): Promise<{
+    Login(login: Login): Promise<{
         accessToken: string;
+        userType: string;
     }>;
 }

@@ -1,15 +1,15 @@
-import UniqueEntityCPF from "src/core/entities/unique-entity-cpf";
+import { UniqueEntityCpf } from "src/core/entities/unique-entity-cpf";
 export interface PatientData {
-    cpf: UniqueEntityCPF;
+    cpf: UniqueEntityCpf;
     name: string;
     email: string;
     password: string;
-    typeId: string;
+    type: string;
 }
 export declare class Patient {
     private data;
     constructor(data: PatientData);
-    get cpf(): string;
+    get cpf(): UniqueEntityCpf;
     set cpf(cpf: string);
     get name(): string;
     set name(name: string);
@@ -17,6 +17,6 @@ export declare class Patient {
     set email(email: string);
     get password(): string;
     set password(password: string);
-    get typeId(): string;
-    set typeId(typeId: string);
+    get type(): string;
+    set type(type: string);
 }
