@@ -52,6 +52,8 @@ model Employee {
   type           Type          @relation(fields: [typeId], references: [id])
   employeeType   EmployeeType? @relation(fields: [employeeTypeId], references: [id])
   employeeTypeId String
+  schedules      Schedule[]
+  appointments   Appointment[] @relation("EmployeeAppointments")
 }
 
 //tipo do funcionario 
@@ -69,4 +71,50 @@ model Patient {
   password String
   type     Type?  @relation(fields: [typeId], references: [id])
   typeId   String
+  appointments Appointment[]
+}
+
+model Schedule {
+  id         String   @id @default(uuid())
+  dayOfWeek  Int      // 0 = Domingo, 1 = Segunda, ...
+  startTime  String   // formato HH:mm
+  endTime    String   // formato HH:mm
+  employee   Employee @relation(fields: [employeeId], references: [cpf])
+  employeeId String
+  appointments Appointment[]
+}
+
+model Appointment {
+  id          String    @id @default(uuid())
+  date        DateTime
+  startTime   String    // formato HH:mm
+  endTime     String    // formato HH:mm
+  status      String    // Ex: PENDENTE, CONFIRMADO, FINALIZADO, CANCELADO
+  schedule    Schedule  @relation(fields: [scheduleId], references: [id])
+  scheduleId  String
+  patient     Patient   @relation(fields: [patientId], references: [cpf])
+  patientId   String
+  employee    Employee  @relation("EmployeeAppointments", fields: [employeeId], references: [cpf])
+  employeeId  String
+  medicalRecord MedicalRecord?
+}
+
+model MedicalRecord {
+  id            String      @id @default(uuid())
+  symptoms      String
+  diagnosis     String
+  conduct       String
+  createdAt     DateTime    @default(now())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String      @unique
+  prescriptions Prescription[]
+}
+
+model Prescription {
+  id            String        @id @default(uuid())
+  medication    String
+  dosage        String
+  instructions  String
+  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId String
 }
