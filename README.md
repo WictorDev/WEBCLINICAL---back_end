@@ -5,6 +5,280 @@
 ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 
+## 🚀 Tecnologias Utilizadas
+
+- NestJS
+- Prisma ORM
+- MySQL
+- TypeScript
+- Clean Architecture
+- Docker
+
+## 📋 Pré-requisitos
+
+- Node.js 20+
+- Docker e Docker Compose
+- MySQL (se rodando localmente)
+
+## 🔧 Instalação
+
+1. Clone o repositório
+2. Instale as dependências:
+```bash
+npm install
+```
+
+3. Configure as variáveis de ambiente:
+```bash
+cp .env.example .env
+```
+
+4. Execute as migrações do Prisma:
+```bash
+npx prisma migrate dev
+```
+
+## 🐳 Docker - Guia Detalhado
+
+### Pré-requisitos
+1. Instale o Docker Desktop:
+   - [Windows](https://docs.docker.com/desktop/install/windows-install/)
+   - [Mac](https://docs.docker.com/desktop/install/mac-install/)
+   - [Linux](https://docs.docker.com/desktop/install/linux-install/)
+
+2. Instale o Docker Compose:
+   - Geralmente já vem com o Docker Desktop
+   - Se não, siga a [documentação oficial](https://docs.docker.com/compose/install/)
+
+### Configuração do Ambiente
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/webclinical.git
+cd webclinical/SERVER
+```
+
+2. Crie o arquivo `.env` na raiz do projeto:
+```bash
+cp .env.example .env
+```
+
+3. Edite o arquivo `.env` com as seguintes variáveis:
+```env
+DATABASE_URL="mysql://root:123456@localhost:3309/webclinical?schema=public"
+JWT_SECRET="78asdf6x4r376ngmt87f6awdex312sz87jy23ernx78y"
+```
+
+### Executando com Docker
+
+1. Inicie os containers:
+```bash
+docker-compose up -d
+```
+
+2. Verifique se os containers estão rodando:
+```bash
+docker-compose ps
+```
+
+3. Verifique os logs se necessário:
+```bash
+docker-compose logs -f
+```
+
+### Acessando o Sistema
+
+- Backend API: http://localhost:8080
+- Documentação Swagger: http://localhost:8080/api
+- MySQL: localhost:3309
+  - Usuário: webclinical
+  - Senha: webclinical123
+  - Banco: webclinical
+
+### Comandos Úteis
+
+```bash
+# Parar todos os containers
+docker-compose down
+
+# Reconstruir e iniciar containers
+docker-compose up -d --build
+
+# Ver logs em tempo real
+docker-compose logs -f
+
+# Acessar o shell do MySQL
+docker-compose exec mysql mysql -u webclinical -p
+
+# Acessar o shell do backend
+docker-compose exec backend sh
+
+# Remover todos os dados (incluindo volumes)
+docker-compose down -v
+```
+
+### Solução de Problemas
+
+1. **Erro de conexão com o banco**:
+   - Verifique se o MySQL está rodando: `docker-compose ps`
+   - Verifique os logs: `docker-compose logs mysql`
+   - Aguarde alguns segundos, o MySQL pode levar um tempo para inicializar
+
+2. **Erro de porta em uso**:
+   - Verifique se a porta 3309 ou 8080 já está em uso
+   - Altere as portas no `docker-compose.yml` se necessário
+
+3. **Erro de permissão**:
+   - No Windows: Execute o Docker Desktop como administrador
+   - No Linux: Adicione seu usuário ao grupo docker: `sudo usermod -aG docker $USER`
+
+4. **Dados não persistem**:
+   - Verifique se o volume está criado: `docker volume ls`
+   - Não use `docker-compose down -v` a menos que queira apagar todos os dados
+
+### Estrutura do Docker
+
+O projeto usa dois containers:
+
+1. **MySQL (mysql)**:
+   - Porta: 3309 (externa) -> 3306 (interna)
+   - Usuário: webclinical
+   - Senha: webclinical123
+   - Banco: webclinical
+   - Dados persistentes: volume mysql_data
+
+2. **Backend (backend)**:
+   - Porta: 8080
+   - Conecta ao MySQL automaticamente
+   - Usa as variáveis do .env para configuração
+
+## 🏗️ Estrutura do Projeto
+
+```
+src/
+├── domain/           # Regras de negócio e entidades
+├── use-case/         # Casos de uso da aplicação
+├── infrastructure/   # Implementações concretas
+└── main.ts          # Ponto de entrada da aplicação
+```
+
+## 🔐 Autenticação
+
+O sistema utiliza JWT para autenticação. Todas as rotas (exceto login e registro) requerem um token válido no header:
+
+```
+Authorization: Bearer <token>
+```
+
+## 📝 Novas Funcionalidades
+
+### Agendamento e Atendimento
+
+O sistema agora suporta o ciclo completo do paciente, incluindo:
+
+1. **Agendamento**
+   - Pacientes podem agendar consultas
+   - Funcionários podem gerenciar agendamentos
+   - Confirmação automática de disponibilidade
+
+2. **Atendimento**
+   - Registro de consultas
+   - Geração de prontuários
+   - Prescrições médicas
+
+### Estrutura dos Novos Módulos
+
+```
+src/
+├── domain/
+│   ├── entities/
+│   │   ├── schedule.entity.ts
+│   │   ├── appointment.entity.ts
+│   │   ├── medical-record.entity.ts
+│   │   └── prescription.entity.ts
+│   └── repositories/
+│       ├── schedule.repository.ts
+│       ├── appointment.repository.ts
+│       ├── medical-record.repository.ts
+│       └── prescription.repository.ts
+├── use-case/
+│   ├── schedule/
+│   ├── appointment/
+│   ├── medical-record/
+│   └── prescription/
+└── infrastructure/
+    └── controllers/
+        ├── schedule.controller.ts
+        ├── appointment.controller.ts
+        ├── medical-record.controller.ts
+        └── prescription.controller.ts
+```
+
+### Principais Rotas
+
+#### Agendamento
+- `POST /schedules` - Criar agendamento
+- `GET /schedules` - Listar agendamentos
+- `GET /schedules/:id` - Buscar agendamento específico
+- `PUT /schedules/:id` - Atualizar agendamento
+- `DELETE /schedules/:id` - Cancelar agendamento
+
+#### Consulta
+- `POST /appointments` - Registrar consulta
+- `GET /appointments` - Listar consultas
+- `GET /appointments/:id` - Buscar consulta específica
+- `PUT /appointments/:id` - Atualizar consulta
+
+#### Prontuário
+- `POST /medical-records` - Criar prontuário
+- `GET /medical-records` - Listar prontuários
+- `GET /medical-records/:id` - Buscar prontuário específico
+- `PUT /medical-records/:id` - Atualizar prontuário
+
+#### Prescrição
+- `POST /prescriptions` - Criar prescrição
+- `GET /prescriptions` - Listar prescrições
+- `GET /prescriptions/:id` - Buscar prescrição específica
+- `PUT /prescriptions/:id` - Atualizar prescrição
+
+### Notas para Desenvolvedores
+
+1. **Clean Architecture**
+   - Mantenha a separação de responsabilidades
+   - Use os casos de uso para lógica de negócio
+   - Implemente novas funcionalidades seguindo o padrão existente
+
+2. **Guards**
+   - Todas as rotas são protegidas por autenticação
+   - Use os guards existentes para controle de acesso
+   - Implemente novos guards conforme necessário
+
+3. **Docker**
+   - O backend roda na porta 8080
+   - O MySQL roda na porta 3306
+   - Use `docker-compose up -d` para iniciar
+   - Use `docker-compose down` para parar
+
+4. **Banco de Dados**
+   - As migrações são gerenciadas pelo Prisma
+   - Execute `npx prisma migrate dev` para atualizar o schema
+   - Use `npx prisma studio` para visualizar os dados
+
+## 📚 Documentação da API
+
+A documentação completa da API está disponível em:
+```
+http://localhost:8080/api
+```
+
+## 🤝 Contribuição
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
 ## 📋 Visão Geral
 
 O WebClinical é um sistema de gestão para clínicas médicas desenvolvido com NestJS e Prisma ORM. Esta aplicação backend implementa funcionalidades essenciais como autenticação, gerenciamento de usuários, funcionários, tipos de acesso e empresas.
@@ -93,7 +367,6 @@ Antes de criar um usuário, é necessário que existam:
 }
 ```
 
-**Outros exemplos de tipos:**
 ```json
 {
   "name": "Employee"
@@ -306,6 +579,5 @@ O projeto segue uma arquitetura limpa (Clean Architecture) com as seguintes cama
 - **Erro na criação de funcionário**: Certifique-se de que o tipo e o tipo de funcionário com os nomes informados existem no sistema
 - **Erro no registro de paciente**: Verifique se o tipo informado existe e se o CPF/email não estão duplicados
 
-## 📜 Licença
 
-Este projeto está licenciado sob a [MIT License](LICENSE).
+
