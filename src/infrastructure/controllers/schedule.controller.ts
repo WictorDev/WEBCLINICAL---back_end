@@ -1,14 +1,33 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Post, Body } from '@nestjs/common';
 import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-available-schedules.usecase';
-import { AuthGuard } from '../auth/auth.guard';
+import { CreateScheduleUseCase } from '../../use-case/schedule/create-schedule.usecase';
+import { JwtAuthGuard } from '../auth/jwt.guard';
+import { Schedule } from '../../domain/entities/schedule';
+import { randomUUID } from 'crypto';
 
 @Controller('schedules')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class ScheduleController {
-  constructor(private readonly findAvailableSchedules: FindAvailableSchedulesUseCase) {}
+  constructor(
+    private readonly findAvailableSchedules: FindAvailableSchedulesUseCase,
+    private readonly createSchedule: CreateScheduleUseCase,
+  ) {}
 
   @Get('available')
   async getAvailable(@Query('employeeId') employeeId: string, @Query('dayOfWeek') dayOfWeek: number) {
     return this.findAvailableSchedules.execute(employeeId, Number(dayOfWeek));
+  }
+  
+  @Post()
+  async create(@Body() scheduleData: Omit<Schedule, 'id'>) {
+    const schedule = new Schedule(
+      randomUUID(),
+      scheduleData.dayOfWeek,
+      scheduleData.startTime,
+      scheduleData.endTime,
+      scheduleData.employeeId
+    );
+    
+    return this.createSchedule.execute(schedule);
   }
 } 

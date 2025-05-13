@@ -29,16 +29,7 @@ exports.UserModule = UserModule = __decorate([
         imports: [
             prisma_module_1.PrismaModule,
             config_1.ConfigModule,
-            jwt_1.JwtModule.registerAsync({
-                imports: [config_1.ConfigModule],
-                inject: [config_1.ConfigService],
-                useFactory: (configService) => ({
-                    secret: configService.get('JWT_SECRET'),
-                    signOptions: {
-                        expiresIn: configService.get('JWT_EXPIRATION') || '1h',
-                    },
-                }),
-            }),
+            jwt_1.JwtModule,
         ],
         controllers: [user_controller_1.UserController],
         providers: [
