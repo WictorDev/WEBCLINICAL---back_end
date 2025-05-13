@@ -17,16 +17,7 @@ import { UpdateCompanyUseCase } from 'src/use-case/company/update-company.usecas
   imports: [
     PrismaModule, // Fornece o PrismaService para acessar o banco de dados.
     ConfigModule, // Habilita o uso do ConfigService para carregar variáveis de ambiente.
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRATION') || '1h',
-        },
-      }),
-    }),
+    JwtModule, // Apenas importa, não registra
   ],
   controllers: [CompanyController],
   providers: [

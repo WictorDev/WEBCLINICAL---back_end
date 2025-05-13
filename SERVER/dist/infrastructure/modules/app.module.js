@@ -17,6 +17,10 @@ const type_module_1 = require("./type.module");
 const employee_module_1 = require("./employee.module");
 const employee_type_module_1 = require("./employee-type.module");
 const patient_module_1 = require("./patient.module");
+const medical_record_module_1 = require("./medical-record.module");
+const prescription_module_1 = require("./prescription.module");
+const schedule_module_1 = require("./schedule.module");
+const appointment_module_1 = require("./appointment.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -32,7 +36,13 @@ exports.AppModule = AppModule = __decorate([
             employee_type_module_1.EmployeeTypeModule,
             employee_module_1.EmployeeModule,
             patient_module_1.PatientModule,
+            medical_record_module_1.MedicalRecordModule,
+            prescription_module_1.PrescriptionModule,
+            schedule_module_1.ScheduleModule,
+            appointment_module_1.AppointmentModule,
         ],
+        controllers: [],
+        providers: [],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

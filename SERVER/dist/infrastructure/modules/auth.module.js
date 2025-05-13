@@ -20,6 +20,7 @@ let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
+    (0, common_1.Global)(),
     (0, common_1.Module)({
         imports: [
             prisma_module_1.PrismaModule,
@@ -35,8 +36,8 @@ exports.AuthModule = AuthModule = __decorate([
                 }),
             }),
         ],
-        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService, jwt_guard_1.JwtAuthGuard, core_1.Reflector],
-        exports: [auth_service_1.AuthService, jwt_guard_1.JwtAuthGuard],
+        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_guard_1.JwtAuthGuard, core_1.Reflector],
+        exports: [auth_service_1.AuthService, jwt_guard_1.JwtAuthGuard, jwt_1.JwtModule],
         controllers: [auth_controller_1.AuthController],
     })
 ], AuthModule);

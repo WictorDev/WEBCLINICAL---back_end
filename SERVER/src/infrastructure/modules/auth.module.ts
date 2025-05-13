@@ -1,13 +1,14 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AuthService } from 'src/core/services/auth.service';
 import { PrismaModule } from 'src/infrastructure/modules/prisma.module'; // Ajuste o caminho conforme sua estrutura
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from 'src/infrastructure/controllers/auth.controller';
 import { PrismaService } from 'src/core/services/prisma.service';
 import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
 import { Reflector } from '@nestjs/core';
 
+@Global()
 @Module({
   imports: [
     PrismaModule, // Adicione esta importação
@@ -23,8 +24,8 @@ import { Reflector } from '@nestjs/core';
       }),
     }),
   ],
-  providers: [AuthService,PrismaService,JwtService,JwtAuthGuard,Reflector],
-  exports: [AuthService,JwtAuthGuard],
+  providers: [AuthService,PrismaService,JwtAuthGuard,Reflector],
+  exports: [AuthService,JwtAuthGuard,JwtModule],
   controllers: [AuthController],
 })
 export class AuthModule {}
