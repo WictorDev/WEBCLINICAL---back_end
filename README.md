@@ -84,4 +84,4 @@ O sistema agora cobre todo o ciclo do paciente, incluindo:
 3. Registre novos providers e controllers no `AppModule` (`src/infrastructure/modules/app.module.ts`).
 4. Mantenha as rotas protegidas e documentadas.
 
-Dúvidas? Consulte os exemplos de código ou abra uma issue!
+Dúvidas? Consulte os exemplos de código

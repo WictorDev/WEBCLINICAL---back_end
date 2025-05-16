@@ -14,75 +14,80 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async Login(login: Login): Promise<{ accessToken: string, userType: string }> {
-    const { identifier, password, isPatient } = login;
-    
-    // Verificar se o identificador é CPF ou email
+  async Login(login: any): Promise<any> {
+    const { identifier, password, tipo } = login;
     const isCpf = !identifier.includes('@');
-    
-    let user;
-    let userType = isPatient ? 'patient' : 'user';
-    
-    if (isPatient) {
-      // Buscar na tabela de pacientes
-      if (isCpf) {
-        user = await this.prismaService.patient.findUnique({
-          where: { cpf: identifier },
-          include: { type: true },
-        });
-      } else {
-        user = await this.prismaService.patient.findUnique({
-          where: { email: identifier },
-          include: { type: true },
-        });
-      }
-    } else {
-      // Buscar na tabela de usuários
-      if (isCpf) {
-        user = await this.prismaService.user.findUnique({
-          where: { cpf: identifier },
-          include: { type: true },
-        });
-      } else {
-        user = await this.prismaService.user.findUnique({
-          where: { email: identifier },
-          include: { type: true },
-        });
-      }
+
+    // Buscar paciente e usuário
+    const paciente = await this.prismaService.patient.findUnique({
+      where: isCpf ? { cpf: identifier } : { email: identifier },
+      include: { type: true },
+    });
+    const usuario = await this.prismaService.user.findUnique({
+      where: isCpf ? { cpf: identifier } : { email: identifier },
+      include: { type: true },
+    });
+
+    // Validar senha
+    const senhaPacienteOk = paciente && await bcrypt.compare(password, paciente.password);
+    const senhaUsuarioOk = usuario && await bcrypt.compare(password, usuario.password);
+
+    // Se campo tipo for enviado, autentica apenas aquele perfil
+    if (tipo === 'paciente') {
+      if (!senhaPacienteOk) throw new UnauthorizedException('Usuário ou senha inválidos');
+      return this.gerarTokenPaciente(paciente);
+    }
+    if (tipo === 'profissional') {
+      if (!senhaUsuarioOk) throw new UnauthorizedException('Usuário ou senha inválidos');
+      if (!usuario.active) throw new UnauthorizedException('Usuário inativo');
+      return this.gerarTokenUsuario(usuario);
     }
 
-    if (!user) {
-      throw new UnauthorizedException('Usuário não encontrado');
+    // Nenhum perfil válido
+    if (!senhaPacienteOk && !senhaUsuarioOk) {
+      throw new UnauthorizedException('Usuário ou senha inválidos');
     }
 
-    const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) {
-      throw new UnauthorizedException('Senha incorreta');
+    // Ambos perfis válidos
+    if (senhaPacienteOk && senhaUsuarioOk) {
+      return { multiplosPerfis: true };
     }
 
-    // Verificar se o usuário está ativo (apenas para usuários, não pacientes)
-    if (!isPatient && !user.active) {
-      throw new UnauthorizedException('Usuário inativo');
+    // Apenas paciente
+    if (senhaPacienteOk) {
+      return this.gerarTokenPaciente(paciente);
     }
 
-    const payload = { 
-      id: user.cpf,
-      type: user.type?.name || 'unknown',
-      userType // 'user' ou 'patient'
+    // Apenas profissional
+    if (senhaUsuarioOk) {
+      if (!usuario.active) throw new UnauthorizedException('Usuário inativo');
+      return this.gerarTokenUsuario(usuario);
+    }
+  }
+
+  private gerarTokenPaciente(paciente: any) {
+    const payload = {
+      id: paciente.cpf,
+      type: paciente.type?.name || 'unknown',
+      userType: 'paciente',
     };
-
     const secret = this.configService.get<string>('JWT_SECRET');
     const expiresIn = Number(this.configService.get<string>('JWT_EXPIRES_IN')) || 36000;
-
-    if (!secret) {
-      throw new Error('JWT_SECRET não definido no .env');
-    }
-
+    if (!secret) throw new Error('JWT_SECRET não definido no .env');
     const accessToken = jwt.sign(payload, secret, { expiresIn });
+    return { token: accessToken, tipo: 'paciente', nome: paciente.name };
+  }
 
-    return { 
-      accessToken,
-      userType
+  private gerarTokenUsuario(usuario: any) {
+    const payload = {
+      id: usuario.cpf,
+      type: usuario.type?.name || 'unknown',
+      userType: 'profissional',
     };
+    const secret = this.configService.get<string>('JWT_SECRET');
+    const expiresIn = Number(this.configService.get<string>('JWT_EXPIRES_IN')) || 36000;
+    if (!secret) throw new Error('JWT_SECRET não definido no .env');
+    const accessToken = jwt.sign(payload, secret, { expiresIn });
+    return { token: accessToken, tipo: 'profissional', nome: usuario.name };
   }
 }
