@@ -30,7 +30,10 @@ let JwtAuthGuard = class JwtAuthGuard {
             return true;
         }
         const request = context.switchToHttp().getRequest();
-        const token = request.headers['authorization']?.split(' ')[1];
+        let token = request.cookies?.token;
+        if (!token) {
+            token = request.headers['authorization']?.split(' ')[1];
+        }
         if (!token) {
             throw new common_1.UnauthorizedException('Token não encontrado');
         }
