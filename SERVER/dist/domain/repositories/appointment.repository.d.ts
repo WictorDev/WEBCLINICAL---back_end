@@ -1,5 +1,6 @@
 import { Appointment } from '../entities/appointment';
 export interface AppointmentRepository {
+    findById(id: string): Promise<Appointment | null>;
     findByEmployee(employeeId: string, date?: Date): Promise<Appointment[]>;
     findByPatient(patientId: string): Promise<Appointment[]>;
     create(appointment: Appointment): Promise<Appointment>;

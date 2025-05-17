@@ -7,6 +7,7 @@ import { AuthController } from 'src/infrastructure/controllers/auth.controller';
 import { PrismaService } from 'src/core/services/prisma.service';
 import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
 import { Reflector } from '@nestjs/core';
+import { JwtStrategy } from 'src/infrastructure/auth/jwt.strategy';
 
 @Global()
 @Module({
@@ -24,7 +25,7 @@ import { Reflector } from '@nestjs/core';
       }),
     }),
   ],
-  providers: [AuthService,PrismaService,JwtAuthGuard,Reflector],
+  providers: [AuthService,PrismaService,JwtAuthGuard,Reflector,JwtStrategy],
   exports: [AuthService,JwtAuthGuard,JwtModule],
   controllers: [AuthController],
 })

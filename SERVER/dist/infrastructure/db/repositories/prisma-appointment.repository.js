@@ -18,6 +18,12 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async findById(id) {
+        const appointment = await this.prisma.appointment.findUnique({ where: { id } });
+        if (!appointment)
+            return null;
+        return new appointment_1.Appointment(appointment.id, appointment.date, appointment.startTime, appointment.endTime, appointment.status, appointment.scheduleId, appointment.patientId, appointment.employeeId);
+    }
     async findByEmployee(employeeId, date) {
         const where = { employeeId };
         if (date) {

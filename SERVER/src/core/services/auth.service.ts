@@ -17,7 +17,7 @@ export class AuthService {
   async Login(login: any): Promise<any> {
     const { identifier, password, tipo } = login;
     const isCpf = !identifier.includes('@');
-
+    
     // Buscar paciente e usuário
     const paciente = await this.prismaService.patient.findUnique({
       where: isCpf ? { cpf: identifier } : { email: identifier },
@@ -31,7 +31,7 @@ export class AuthService {
     // Validar senha
     const senhaPacienteOk = paciente && await bcrypt.compare(password, paciente.password);
     const senhaUsuarioOk = usuario && await bcrypt.compare(password, usuario.password);
-
+    
     // Se campo tipo for enviado, autentica apenas aquele perfil
     if (tipo === 'paciente') {
       if (!senhaPacienteOk) throw new UnauthorizedException('Usuário ou senha inválidos');
@@ -50,7 +50,22 @@ export class AuthService {
 
     // Ambos perfis válidos
     if (senhaPacienteOk && senhaUsuarioOk) {
-      return { multiplosPerfis: true };
+      // Gerar token genérico para multiplos perfis
+      const payload = {
+        id: isCpf ? identifier : (paciente?.cpf || usuario?.cpf),
+        multiplosPerfis: true,
+        userType: 'multi'
+      };
+      const secret = this.configService.get<string>('JWT_SECRET');
+      const expiresIn = Number(this.configService.get<string>('JWT_EXPIRES_IN')) || 36000;
+      if (!secret) throw new Error('JWT_SECRET não definido no .env');
+      const accessToken = jwt.sign(payload, secret, { expiresIn });
+      
+      // Retorna info de múltiplos perfis com um token válido
+      return { 
+        multiplosPerfis: true, 
+        token: accessToken
+      };
     }
 
     // Apenas paciente
@@ -72,7 +87,7 @@ export class AuthService {
       userType: 'paciente',
     };
     const secret = this.configService.get<string>('JWT_SECRET');
-    const expiresIn = Number(this.configService.get<string>('JWT_EXPIRES_IN')) || 36000;
+    const expiresIn = 3600;
     if (!secret) throw new Error('JWT_SECRET não definido no .env');
     const accessToken = jwt.sign(payload, secret, { expiresIn });
     return { token: accessToken, tipo: 'paciente', nome: paciente.name };
@@ -85,7 +100,7 @@ export class AuthService {
       userType: 'profissional',
     };
     const secret = this.configService.get<string>('JWT_SECRET');
-    const expiresIn = Number(this.configService.get<string>('JWT_EXPIRES_IN')) || 36000;
+    const expiresIn = 3600;
     if (!secret) throw new Error('JWT_SECRET não definido no .env');
     const accessToken = jwt.sign(payload, secret, { expiresIn });
     return { token: accessToken, tipo: 'profissional', nome: usuario.name };

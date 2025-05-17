@@ -23,8 +23,7 @@ let FinalizeAppointmentUseCase = class FinalizeAppointmentUseCase {
         this.appointmentRepository = appointmentRepository;
     }
     async execute(appointmentId, data) {
-        const appointments = await this.appointmentRepository.findByEmployee('', undefined);
-        const appointment = appointments.find(a => a.id === appointmentId);
+        const appointment = await this.appointmentRepository.findById(appointmentId);
         if (!appointment) {
             throw new Error('Agendamento não encontrado.');
         }
@@ -36,6 +35,7 @@ let FinalizeAppointmentUseCase = class FinalizeAppointmentUseCase {
             ...data,
             id: '',
             createdAt: new Date(),
+            appointmentId: appointmentId
         });
         return record;
     }

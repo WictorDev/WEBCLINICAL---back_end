@@ -11,17 +11,28 @@ export class JwtAuthGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers['authorization']?.split(' ')[1];
+    
+    // Tentar obter token do cookie primeiro e depois do header Authorization
+    let token = request.cookies?.auth_token;
+    
+    // Se não encontrar no cookie, tentar do header
+    if (!token) {
+      token = request.headers['authorization']?.split(' ')[1];
+    }
 
     if (!token) {
+      console.log('Nenhum token encontrado (cookie ou header)');
       throw new UnauthorizedException('Token não encontrado');
     }
+    
+    console.log('Token encontrado:', token ? `${token.substring(0, 10)}...` : 'NULO');
 
     try {
       const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
       request.user = payload;
       return true;
     } catch (error) {
+      console.error('Erro ao verificar token:', error.message);
       throw new UnauthorizedException('Token inválido ou expirado');
     }
   }

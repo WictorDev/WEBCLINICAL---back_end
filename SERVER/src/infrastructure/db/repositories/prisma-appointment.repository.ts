@@ -7,6 +7,22 @@ import { Appointment } from '../../../domain/entities/appointment';
 export class PrismaAppointmentRepository implements AppointmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findById(id: string): Promise<Appointment | null> {
+    const appointment = await this.prisma.appointment.findUnique({ where: { id } });
+    if (!appointment) return null;
+    
+    return new Appointment(
+      appointment.id,
+      appointment.date,
+      appointment.startTime,
+      appointment.endTime,
+      appointment.status,
+      appointment.scheduleId,
+      appointment.patientId,
+      appointment.employeeId
+    );
+  }
+
   async findByEmployee(employeeId: string, date?: Date): Promise<Appointment[]> {
     const where: any = { employeeId };
     if (date) {

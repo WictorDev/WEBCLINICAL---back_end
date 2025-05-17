@@ -15,8 +15,7 @@ export class FinalizeAppointmentUseCase {
 
   async execute(appointmentId: string, data: Omit<MedicalRecord, 'id' | 'createdAt'>): Promise<MedicalRecord> {
     // Verificar se o agendamento pode ser finalizado
-    const appointments = await this.appointmentRepository.findByEmployee('', undefined);
-    const appointment = appointments.find(a => a.id === appointmentId);
+    const appointment = await this.appointmentRepository.findById(appointmentId);
     
     if (!appointment) {
       throw new Error('Agendamento não encontrado.');
@@ -28,12 +27,15 @@ export class FinalizeAppointmentUseCase {
 
     // Finalizar o agendamento
     await this.appointmentRepository.updateStatus(appointmentId, 'FINALIZADO');
+    
     // Cria o prontuário
     const record = await this.medicalRecordRepository.create({
       ...data,
       id: '', // será gerado pelo banco
       createdAt: new Date(),
+      appointmentId: appointmentId
     } as MedicalRecord);
+    
     return record;
   }
 } 

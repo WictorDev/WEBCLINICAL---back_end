@@ -4,6 +4,7 @@ import { Appointment } from '../../../domain/entities/appointment';
 export declare class PrismaAppointmentRepository implements AppointmentRepository {
     private readonly prisma;
     constructor(prisma: PrismaService);
+    findById(id: string): Promise<Appointment | null>;
     findByEmployee(employeeId: string, date?: Date): Promise<Appointment[]>;
     findByPatient(patientId: string): Promise<Appointment[]>;
     create(appointment: Appointment): Promise<Appointment>;

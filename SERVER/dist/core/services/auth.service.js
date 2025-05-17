@@ -54,7 +54,20 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
         }
         if (senhaPacienteOk && senhaUsuarioOk) {
-            return { multiplosPerfis: true };
+            const payload = {
+                id: isCpf ? identifier : (paciente?.cpf || usuario?.cpf),
+                multiplosPerfis: true,
+                userType: 'multi'
+            };
+            const secret = this.configService.get('JWT_SECRET');
+            const expiresIn = Number(this.configService.get('JWT_EXPIRES_IN')) || 36000;
+            if (!secret)
+                throw new Error('JWT_SECRET não definido no .env');
+            const accessToken = jwt.sign(payload, secret, { expiresIn });
+            return {
+                multiplosPerfis: true,
+                token: accessToken
+            };
         }
         if (senhaPacienteOk) {
             return this.gerarTokenPaciente(paciente);
@@ -72,7 +85,7 @@ let AuthService = class AuthService {
             userType: 'paciente',
         };
         const secret = this.configService.get('JWT_SECRET');
-        const expiresIn = Number(this.configService.get('JWT_EXPIRES_IN')) || 36000;
+        const expiresIn = 3600;
         if (!secret)
             throw new Error('JWT_SECRET não definido no .env');
         const accessToken = jwt.sign(payload, secret, { expiresIn });
@@ -85,7 +98,7 @@ let AuthService = class AuthService {
             userType: 'profissional',
         };
         const secret = this.configService.get('JWT_SECRET');
-        const expiresIn = Number(this.configService.get('JWT_EXPIRES_IN')) || 36000;
+        const expiresIn = 3600;
         if (!secret)
             throw new Error('JWT_SECRET não definido no .env');
         const accessToken = jwt.sign(payload, secret, { expiresIn });
