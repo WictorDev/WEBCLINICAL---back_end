@@ -9,7 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmployeeTypeModule = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_module_1 = require("./prisma.module");
-const employee_type_repository_1 = require("../../domain/repositories/employee-type.repository");
+const employee_type_controller_1 = require("../controllers/employee-type.controller");
+const create_employee_type_usecase_1 = require("../../use-case/employee/create-employee-type.usecase");
+const find_all_employee_type_usecase_1 = require("../../use-case/employee/find-all-employee-type.usecase");
 const prisma_employee_type_repository_1 = require("../db/repositories/prisma-employee-type.repository");
 let EmployeeTypeModule = class EmployeeTypeModule {
 };
@@ -17,17 +19,17 @@ exports.EmployeeTypeModule = EmployeeTypeModule;
 exports.EmployeeTypeModule = EmployeeTypeModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_module_1.PrismaModule],
+        controllers: [employee_type_controller_1.EmployeeTypeController],
         providers: [
-            {
-                provide: employee_type_repository_1.EmployeeTypeRepository,
-                useClass: prisma_employee_type_repository_1.PrismaEmployeeTypeRepository,
-            },
-            prisma_employee_type_repository_1.PrismaEmployeeTypeRepository,
+            create_employee_type_usecase_1.CreateEmployeeTypeUseCase,
+            find_all_employee_type_usecase_1.FindAllEmployeeTypeUseCase,
+            prisma_employee_type_repository_1.PrismaEmployeeTypeRepository
         ],
         exports: [
-            employee_type_repository_1.EmployeeTypeRepository,
-            prisma_employee_type_repository_1.PrismaEmployeeTypeRepository,
-        ],
+            create_employee_type_usecase_1.CreateEmployeeTypeUseCase,
+            find_all_employee_type_usecase_1.FindAllEmployeeTypeUseCase,
+            prisma_employee_type_repository_1.PrismaEmployeeTypeRepository
+        ]
     })
 ], EmployeeTypeModule);
 //# sourceMappingURL=employee-type.module.js.map

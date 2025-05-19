@@ -49,7 +49,7 @@ docker run --name mysql-webclinical -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABAS
 Crie um arquivo `.env` na raiz da pasta SERVER com o seguinte conteúdo:
 
 ```
-DATABASE_URL="mysql://root:root@localhost:3306/webclinical?schema=public"
+DATABASE_URL="mysql://root:root@localhost:3306/webclinical"
 JWT_SECRET="seu-segredo-jwt-aqui"
 ```
 
@@ -74,17 +74,38 @@ Depois de iniciar o servidor, acesse a documentação Swagger em:
 http://localhost:3000/api
 ```
 
+## 🔐 Autenticação JWT (Login Unificado, Cookies HttpOnly e Proteção de Rotas)
 
+O sistema implementa autenticação JWT moderna e segura, com as seguintes características:
 
-## 🔐 Autenticação
+### 1. Login Unificado
+- O endpoint de login aceita CPF ou e-mail.
+- O backend verifica se o identificador existe como paciente, profissional ou ambos.
+- Se existir em ambos, retorna `{ multiplosPerfis: true }` e aguarda a escolha do perfil pelo usuário.
+- Após a escolha, retorna o JWT e o nome do usuário.
 
-O sistema utiliza JWT para autenticação. Todas as rotas (exceto login e registro) requerem um token válido no header:
+### 2. Token em Cookie HttpOnly
+- O JWT é enviado como cookie HttpOnly, não acessível via JavaScript.
+- O frontend deve enviar `withCredentials: true` em todas as requisições autenticadas.
 
-```
-Authorization: Bearer <token>
-```
+### 3. Guards e Proteção de Rotas
+- Todas as rotas protegidas usam guards que leem o token do cookie.
+- O guard valida o perfil do usuário conforme a rota (paciente, profissional, admin, etc).
 
+### 4. Logout Seguro
+- O endpoint de logout remove o cookie JWT do navegador.
+- O frontend limpa o estado do usuário e redireciona para a Home.
 
+### 5. Fluxo Completo
+1. Login → backend retorna cookie JWT.
+2. Frontend salva apenas o nome do usuário para exibição.
+3. Requisições autenticadas usam o cookie automaticamente.
+4. Logout remove o cookie e limpa o estado.
+
+### 6. Boas Práticas
+- Nunca armazene JWT em localStorage/sessionStorage.
+- Sempre use cookies HttpOnly para tokens.
+- Proteja endpoints sensíveis com guards e validação de perfil.
 
 ## 📋 Visão Geral da Arquitetura
 
@@ -275,11 +296,12 @@ ou
 **Endpoint:** `POST /api/employees`
 ```json
 {
-  "cpf": "12345678900",
-  "name": "Maria da Silva",
-  "advice": "CRM 12345",
-  "type": "medico",
-  "employeeType": "Urologista"
+
+  "cpf": "12697366040",
+  "name": "Dra. Maria Teste",
+  "advice": "CRP 12345/06",
+  "type": "Employee",
+  "employeeType": "Psicólogo"
 }
 ```
 

@@ -62,6 +62,42 @@ O sistema agora cobre todo o ciclo do paciente, incluindo:
 
 ---
 
+## Autenticação JWT (Login Unificado e Cookies HttpOnly)
+
+O sistema utiliza autenticação baseada em JWT, com foco em segurança e experiência do usuário. Veja como funciona:
+
+### 1. Login Unificado
+- O usuário pode fazer login usando CPF ou e-mail.
+- O backend verifica se o identificador existe como paciente, profissional ou ambos.
+- Se existir em ambos, o backend retorna `{ multiplosPerfis: true }` e o frontend exibe uma tela para o usuário escolher o perfil (paciente ou profissional).
+- Após a escolha, o backend retorna o JWT e o nome do usuário.
+
+### 2. Armazenamento Seguro do Token
+- O JWT é enviado do backend para o frontend como um **cookie HttpOnly** (não acessível via JavaScript), aumentando a segurança contra XSS.
+- O frontend faz requisições autenticadas usando `withCredentials: true` no axios/fetch.
+
+### 3. Proteção de Rotas
+- Todas as rotas protegidas exigem autenticação JWT.
+- O backend utiliza guards que leem o token do cookie HttpOnly.
+- O frontend redireciona para login caso o usuário não esteja autenticado.
+
+### 4. Logout
+- O logout é feito via endpoint dedicado, que remove o cookie JWT do navegador.
+- O frontend limpa o estado do usuário e redireciona para a Home.
+
+### 5. Fluxo Resumido
+1. Usuário faz login → backend retorna cookie JWT.
+2. Frontend salva nome do usuário (não o token) no localStorage para exibição.
+3. Requisições autenticadas usam o cookie automaticamente.
+4. Logout remove o cookie e limpa o estado.
+
+### 6. Boas Práticas
+- Nunca armazene o JWT em localStorage/sessionStorage.
+- Sempre use cookies HttpOnly para tokens sensíveis.
+- Proteja endpoints sensíveis com guards e validação de perfil.
+
+---
+
 ## Observações para Desenvolvedores
 
 - **Clean Architecture:**

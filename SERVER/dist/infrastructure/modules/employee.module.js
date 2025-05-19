@@ -16,6 +16,8 @@ const update_employee_usecase_1 = require("../../use-case/employee/update-employ
 const employee_repository_1 = require("../../domain/repositories/employee.repository");
 const type_module_1 = require("./type.module");
 const employee_type_module_1 = require("./employee-type.module");
+const employee_type_repository_1 = require("../../domain/repositories/employee-type.repository");
+const prisma_employee_type_repository_1 = require("../db/repositories/prisma-employee-type.repository");
 let EmployeeModule = class EmployeeModule {
 };
 exports.EmployeeModule = EmployeeModule;
@@ -31,12 +33,19 @@ exports.EmployeeModule = EmployeeModule = __decorate([
             prisma_employee_repository_1.PrismaEmployeeRepository,
             create_employee_usecase_1.CreateEmployeeUseCase,
             update_employee_usecase_1.UpdateEmployeeUseCase,
+            {
+                provide: employee_type_repository_1.EmployeeTypeRepository,
+                useClass: prisma_employee_type_repository_1.PrismaEmployeeTypeRepository,
+            },
+            prisma_employee_type_repository_1.PrismaEmployeeTypeRepository,
         ],
         exports: [
             employee_repository_1.EmployeeRepository,
             prisma_employee_repository_1.PrismaEmployeeRepository,
             create_employee_usecase_1.CreateEmployeeUseCase,
             update_employee_usecase_1.UpdateEmployeeUseCase,
+            employee_type_repository_1.EmployeeTypeRepository,
+            prisma_employee_type_repository_1.PrismaEmployeeTypeRepository,
         ],
     })
 ], EmployeeModule);

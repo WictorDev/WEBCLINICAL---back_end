@@ -1,20 +1,22 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from 'src/infrastructure/modules/prisma.module';
-import { EmployeeTypeRepository } from 'src/domain/repositories/employee-type.repository';
+import { PrismaModule } from './prisma.module';
+import { EmployeeTypeController } from '../controllers/employee-type.controller';
+import { CreateEmployeeTypeUseCase } from 'src/use-case/employee/create-employee-type.usecase';
+import { FindAllEmployeeTypeUseCase } from 'src/use-case/employee/find-all-employee-type.usecase';
 import { PrismaEmployeeTypeRepository } from '../db/repositories/prisma-employee-type.repository';
 
 @Module({
   imports: [PrismaModule],
+  controllers: [EmployeeTypeController],
   providers: [
-    {
-      provide: EmployeeTypeRepository,
-      useClass: PrismaEmployeeTypeRepository,
-    },
-    PrismaEmployeeTypeRepository,
+    CreateEmployeeTypeUseCase,
+    FindAllEmployeeTypeUseCase,
+    PrismaEmployeeTypeRepository
   ],
   exports: [
-    EmployeeTypeRepository,
-    PrismaEmployeeTypeRepository,
-  ],
+    CreateEmployeeTypeUseCase,
+    FindAllEmployeeTypeUseCase,
+    PrismaEmployeeTypeRepository
+  ]
 })
 export class EmployeeTypeModule {} 
