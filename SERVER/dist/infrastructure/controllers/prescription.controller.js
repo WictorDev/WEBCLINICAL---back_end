@@ -15,8 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrescriptionController = void 0;
 const common_1 = require("@nestjs/common");
 const add_prescription_usecase_1 = require("../../use-case/medical-record/add-prescription.usecase");
+const prescription_repository_1 = require("../../domain/repositories/prescription.repository");
 const jwt_guard_1 = require("../auth/jwt.guard");
-const tokens_constants_1 = require("../constants/tokens.constants");
+const swagger_1 = require("@nestjs/swagger");
 let PrescriptionController = class PrescriptionController {
     addPrescription;
     prescriptionRepository;
@@ -47,9 +48,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PrescriptionController.prototype, "getByMedicalRecord", null);
 exports.PrescriptionController = PrescriptionController = __decorate([
+    (0, swagger_1.ApiTags)('prescriptions'),
     (0, common_1.Controller)('prescriptions'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
-    __param(1, (0, common_1.Inject)(tokens_constants_1.PRESCRIPTION_REPOSITORY_TOKEN)),
-    __metadata("design:paramtypes", [add_prescription_usecase_1.AddPrescriptionUseCase, Object])
+    __metadata("design:paramtypes", [add_prescription_usecase_1.AddPrescriptionUseCase,
+        prescription_repository_1.PrescriptionRepository])
 ], PrescriptionController);
 //# sourceMappingURL=prescription.controller.js.map

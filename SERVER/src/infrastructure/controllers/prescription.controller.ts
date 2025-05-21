@@ -1,16 +1,16 @@
-import { Controller, Post, Body, Get, Query, UseGuards, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, UseGuards } from '@nestjs/common';
 import { AddPrescriptionUseCase } from '../../use-case/medical-record/add-prescription.usecase';
 import { PrescriptionRepository } from '../../domain/repositories/prescription.repository';
 import { Prescription } from '../../domain/entities/prescription';
 import { JwtAuthGuard } from '../auth/jwt.guard';
-import { PRESCRIPTION_REPOSITORY_TOKEN } from '../constants/tokens.constants';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('prescriptions')
 @Controller('prescriptions')
 @UseGuards(JwtAuthGuard)
 export class PrescriptionController {
   constructor(
     private readonly addPrescription: AddPrescriptionUseCase,
-    @Inject(PRESCRIPTION_REPOSITORY_TOKEN)
     private readonly prescriptionRepository: PrescriptionRepository,
   ) {}
 

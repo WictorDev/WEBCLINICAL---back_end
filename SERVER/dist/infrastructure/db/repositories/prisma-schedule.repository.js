@@ -18,35 +18,158 @@ let PrismaScheduleRepository = class PrismaScheduleRepository {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async findAvailableByEmployee(employeeId, dayOfWeek) {
-        const schedules = await this.prisma.schedule.findMany({
-            where: { employeeId, dayOfWeek },
-        });
-        return schedules.map(s => new schedule_1.Schedule({
-            id: s.id,
-            dayOfWeek: s.dayOfWeek,
-            startTime: s.startTime,
-            endTime: s.endTime,
-            employeeId: s.employeeId
-        }));
-    }
     async create(schedule) {
         const s = await this.prisma.schedule.create({
             data: {
                 id: schedule.id,
-                dayOfWeek: schedule.dayOfWeek,
+                date: schedule.date,
                 startTime: schedule.startTime,
                 endTime: schedule.endTime,
+                duration: schedule.duration,
+                totalSlots: schedule.totalSlots,
+                availableSlots: schedule.availableSlots,
                 employeeId: schedule.employeeId,
+                active: schedule.active,
             },
         });
         return new schedule_1.Schedule({
             id: s.id,
-            dayOfWeek: s.dayOfWeek,
+            date: s.date,
             startTime: s.startTime,
             endTime: s.endTime,
-            employeeId: s.employeeId
+            duration: s.duration,
+            totalSlots: s.totalSlots,
+            availableSlots: s.availableSlots,
+            employeeId: s.employeeId,
+            active: s.active,
         });
+    }
+    async update(id, data) {
+        const updated = await this.prisma.schedule.update({
+            where: { id },
+            data,
+        });
+        return new schedule_1.Schedule({
+            id: updated.id,
+            date: updated.date,
+            startTime: updated.startTime,
+            endTime: updated.endTime,
+            duration: updated.duration,
+            totalSlots: updated.totalSlots,
+            availableSlots: updated.availableSlots,
+            employeeId: updated.employeeId,
+            active: updated.active,
+        });
+    }
+    async delete(id) {
+        await this.prisma.schedule.delete({ where: { id } });
+    }
+    async findById(id) {
+        const schedule = await this.prisma.schedule.findUnique({ where: { id } });
+        if (!schedule)
+            return null;
+        return new schedule_1.Schedule({
+            id: schedule.id,
+            date: schedule.date,
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
+            duration: schedule.duration,
+            totalSlots: schedule.totalSlots,
+            availableSlots: schedule.availableSlots,
+            employeeId: schedule.employeeId,
+            active: schedule.active,
+        });
+    }
+    async findAll() {
+        const schedules = await this.prisma.schedule.findMany();
+        return schedules.map(s => new schedule_1.Schedule({
+            id: s.id,
+            date: s.date,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            duration: s.duration,
+            totalSlots: s.totalSlots,
+            availableSlots: s.availableSlots,
+            employeeId: s.employeeId,
+            active: s.active,
+        }));
+    }
+    async findByEmployeeId(employeeId) {
+        const schedules = await this.prisma.schedule.findMany({
+            where: { employeeId },
+        });
+        return schedules.map(s => new schedule_1.Schedule({
+            id: s.id,
+            date: s.date,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            duration: s.duration,
+            totalSlots: s.totalSlots,
+            availableSlots: s.availableSlots,
+            employeeId: s.employeeId,
+            active: s.active,
+        }));
+    }
+    async findAvailableByEmployeeId(employeeId, active) {
+        const schedules = await this.prisma.schedule.findMany({
+            where: { employeeId, active },
+        });
+        return schedules.map(s => new schedule_1.Schedule({
+            id: s.id,
+            date: s.date,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            duration: s.duration,
+            totalSlots: s.totalSlots,
+            availableSlots: s.availableSlots,
+            employeeId: s.employeeId,
+            active: s.active,
+        }));
+    }
+    async findByDate(employeeId, date) {
+        const schedules = await this.prisma.schedule.findMany({
+            where: {
+                employeeId,
+                date: {
+                    gte: new Date(date.setHours(0, 0, 0, 0)),
+                    lt: new Date(date.setHours(23, 59, 59, 999)),
+                },
+            },
+        });
+        return schedules.map(s => new schedule_1.Schedule({
+            id: s.id,
+            date: s.date,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            duration: s.duration,
+            totalSlots: s.totalSlots,
+            availableSlots: s.availableSlots,
+            employeeId: s.employeeId,
+            active: s.active,
+        }));
+    }
+    async findAvailableByDate(employeeId, date, active) {
+        const schedules = await this.prisma.schedule.findMany({
+            where: {
+                employeeId,
+                active,
+                date: {
+                    gte: new Date(date.setHours(0, 0, 0, 0)),
+                    lt: new Date(date.setHours(23, 59, 59, 999)),
+                },
+            },
+        });
+        return schedules.map(s => new schedule_1.Schedule({
+            id: s.id,
+            date: s.date,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            duration: s.duration,
+            totalSlots: s.totalSlots,
+            availableSlots: s.availableSlots,
+            employeeId: s.employeeId,
+            active: s.active,
+        }));
     }
 };
 exports.PrismaScheduleRepository = PrismaScheduleRepository;

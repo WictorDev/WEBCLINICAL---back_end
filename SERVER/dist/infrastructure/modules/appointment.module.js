@@ -11,10 +11,13 @@ const common_1 = require("@nestjs/common");
 const prisma_module_1 = require("./prisma.module");
 const appointment_controller_1 = require("../controllers/appointment.controller");
 const prisma_appointment_repository_1 = require("../db/repositories/prisma-appointment.repository");
+const appointment_repository_1 = require("../../domain/repositories/appointment.repository");
 const create_appointment_usecase_1 = require("../../use-case/appointment/create-appointment.usecase");
-const find_employee_appointments_usecase_1 = require("../../use-case/appointment/find-employee-appointments.usecase");
+const cancel_appointment_usecase_1 = require("../../use-case/appointment/cancel-appointment.usecase");
 const update_appointment_status_usecase_1 = require("../../use-case/appointment/update-appointment-status.usecase");
-const tokens_constants_1 = require("../constants/tokens.constants");
+const finalize_appointment_usecase_1 = require("../../use-case/appointment/finalize-appointment.usecase");
+const find_employee_appointments_usecase_1 = require("../../use-case/appointment/find-employee-appointments.usecase");
+const find_patient_appointments_usecase_1 = require("../../use-case/appointment/find-patient-appointments.usecase");
 const schedule_module_1 = require("./schedule.module");
 const medical_record_module_1 = require("./medical-record.module");
 let AppointmentModule = class AppointmentModule {
@@ -30,20 +33,26 @@ exports.AppointmentModule = AppointmentModule = __decorate([
         controllers: [appointment_controller_1.AppointmentController],
         providers: [
             {
-                provide: tokens_constants_1.APPOINTMENT_REPOSITORY_TOKEN,
+                provide: appointment_repository_1.AppointmentRepository,
                 useClass: prisma_appointment_repository_1.PrismaAppointmentRepository,
             },
             prisma_appointment_repository_1.PrismaAppointmentRepository,
             create_appointment_usecase_1.CreateAppointmentUseCase,
-            find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,
+            cancel_appointment_usecase_1.CancelAppointmentUseCase,
             update_appointment_status_usecase_1.UpdateAppointmentStatusUseCase,
+            finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
+            find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,
+            find_patient_appointments_usecase_1.FindPatientAppointmentsUseCase,
         ],
         exports: [
-            tokens_constants_1.APPOINTMENT_REPOSITORY_TOKEN,
+            appointment_repository_1.AppointmentRepository,
             prisma_appointment_repository_1.PrismaAppointmentRepository,
             create_appointment_usecase_1.CreateAppointmentUseCase,
-            find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,
+            cancel_appointment_usecase_1.CancelAppointmentUseCase,
             update_appointment_status_usecase_1.UpdateAppointmentStatusUseCase,
+            finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
+            find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,
+            find_patient_appointments_usecase_1.FindPatientAppointmentsUseCase,
         ],
     })
 ], AppointmentModule);

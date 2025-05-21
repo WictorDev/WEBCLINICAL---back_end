@@ -10,9 +10,9 @@ exports.PrescriptionModule = void 0;
 const common_1 = require("@nestjs/common");
 const prescription_controller_1 = require("../controllers/prescription.controller");
 const prisma_prescription_repository_1 = require("../db/repositories/prisma-prescription.repository");
+const prescription_repository_1 = require("../../domain/repositories/prescription.repository");
 const add_prescription_usecase_1 = require("../../use-case/medical-record/add-prescription.usecase");
 const prisma_module_1 = require("./prisma.module");
-const tokens_constants_1 = require("../constants/tokens.constants");
 let PrescriptionModule = class PrescriptionModule {
 };
 exports.PrescriptionModule = PrescriptionModule;
@@ -21,14 +21,18 @@ exports.PrescriptionModule = PrescriptionModule = __decorate([
         imports: [prisma_module_1.PrismaModule],
         controllers: [prescription_controller_1.PrescriptionController],
         providers: [
-            prisma_prescription_repository_1.PrismaPrescriptionRepository,
             {
-                provide: tokens_constants_1.PRESCRIPTION_REPOSITORY_TOKEN,
+                provide: prescription_repository_1.PrescriptionRepository,
                 useClass: prisma_prescription_repository_1.PrismaPrescriptionRepository,
             },
+            prisma_prescription_repository_1.PrismaPrescriptionRepository,
             add_prescription_usecase_1.AddPrescriptionUseCase,
         ],
-        exports: [tokens_constants_1.PRESCRIPTION_REPOSITORY_TOKEN],
+        exports: [
+            prescription_repository_1.PrescriptionRepository,
+            prisma_prescription_repository_1.PrismaPrescriptionRepository,
+            add_prescription_usecase_1.AddPrescriptionUseCase,
+        ],
     })
 ], PrescriptionModule);
 //# sourceMappingURL=prescription.module.js.map

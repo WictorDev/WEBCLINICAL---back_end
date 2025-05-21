@@ -5,29 +5,33 @@ import { MedicalRecordRepository } from '../../domain/repositories/medical-recor
 import { FinalizeAppointmentUseCase } from '../../use-case/appointment/finalize-appointment.usecase';
 import { PrismaAppointmentRepository } from '../db/repositories/prisma-appointment.repository';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
+import { AddPrescriptionUseCase } from '../../use-case/medical-record/add-prescription.usecase';
 import { PrismaModule } from './prisma.module';
-import { MEDICAL_RECORD_REPOSITORY_TOKEN, APPOINTMENT_REPOSITORY_TOKEN } from '../constants/tokens.constants';
 
 @Module({
   imports: [PrismaModule],
   controllers: [MedicalRecordController],
   providers: [
-    PrismaMedicalRecordRepository,
     {
-      provide: MEDICAL_RECORD_REPOSITORY_TOKEN,
+      provide: MedicalRecordRepository,
       useClass: PrismaMedicalRecordRepository,
     },
+    PrismaMedicalRecordRepository,
     FinalizeAppointmentUseCase,
-    PrismaAppointmentRepository,
     {
-      provide: APPOINTMENT_REPOSITORY_TOKEN,
+      provide: AppointmentRepository,
       useClass: PrismaAppointmentRepository,
     },
+    PrismaAppointmentRepository,
+    AddPrescriptionUseCase,
   ],
   exports: [
-    MEDICAL_RECORD_REPOSITORY_TOKEN,
-    APPOINTMENT_REPOSITORY_TOKEN,
+    MedicalRecordRepository,
+    PrismaMedicalRecordRepository,
+    AppointmentRepository,
+    PrismaAppointmentRepository,
     FinalizeAppointmentUseCase,
+    AddPrescriptionUseCase,
   ],
 })
 export class MedicalRecordModule {} 

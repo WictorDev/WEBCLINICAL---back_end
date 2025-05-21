@@ -1,16 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MedicalRecordRepository } from '../../domain/repositories/medical-record.repository';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 import { MedicalRecord } from '../../domain/entities/medical-record';
-import { APPOINTMENT_REPOSITORY_TOKEN, MEDICAL_RECORD_REPOSITORY_TOKEN } from '../../infrastructure/constants/tokens.constants';
 import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 
 @Injectable()
 export class FinalizeAppointmentUseCase {
   constructor(
-    @Inject(MEDICAL_RECORD_REPOSITORY_TOKEN)
     private readonly medicalRecordRepository: MedicalRecordRepository,
-    @Inject(APPOINTMENT_REPOSITORY_TOKEN)
     private readonly appointmentRepository: AppointmentRepository,
   ) {}
 

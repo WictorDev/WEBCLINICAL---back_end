@@ -4,19 +4,22 @@ import { PrismaPrescriptionRepository } from '../db/repositories/prisma-prescrip
 import { PrescriptionRepository } from '../../domain/repositories/prescription.repository';
 import { AddPrescriptionUseCase } from '../../use-case/medical-record/add-prescription.usecase';
 import { PrismaModule } from './prisma.module';
-import { PRESCRIPTION_REPOSITORY_TOKEN } from '../constants/tokens.constants';
 
 @Module({
   imports: [PrismaModule],
   controllers: [PrescriptionController],
   providers: [
-    PrismaPrescriptionRepository,
     {
-      provide: PRESCRIPTION_REPOSITORY_TOKEN,
+      provide: PrescriptionRepository,
       useClass: PrismaPrescriptionRepository,
     },
+    PrismaPrescriptionRepository,
     AddPrescriptionUseCase,
   ],
-  exports: [PRESCRIPTION_REPOSITORY_TOKEN],
+  exports: [
+    PrescriptionRepository,
+    PrismaPrescriptionRepository,
+    AddPrescriptionUseCase,
+  ],
 })
 export class PrescriptionModule {} 

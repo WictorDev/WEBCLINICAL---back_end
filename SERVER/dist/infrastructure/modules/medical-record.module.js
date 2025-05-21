@@ -10,10 +10,12 @@ exports.MedicalRecordModule = void 0;
 const common_1 = require("@nestjs/common");
 const medical_record_controller_1 = require("../controllers/medical-record.controller");
 const prisma_medical_record_repository_1 = require("../db/repositories/prisma-medical-record.repository");
+const medical_record_repository_1 = require("../../domain/repositories/medical-record.repository");
 const finalize_appointment_usecase_1 = require("../../use-case/appointment/finalize-appointment.usecase");
 const prisma_appointment_repository_1 = require("../db/repositories/prisma-appointment.repository");
+const appointment_repository_1 = require("../../domain/repositories/appointment.repository");
+const add_prescription_usecase_1 = require("../../use-case/medical-record/add-prescription.usecase");
 const prisma_module_1 = require("./prisma.module");
-const tokens_constants_1 = require("../constants/tokens.constants");
 let MedicalRecordModule = class MedicalRecordModule {
 };
 exports.MedicalRecordModule = MedicalRecordModule;
@@ -22,22 +24,26 @@ exports.MedicalRecordModule = MedicalRecordModule = __decorate([
         imports: [prisma_module_1.PrismaModule],
         controllers: [medical_record_controller_1.MedicalRecordController],
         providers: [
-            prisma_medical_record_repository_1.PrismaMedicalRecordRepository,
             {
-                provide: tokens_constants_1.MEDICAL_RECORD_REPOSITORY_TOKEN,
+                provide: medical_record_repository_1.MedicalRecordRepository,
                 useClass: prisma_medical_record_repository_1.PrismaMedicalRecordRepository,
             },
+            prisma_medical_record_repository_1.PrismaMedicalRecordRepository,
             finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
-            prisma_appointment_repository_1.PrismaAppointmentRepository,
             {
-                provide: tokens_constants_1.APPOINTMENT_REPOSITORY_TOKEN,
+                provide: appointment_repository_1.AppointmentRepository,
                 useClass: prisma_appointment_repository_1.PrismaAppointmentRepository,
             },
+            prisma_appointment_repository_1.PrismaAppointmentRepository,
+            add_prescription_usecase_1.AddPrescriptionUseCase,
         ],
         exports: [
-            tokens_constants_1.MEDICAL_RECORD_REPOSITORY_TOKEN,
-            tokens_constants_1.APPOINTMENT_REPOSITORY_TOKEN,
+            medical_record_repository_1.MedicalRecordRepository,
+            prisma_medical_record_repository_1.PrismaMedicalRecordRepository,
+            appointment_repository_1.AppointmentRepository,
+            prisma_appointment_repository_1.PrismaAppointmentRepository,
             finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
+            add_prescription_usecase_1.AddPrescriptionUseCase,
         ],
     })
 ], MedicalRecordModule);

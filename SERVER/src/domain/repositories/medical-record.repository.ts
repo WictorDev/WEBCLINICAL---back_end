@@ -1,7 +1,7 @@
 import { MedicalRecord } from '../entities/medical-record';
 
-export interface MedicalRecordRepository {
-  findByAppointment(appointmentId: string): Promise<MedicalRecord | null>;
-  create(medicalRecord: MedicalRecord): Promise<MedicalRecord>;
+export abstract class MedicalRecordRepository {
+  abstract findByAppointment(appointmentId: string): Promise<MedicalRecord | null>;
+  abstract create(medicalRecord: MedicalRecord): Promise<MedicalRecord>;
   // outros métodos necessários...
 } 
