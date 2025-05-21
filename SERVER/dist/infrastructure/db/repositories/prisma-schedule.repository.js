@@ -22,7 +22,13 @@ let PrismaScheduleRepository = class PrismaScheduleRepository {
         const schedules = await this.prisma.schedule.findMany({
             where: { employeeId, dayOfWeek },
         });
-        return schedules.map(s => new schedule_1.Schedule(s.id, s.dayOfWeek, s.startTime, s.endTime, s.employeeId));
+        return schedules.map(s => new schedule_1.Schedule({
+            id: s.id,
+            dayOfWeek: s.dayOfWeek,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            employeeId: s.employeeId
+        }));
     }
     async create(schedule) {
         const s = await this.prisma.schedule.create({
@@ -34,7 +40,13 @@ let PrismaScheduleRepository = class PrismaScheduleRepository {
                 employeeId: schedule.employeeId,
             },
         });
-        return new schedule_1.Schedule(s.id, s.dayOfWeek, s.startTime, s.endTime, s.employeeId);
+        return new schedule_1.Schedule({
+            id: s.id,
+            dayOfWeek: s.dayOfWeek,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            employeeId: s.employeeId
+        });
     }
 };
 exports.PrismaScheduleRepository = PrismaScheduleRepository;

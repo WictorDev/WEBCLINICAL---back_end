@@ -24,7 +24,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
         });
         if (!appointment)
             return null;
-        return appointment_1.Appointment.create({
+        return new appointment_1.Appointment({
             id: appointment.id,
             date: appointment.date,
             startTime: appointment.startTime,
@@ -48,7 +48,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
                 employeeId: data.employeeId
             }
         });
-        return appointment_1.Appointment.create({
+        return new appointment_1.Appointment({
             id: updated.id,
             date: updated.date,
             startTime: updated.startTime,
@@ -63,7 +63,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
         const appointments = await this.prisma.appointment.findMany({
             where: { patientId }
         });
-        return appointments.map(appointment => appointment_1.Appointment.create({
+        return appointments.map(appointment => new appointment_1.Appointment({
             id: appointment.id,
             date: appointment.date,
             startTime: appointment.startTime,
@@ -83,7 +83,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
             }
         } : { employeeId };
         const appointments = await this.prisma.appointment.findMany({ where });
-        return appointments.map(appointment => appointment_1.Appointment.create({
+        return appointments.map(appointment => new appointment_1.Appointment({
             id: appointment.id,
             date: appointment.date,
             startTime: appointment.startTime,
@@ -106,7 +106,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
                 employeeId: appointment.employeeId
             }
         });
-        return appointment_1.Appointment.create({
+        return new appointment_1.Appointment({
             id: created.id,
             date: created.date,
             startTime: created.startTime,
@@ -122,7 +122,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
             where: { id: id.toString() },
             data: { status }
         });
-        return appointment_1.Appointment.create({
+        return new appointment_1.Appointment({
             id: updated.id,
             date: updated.date,
             startTime: updated.startTime,

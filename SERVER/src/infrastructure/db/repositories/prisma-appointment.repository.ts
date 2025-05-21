@@ -15,7 +15,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
 
     if (!appointment) return null;
 
-    return Appointment.create({
+    return new Appointment({
       id: appointment.id,
       date: appointment.date,
       startTime: appointment.startTime,
@@ -41,7 +41,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       }
     });
 
-    return Appointment.create({
+    return new Appointment({
       id: updated.id,
       date: updated.date,
       startTime: updated.startTime,
@@ -58,7 +58,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       where: { patientId }
     });
 
-    return appointments.map(appointment => Appointment.create({
+    return appointments.map(appointment => new Appointment({
       id: appointment.id,
       date: appointment.date,
       startTime: appointment.startTime,
@@ -81,7 +81,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
 
     const appointments = await this.prisma.appointment.findMany({ where });
 
-    return appointments.map(appointment => Appointment.create({
+    return appointments.map(appointment => new Appointment({
       id: appointment.id,
       date: appointment.date,
       startTime: appointment.startTime,
@@ -106,7 +106,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       }
     });
 
-    return Appointment.create({
+    return new Appointment({
       id: created.id,
       date: created.date,
       startTime: created.startTime,
@@ -124,7 +124,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       data: { status }
     });
 
-    return Appointment.create({
+    return new Appointment({
       id: updated.id,
       date: updated.date,
       startTime: updated.startTime,

@@ -11,7 +11,13 @@ export class PrismaScheduleRepository implements ScheduleRepository {
     const schedules = await this.prisma.schedule.findMany({
       where: { employeeId, dayOfWeek },
     });
-    return schedules.map(s => new Schedule(s.id, s.dayOfWeek, s.startTime, s.endTime, s.employeeId));
+    return schedules.map(s => new Schedule({
+      id: s.id,
+      dayOfWeek: s.dayOfWeek,
+      startTime: s.startTime,
+      endTime: s.endTime,
+      employeeId: s.employeeId
+    }));
   }
 
   async create(schedule: Schedule): Promise<Schedule> {
@@ -24,6 +30,12 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         employeeId: schedule.employeeId,
       },
     });
-    return new Schedule(s.id, s.dayOfWeek, s.startTime, s.endTime, s.employeeId);
+    return new Schedule({
+      id: s.id,
+      dayOfWeek: s.dayOfWeek,
+      startTime: s.startTime,
+      endTime: s.endTime,
+      employeeId: s.employeeId
+    });
   }
 } 

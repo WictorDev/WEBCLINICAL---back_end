@@ -2,19 +2,57 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MedicalRecord = void 0;
 class MedicalRecord {
-    id;
-    symptoms;
-    diagnosis;
-    conduct;
-    createdAt;
-    appointmentId;
-    constructor(id, symptoms, diagnosis, conduct, createdAt, appointmentId) {
-        this.id = id;
-        this.symptoms = symptoms;
-        this.diagnosis = diagnosis;
-        this.conduct = conduct;
-        this.createdAt = createdAt;
-        this.appointmentId = appointmentId;
+    data;
+    constructor(data) {
+        this.data = data;
+    }
+    get id() {
+        return this.data.id;
+    }
+    get symptoms() {
+        return this.data.symptoms;
+    }
+    set symptoms(symptoms) {
+        if (!symptoms)
+            throw new Error("Sintomas são obrigatórios.");
+        this.data.symptoms = symptoms;
+    }
+    get diagnosis() {
+        return this.data.diagnosis;
+    }
+    set diagnosis(diagnosis) {
+        if (!diagnosis)
+            throw new Error("Diagnóstico é obrigatório.");
+        this.data.diagnosis = diagnosis;
+    }
+    get conduct() {
+        return this.data.conduct;
+    }
+    set conduct(conduct) {
+        if (!conduct)
+            throw new Error("Conduta é obrigatória.");
+        this.data.conduct = conduct;
+    }
+    get createdAt() {
+        return this.data.createdAt;
+    }
+    get appointmentId() {
+        return this.data.appointmentId;
+    }
+    set appointmentId(appointmentId) {
+        if (!appointmentId)
+            throw new Error("ID do agendamento é obrigatório.");
+        this.data.appointmentId = appointmentId;
+    }
+    toJSON() {
+        return {
+            id: this.id,
+            symptoms: this.symptoms,
+            diagnosis: this.diagnosis,
+            conduct: this.conduct,
+            createdAt: this.createdAt,
+            appointmentId: this.appointmentId
+        };
     }
     static create(data) {
         return {

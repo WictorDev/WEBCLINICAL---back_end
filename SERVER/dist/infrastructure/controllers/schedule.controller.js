@@ -30,7 +30,13 @@ let ScheduleController = class ScheduleController {
         return this.findAvailableSchedules.execute(employeeId, Number(dayOfWeek));
     }
     async create(scheduleData) {
-        const schedule = new schedule_1.Schedule((0, crypto_1.randomUUID)(), scheduleData.dayOfWeek, scheduleData.startTime, scheduleData.endTime, scheduleData.employeeId);
+        const schedule = new schedule_1.Schedule({
+            id: (0, crypto_1.randomUUID)(),
+            dayOfWeek: scheduleData.dayOfWeek,
+            startTime: scheduleData.startTime,
+            endTime: scheduleData.endTime,
+            employeeId: scheduleData.employeeId
+        });
         return this.createSchedule.execute(schedule);
     }
 };

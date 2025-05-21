@@ -20,7 +20,13 @@ let PrismaPrescriptionRepository = class PrismaPrescriptionRepository {
     }
     async findByMedicalRecord(medicalRecordId) {
         const prescriptions = await this.prisma.prescription.findMany({ where: { medicalRecordId } });
-        return prescriptions.map(p => new prescription_1.Prescription(p.id, p.medication, p.dosage, p.instructions, p.medicalRecordId));
+        return prescriptions.map(p => new prescription_1.Prescription({
+            id: p.id,
+            medication: p.medication,
+            dosage: p.dosage,
+            instructions: p.instructions,
+            medicalRecordId: p.medicalRecordId
+        }));
     }
     async create(prescription) {
         const p = await this.prisma.prescription.create({
@@ -32,7 +38,13 @@ let PrismaPrescriptionRepository = class PrismaPrescriptionRepository {
                 medicalRecordId: prescription.medicalRecordId,
             },
         });
-        return new prescription_1.Prescription(p.id, p.medication, p.dosage, p.instructions, p.medicalRecordId);
+        return new prescription_1.Prescription({
+            id: p.id,
+            medication: p.medication,
+            dosage: p.dosage,
+            instructions: p.instructions,
+            medicalRecordId: p.medicalRecordId
+        });
     }
 };
 exports.PrismaPrescriptionRepository = PrismaPrescriptionRepository;

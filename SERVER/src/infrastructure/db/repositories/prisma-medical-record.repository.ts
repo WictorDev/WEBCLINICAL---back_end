@@ -10,7 +10,14 @@ export class PrismaMedicalRecordRepository implements MedicalRecordRepository {
   async findByAppointment(appointmentId: string): Promise<MedicalRecord | null> {
     const record = await this.prisma.medicalRecord.findUnique({ where: { appointmentId } });
     if (!record) return null;
-    return new MedicalRecord(record.id, record.symptoms, record.diagnosis, record.conduct, record.createdAt, record.appointmentId);
+    return new MedicalRecord({
+      id: record.id,
+      symptoms: record.symptoms,
+      diagnosis: record.diagnosis,
+      conduct: record.conduct,
+      createdAt: record.createdAt,
+      appointmentId: record.appointmentId
+    });
   }
 
   async create(medicalRecord: MedicalRecord): Promise<MedicalRecord> {
@@ -24,6 +31,13 @@ export class PrismaMedicalRecordRepository implements MedicalRecordRepository {
         appointmentId: medicalRecord.appointmentId,
       },
     });
-    return new MedicalRecord(r.id, r.symptoms, r.diagnosis, r.conduct, r.createdAt, r.appointmentId);
+    return new MedicalRecord({
+      id: r.id,
+      symptoms: r.symptoms,
+      diagnosis: r.diagnosis,
+      conduct: r.conduct,
+      createdAt: r.createdAt,
+      appointmentId: r.appointmentId
+    });
   }
 } 
