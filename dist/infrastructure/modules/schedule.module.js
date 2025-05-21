@@ -11,9 +11,15 @@ const common_1 = require("@nestjs/common");
 const prisma_module_1 = require("./prisma.module");
 const schedule_controller_1 = require("../controllers/schedule.controller");
 const prisma_schedule_repository_1 = require("../db/repositories/prisma-schedule.repository");
-const find_available_schedules_usecase_1 = require("../../use-case/schedule/find-available-schedules.usecase");
 const create_schedule_usecase_1 = require("../../use-case/schedule/create-schedule.usecase");
-const tokens_constants_1 = require("../constants/tokens.constants");
+const update_schedule_usecase_1 = require("../../use-case/schedule/update-schedule.usecase");
+const delete_schedule_usecase_1 = require("../../use-case/schedule/delete-schedule.usecase");
+const find_schedule_by_id_usecase_1 = require("../../use-case/schedule/find-schedule-by-id.usecase");
+const find_schedule_by_employee_usecase_1 = require("../../use-case/schedule/find-schedule-by-employee.usecase");
+const find_schedule_by_date_usecase_1 = require("../../use-case/schedule/find-schedule-by-date.usecase");
+const find_all_schedules_usecase_1 = require("../../use-case/schedule/find-all-schedules.usecase");
+const find_schedule_usecase_1 = require("../../use-case/schedule/find-schedule.usecase");
+const schedule_repository_1 = require("../../domain/repositories/schedule.repository");
 let ScheduleModule = class ScheduleModule {
 };
 exports.ScheduleModule = ScheduleModule;
@@ -25,18 +31,30 @@ exports.ScheduleModule = ScheduleModule = __decorate([
         controllers: [schedule_controller_1.ScheduleController],
         providers: [
             {
-                provide: tokens_constants_1.SCHEDULE_REPOSITORY_TOKEN,
+                provide: schedule_repository_1.ScheduleRepository,
                 useClass: prisma_schedule_repository_1.PrismaScheduleRepository,
             },
             prisma_schedule_repository_1.PrismaScheduleRepository,
-            find_available_schedules_usecase_1.FindAvailableSchedulesUseCase,
             create_schedule_usecase_1.CreateScheduleUseCase,
+            update_schedule_usecase_1.UpdateScheduleUseCase,
+            delete_schedule_usecase_1.DeleteScheduleUseCase,
+            find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
+            find_schedule_by_employee_usecase_1.FindScheduleByEmployeeUseCase,
+            find_schedule_by_date_usecase_1.FindScheduleByDateUseCase,
+            find_all_schedules_usecase_1.FindAllSchedulesUseCase,
+            find_schedule_usecase_1.FindScheduleUseCase,
         ],
         exports: [
-            tokens_constants_1.SCHEDULE_REPOSITORY_TOKEN,
+            schedule_repository_1.ScheduleRepository,
             prisma_schedule_repository_1.PrismaScheduleRepository,
-            find_available_schedules_usecase_1.FindAvailableSchedulesUseCase,
             create_schedule_usecase_1.CreateScheduleUseCase,
+            update_schedule_usecase_1.UpdateScheduleUseCase,
+            delete_schedule_usecase_1.DeleteScheduleUseCase,
+            find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
+            find_schedule_by_employee_usecase_1.FindScheduleByEmployeeUseCase,
+            find_schedule_by_date_usecase_1.FindScheduleByDateUseCase,
+            find_all_schedules_usecase_1.FindAllSchedulesUseCase,
+            find_schedule_usecase_1.FindScheduleUseCase,
         ],
     })
 ], ScheduleModule);

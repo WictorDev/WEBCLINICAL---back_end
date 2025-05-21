@@ -8,29 +8,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FindAvailableSchedulesUseCase = void 0;
+exports.FindScheduleByIdUseCase = void 0;
 const common_1 = require("@nestjs/common");
-const tokens_constants_1 = require("../../infrastructure/constants/tokens.constants");
-let FindAvailableSchedulesUseCase = class FindAvailableSchedulesUseCase {
+const schedule_repository_1 = require("../../domain/repositories/schedule.repository");
+let FindScheduleByIdUseCase = class FindScheduleByIdUseCase {
     scheduleRepository;
     constructor(scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
-    async execute(employeeId, dayOfWeek) {
-        if (dayOfWeek < 0 || dayOfWeek > 6) {
-            throw new Error('Dia da semana inválido. Deve ser entre 0 (Domingo) e 6 (Sábado).');
-        }
-        return this.scheduleRepository.findAvailableByEmployee(employeeId, dayOfWeek);
+    async execute(id) {
+        return await this.scheduleRepository.findById(id);
     }
 };
-exports.FindAvailableSchedulesUseCase = FindAvailableSchedulesUseCase;
-exports.FindAvailableSchedulesUseCase = FindAvailableSchedulesUseCase = __decorate([
+exports.FindScheduleByIdUseCase = FindScheduleByIdUseCase;
+exports.FindScheduleByIdUseCase = FindScheduleByIdUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(tokens_constants_1.SCHEDULE_REPOSITORY_TOKEN)),
-    __metadata("design:paramtypes", [Object])
-], FindAvailableSchedulesUseCase);
-//# sourceMappingURL=find-available-schedules.usecase.js.map
+    __metadata("design:paramtypes", [schedule_repository_1.ScheduleRepository])
+], FindScheduleByIdUseCase);
+//# sourceMappingURL=find-schedule-by-id.usecase.js.map

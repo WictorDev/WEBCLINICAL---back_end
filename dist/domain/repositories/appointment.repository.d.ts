@@ -1,10 +1,10 @@
 import { Appointment } from '../entities/appointment';
 import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
-export interface AppointmentRepository {
-    findByEmployee(employeeId: string, date?: Date): Promise<Appointment[]>;
-    findByPatient(patientId: string): Promise<Appointment[]>;
-    create(appointment: Appointment): Promise<Appointment>;
-    findById(id: UniqueEntityID): Promise<Appointment | null>;
-    update(id: UniqueEntityID, data: Partial<Appointment>): Promise<Appointment>;
-    updateStatus(id: UniqueEntityID, status: string): Promise<Appointment>;
+export declare abstract class AppointmentRepository {
+    abstract findByEmployee(employeeId: string, date?: Date): Promise<Appointment[]>;
+    abstract findByPatient(patientId: string): Promise<Appointment[]>;
+    abstract create(appointment: Appointment): Promise<Appointment>;
+    abstract findById(id: UniqueEntityID): Promise<Appointment | null>;
+    abstract update(id: UniqueEntityID, data: Partial<Appointment>): Promise<Appointment>;
+    abstract updateStatus(id: UniqueEntityID, status: string): Promise<Appointment>;
 }

@@ -1,27 +1,32 @@
-import { Controller, Post, Body, Get, Query, UseGuards, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, UseGuards } from '@nestjs/common';
 import { FinalizeAppointmentUseCase } from '../../use-case/appointment/finalize-appointment.usecase';
 import { MedicalRecordRepository } from '../../domain/repositories/medical-record.repository';
 import { MedicalRecord } from '../../domain/entities/medical-record';
 import { JwtAuthGuard } from '../auth/jwt.guard';
-import { MEDICAL_RECORD_REPOSITORY_TOKEN } from '../constants/tokens.constants';
+import { ApiTags } from '@nestjs/swagger';
+import { randomUUID } from 'crypto';
 
+@ApiTags('medical-records')
 @Controller('medical-records')
 @UseGuards(JwtAuthGuard)
 export class MedicalRecordController {
   constructor(
     private readonly finalizeAppointment: FinalizeAppointmentUseCase,
-    @Inject(MEDICAL_RECORD_REPOSITORY_TOKEN)
     private readonly medicalRecordRepository: MedicalRecordRepository,
   ) {}
 
   @Post('finalize')
   async finalize(@Body() body: { appointmentId: string, symptoms: string, diagnosis: string, conduct: string }) {
-    return this.finalizeAppointment.execute(body.appointmentId, {
+    const medicalRecord = new MedicalRecord({
+      id: randomUUID(),
       symptoms: body.symptoms,
       diagnosis: body.diagnosis,
       conduct: body.conduct,
       appointmentId: body.appointmentId,
-    } as any);
+      createdAt: new Date(),
+    });
+
+    return this.finalizeAppointment.execute(body.appointmentId, medicalRecord);
   }
 
   @Get()

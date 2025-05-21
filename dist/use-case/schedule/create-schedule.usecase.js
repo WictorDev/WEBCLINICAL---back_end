@@ -8,32 +8,34 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateScheduleUseCase = void 0;
 const common_1 = require("@nestjs/common");
-const tokens_constants_1 = require("../../infrastructure/constants/tokens.constants");
+const schedule_repository_1 = require("../../domain/repositories/schedule.repository");
+const schedule_1 = require("../../domain/entities/schedule");
 let CreateScheduleUseCase = class CreateScheduleUseCase {
     scheduleRepository;
     constructor(scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
-    async execute(schedule) {
-        if (schedule.startTime >= schedule.endTime) {
-            throw new Error('O horário de início deve ser anterior ao horário de término.');
-        }
-        if (schedule.dayOfWeek < 0 || schedule.dayOfWeek > 6) {
-            throw new Error('Dia da semana inválido. Deve ser entre 0 (Domingo) e 6 (Sábado).');
-        }
-        return this.scheduleRepository.create(schedule);
+    async execute(data) {
+        const schedule = new schedule_1.Schedule({
+            id: crypto.randomUUID(),
+            date: data.date,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            duration: data.duration,
+            totalSlots: data.totalSlots,
+            availableSlots: data.availableSlots,
+            employeeId: data.employeeId,
+            active: data.active
+        });
+        return await this.scheduleRepository.create(schedule);
     }
 };
 exports.CreateScheduleUseCase = CreateScheduleUseCase;
 exports.CreateScheduleUseCase = CreateScheduleUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(tokens_constants_1.SCHEDULE_REPOSITORY_TOKEN)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [schedule_repository_1.ScheduleRepository])
 ], CreateScheduleUseCase);
 //# sourceMappingURL=create-schedule.usecase.js.map

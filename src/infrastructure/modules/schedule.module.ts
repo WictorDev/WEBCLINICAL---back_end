@@ -2,9 +2,15 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma.module';
 import { ScheduleController } from '../controllers/schedule.controller';
 import { PrismaScheduleRepository } from '../db/repositories/prisma-schedule.repository';
-import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-available-schedules.usecase';
 import { CreateScheduleUseCase } from '../../use-case/schedule/create-schedule.usecase';
-import { SCHEDULE_REPOSITORY_TOKEN } from '../constants/tokens.constants';
+import { UpdateScheduleUseCase } from '../../use-case/schedule/update-schedule.usecase';
+import { DeleteScheduleUseCase } from '../../use-case/schedule/delete-schedule.usecase';
+import { FindScheduleByIdUseCase } from '../../use-case/schedule/find-schedule-by-id.usecase';
+import { FindScheduleByEmployeeUseCase } from '../../use-case/schedule/find-schedule-by-employee.usecase';
+import { FindScheduleByDateUseCase } from '../../use-case/schedule/find-schedule-by-date.usecase';
+import { FindAllSchedulesUseCase } from '../../use-case/schedule/find-all-schedules.usecase';
+import { FindScheduleUseCase } from '../../use-case/schedule/find-schedule.usecase';
+import { ScheduleRepository } from '../../domain/repositories/schedule.repository';
 
 @Module({
   imports: [
@@ -13,18 +19,30 @@ import { SCHEDULE_REPOSITORY_TOKEN } from '../constants/tokens.constants';
   controllers: [ScheduleController],
   providers: [
     {
-      provide: SCHEDULE_REPOSITORY_TOKEN,
+      provide: ScheduleRepository,
       useClass: PrismaScheduleRepository,
     },
     PrismaScheduleRepository,
-    FindAvailableSchedulesUseCase,
     CreateScheduleUseCase,
+    UpdateScheduleUseCase,
+    DeleteScheduleUseCase,
+    FindScheduleByIdUseCase,
+    FindScheduleByEmployeeUseCase,
+    FindScheduleByDateUseCase,
+    FindAllSchedulesUseCase,
+    FindScheduleUseCase,
   ],
   exports: [
-    SCHEDULE_REPOSITORY_TOKEN,
+    ScheduleRepository,
     PrismaScheduleRepository,
-    FindAvailableSchedulesUseCase,
     CreateScheduleUseCase,
+    UpdateScheduleUseCase,
+    DeleteScheduleUseCase,
+    FindScheduleByIdUseCase,
+    FindScheduleByEmployeeUseCase,
+    FindScheduleByDateUseCase,
+    FindAllSchedulesUseCase,
+    FindScheduleUseCase,
   ],
 })
 export class ScheduleModule {} 

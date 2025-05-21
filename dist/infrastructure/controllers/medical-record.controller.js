@@ -15,8 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MedicalRecordController = void 0;
 const common_1 = require("@nestjs/common");
 const finalize_appointment_usecase_1 = require("../../use-case/appointment/finalize-appointment.usecase");
+const medical_record_repository_1 = require("../../domain/repositories/medical-record.repository");
+const medical_record_1 = require("../../domain/entities/medical-record");
 const jwt_guard_1 = require("../auth/jwt.guard");
-const tokens_constants_1 = require("../constants/tokens.constants");
+const swagger_1 = require("@nestjs/swagger");
+const crypto_1 = require("crypto");
 let MedicalRecordController = class MedicalRecordController {
     finalizeAppointment;
     medicalRecordRepository;
@@ -25,12 +28,15 @@ let MedicalRecordController = class MedicalRecordController {
         this.medicalRecordRepository = medicalRecordRepository;
     }
     async finalize(body) {
-        return this.finalizeAppointment.execute(body.appointmentId, {
+        const medicalRecord = new medical_record_1.MedicalRecord({
+            id: (0, crypto_1.randomUUID)(),
             symptoms: body.symptoms,
             diagnosis: body.diagnosis,
             conduct: body.conduct,
             appointmentId: body.appointmentId,
+            createdAt: new Date(),
         });
+        return this.finalizeAppointment.execute(body.appointmentId, medicalRecord);
     }
     async getByAppointment(appointmentId) {
         return this.medicalRecordRepository.findByAppointment(appointmentId);
@@ -52,9 +58,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MedicalRecordController.prototype, "getByAppointment", null);
 exports.MedicalRecordController = MedicalRecordController = __decorate([
+    (0, swagger_1.ApiTags)('medical-records'),
     (0, common_1.Controller)('medical-records'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
-    __param(1, (0, common_1.Inject)(tokens_constants_1.MEDICAL_RECORD_REPOSITORY_TOKEN)),
-    __metadata("design:paramtypes", [finalize_appointment_usecase_1.FinalizeAppointmentUseCase, Object])
+    __metadata("design:paramtypes", [finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
+        medical_record_repository_1.MedicalRecordRepository])
 ], MedicalRecordController);
 //# sourceMappingURL=medical-record.controller.js.map

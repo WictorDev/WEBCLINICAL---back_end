@@ -1,5 +1,5 @@
 import { Prescription } from '../entities/prescription';
-export interface PrescriptionRepository {
-    findByMedicalRecord(medicalRecordId: string): Promise<Prescription[]>;
-    create(prescription: Prescription): Promise<Prescription>;
+export declare abstract class PrescriptionRepository {
+    abstract findByMedicalRecord(medicalRecordId: string): Promise<Prescription[]>;
+    abstract create(prescription: Prescription): Promise<Prescription>;
 }

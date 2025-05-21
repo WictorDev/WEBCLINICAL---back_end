@@ -14,41 +14,121 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleController = void 0;
 const common_1 = require("@nestjs/common");
-const find_available_schedules_usecase_1 = require("../../use-case/schedule/find-available-schedules.usecase");
-const create_schedule_usecase_1 = require("../../use-case/schedule/create-schedule.usecase");
 const jwt_guard_1 = require("../auth/jwt.guard");
 const schedule_1 = require("../../domain/entities/schedule");
 const crypto_1 = require("crypto");
+const create_schedule_usecase_1 = require("../../use-case/schedule/create-schedule.usecase");
+const update_schedule_usecase_1 = require("../../use-case/schedule/update-schedule.usecase");
+const delete_schedule_usecase_1 = require("../../use-case/schedule/delete-schedule.usecase");
+const find_schedule_by_id_usecase_1 = require("../../use-case/schedule/find-schedule-by-id.usecase");
+const find_schedule_by_employee_usecase_1 = require("../../use-case/schedule/find-schedule-by-employee.usecase");
+const find_schedule_by_date_usecase_1 = require("../../use-case/schedule/find-schedule-by-date.usecase");
+const find_all_schedules_usecase_1 = require("../../use-case/schedule/find-all-schedules.usecase");
+const swagger_1 = require("@nestjs/swagger");
 let ScheduleController = class ScheduleController {
-    findAvailableSchedules;
     createSchedule;
-    constructor(findAvailableSchedules, createSchedule) {
-        this.findAvailableSchedules = findAvailableSchedules;
+    updateSchedule;
+    deleteSchedule;
+    findScheduleById;
+    findScheduleByEmployee;
+    findScheduleByDate;
+    findAllSchedules;
+    constructor(createSchedule, updateSchedule, deleteSchedule, findScheduleById, findScheduleByEmployee, findScheduleByDate, findAllSchedules) {
         this.createSchedule = createSchedule;
+        this.updateSchedule = updateSchedule;
+        this.deleteSchedule = deleteSchedule;
+        this.findScheduleById = findScheduleById;
+        this.findScheduleByEmployee = findScheduleByEmployee;
+        this.findScheduleByDate = findScheduleByDate;
+        this.findAllSchedules = findAllSchedules;
     }
-    async getAvailable(employeeId, dayOfWeek) {
-        return this.findAvailableSchedules.execute(employeeId, Number(dayOfWeek));
+    async findAll() {
+        return this.findAllSchedules.execute();
+    }
+    async findById(id) {
+        return this.findScheduleById.execute(id);
+    }
+    async findByEmployee(employeeId) {
+        return this.findScheduleByEmployee.findAllByEmployee(employeeId);
+    }
+    async findAvailableByEmployee(employeeId) {
+        return this.findScheduleByEmployee.findAvailableByEmployee(employeeId);
+    }
+    async findByDate(employeeId, date) {
+        return this.findScheduleByDate.findByDate(employeeId, new Date(date));
+    }
+    async findAvailableByDate(employeeId, date) {
+        return this.findScheduleByDate.findAvailableByDate(employeeId, new Date(date));
     }
     async create(scheduleData) {
         const schedule = new schedule_1.Schedule({
             id: (0, crypto_1.randomUUID)(),
-            dayOfWeek: scheduleData.dayOfWeek,
+            date: new Date(scheduleData.date),
             startTime: scheduleData.startTime,
             endTime: scheduleData.endTime,
-            employeeId: scheduleData.employeeId
+            duration: scheduleData.duration,
+            totalSlots: scheduleData.totalSlots,
+            availableSlots: scheduleData.availableSlots,
+            employeeId: scheduleData.employeeId,
+            active: scheduleData.active,
         });
         return this.createSchedule.execute(schedule);
+    }
+    async update(id, scheduleData) {
+        return this.updateSchedule.execute({
+            id,
+            ...scheduleData,
+            date: scheduleData.date ? new Date(scheduleData.date) : undefined,
+        });
+    }
+    async delete(id) {
+        return this.deleteSchedule.execute(id);
     }
 };
 exports.ScheduleController = ScheduleController;
 __decorate([
-    (0, common_1.Get)('available'),
-    __param(0, (0, common_1.Query)('employeeId')),
-    __param(1, (0, common_1.Query)('dayOfWeek')),
+    (0, common_1.Get)(),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], ScheduleController.prototype, "getAvailable", null);
+], ScheduleController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findById", null);
+__decorate([
+    (0, common_1.Get)('employee/:employeeId'),
+    __param(0, (0, common_1.Param)('employeeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findByEmployee", null);
+__decorate([
+    (0, common_1.Get)('employee/:employeeId/available'),
+    __param(0, (0, common_1.Param)('employeeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findAvailableByEmployee", null);
+__decorate([
+    (0, common_1.Get)('date/:employeeId'),
+    __param(0, (0, common_1.Param)('employeeId')),
+    __param(1, (0, common_1.Query)('date')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findByDate", null);
+__decorate([
+    (0, common_1.Get)('date/:employeeId/available'),
+    __param(0, (0, common_1.Param)('employeeId')),
+    __param(1, (0, common_1.Query)('date')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findAvailableByDate", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
@@ -56,10 +136,31 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ScheduleController.prototype, "create", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "delete", null);
 exports.ScheduleController = ScheduleController = __decorate([
+    (0, swagger_1.ApiTags)('schedules'),
     (0, common_1.Controller)('schedules'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
-    __metadata("design:paramtypes", [find_available_schedules_usecase_1.FindAvailableSchedulesUseCase,
-        create_schedule_usecase_1.CreateScheduleUseCase])
+    __metadata("design:paramtypes", [create_schedule_usecase_1.CreateScheduleUseCase,
+        update_schedule_usecase_1.UpdateScheduleUseCase,
+        delete_schedule_usecase_1.DeleteScheduleUseCase,
+        find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
+        find_schedule_by_employee_usecase_1.FindScheduleByEmployeeUseCase,
+        find_schedule_by_date_usecase_1.FindScheduleByDateUseCase,
+        find_all_schedules_usecase_1.FindAllSchedulesUseCase])
 ], ScheduleController);
 //# sourceMappingURL=schedule.controller.js.map

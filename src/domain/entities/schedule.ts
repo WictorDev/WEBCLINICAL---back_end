@@ -1,9 +1,13 @@
 export interface ScheduleData {
   id: string;
-  dayOfWeek: number;
+  date: Date;
   startTime: string;
   endTime: string;
+  duration: number;
+  totalSlots: number;
+  availableSlots: number;
   employeeId: string;
+  active: boolean;
 }
 
 export class Schedule {
@@ -13,13 +17,14 @@ export class Schedule {
     return this.data.id;
   }
 
-  get dayOfWeek(): number {
-    return this.data.dayOfWeek;
+  get date(): Date {
+    return this.data.date;
   }
 
-  set dayOfWeek(dayOfWeek: number) {
-    if (dayOfWeek < 0 || dayOfWeek > 6) throw new Error("Dia da semana inválido.");
-    this.data.dayOfWeek = dayOfWeek;
+  set date(date: Date) {
+    if (!date) throw new Error("Data é obrigatória.");
+    if (date < new Date()) throw new Error("Data não pode ser no passado.");
+    this.data.date = date;
   }
 
   get startTime(): string {
@@ -40,6 +45,34 @@ export class Schedule {
     this.data.endTime = endTime;
   }
 
+  get duration(): number {
+    return this.data.duration;
+  }
+
+  set duration(duration: number) {
+    if (duration <= 0) throw new Error("Duração deve ser maior que zero.");
+    this.data.duration = duration;
+  }
+
+  get totalSlots(): number {
+    return this.data.totalSlots;
+  }
+
+  set totalSlots(totalSlots: number) {
+    if (totalSlots <= 0) throw new Error("Total de vagas deve ser maior que zero.");
+    this.data.totalSlots = totalSlots;
+  }
+
+  get availableSlots(): number {
+    return this.data.availableSlots;
+  }
+
+  set availableSlots(availableSlots: number) {
+    if (availableSlots < 0) throw new Error("Vagas disponíveis não podem ser negativas.");
+    if (availableSlots > this.totalSlots) throw new Error("Vagas disponíveis não podem ser maiores que o total de vagas.");
+    this.data.availableSlots = availableSlots;
+  }
+
   get employeeId(): string {
     return this.data.employeeId;
   }
@@ -49,12 +82,23 @@ export class Schedule {
     this.data.employeeId = employeeId;
   }
 
+  get active(): boolean {
+    return this.data.active;
+  }
+
+  set active(active: boolean) {
+    this.data.active = active;
+  }
+
   toJSON() {
     return {
       id: this.id,
-      dayOfWeek: this.dayOfWeek,
+      date: this.date,
       startTime: this.startTime,
       endTime: this.endTime,
+      duration: this.duration,
+      totalSlots: this.totalSlots,
+      availableSlots: this.availableSlots,
       employeeId: this.employeeId
     };
   }
@@ -62,9 +106,12 @@ export class Schedule {
   static create(data: ScheduleData) {
     return {
       id: data.id,
-      dayOfWeek: data.dayOfWeek,
+      date: data.date,
       startTime: data.startTime,
       endTime: data.endTime,
+      duration: data.duration,
+      totalSlots: data.totalSlots,
+      availableSlots: data.availableSlots,
       employeeId: data.employeeId
     };
   }
