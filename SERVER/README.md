@@ -81,8 +81,6 @@ Depois de iniciar o servidor, acesse a documentação Swagger em:
 http://localhost:3000/api
 ```
 
-
-
 ## 🔐 Autenticação
 
 O sistema utiliza JWT para autenticação. Todas as rotas (exceto login e registro) requerem um token válido no header:
@@ -90,8 +88,6 @@ O sistema utiliza JWT para autenticação. Todas as rotas (exceto login e regist
 ```
 Authorization: Bearer <token>
 ```
-
-
 
 ## 📋 Visão Geral da Arquitetura
 
@@ -237,7 +233,7 @@ Antes de registrar um paciente, é necessário que exista no sistema um **tipo c
 
 ### 3️⃣ Login de Paciente
 
-**Endpoint:** `POST /api/auth/login/patient`
+**Endpoint:** `POST /api/auth/login`
 
 **Corpo da requisição:**
 ```json
@@ -312,7 +308,6 @@ ou
   "employeeType": "Enfermeiro"
 }
 ```
-
 
 ## 🗓️ Novas Funcionalidades: Agendamentos e Consultas
 
@@ -479,9 +474,6 @@ As consultas representam os agendamentos feitos para os horários disponíveis.
 > - Este endpoint só funciona para agendamentos com status "CONFIRMADO"  
 > - Após finalizar, o status será alterado para "FINALIZADO"  
 > - Um prontuário médico será criado automaticamente
-
-
-
 
 ### 🎬 Guia Passo a Passo de Agendamento para Recepcionistas
 
@@ -664,7 +656,6 @@ GET /schedules/available?employeeId=12345678900&dayOfWeek=3
   "conduct": "Medicação e retorno em 7 dias"
 }
 ```
-
 
 ## 📊 Estrutura do Projeto
 

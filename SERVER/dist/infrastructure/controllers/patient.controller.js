@@ -21,19 +21,25 @@ const find_patient_by_email_usecase_1 = require("../../use-case/patient/find-pat
 const jwt_guard_1 = require("../auth/jwt.guard");
 const swagger_1 = require("@nestjs/swagger");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
+const update_patient_usecase_1 = require("../../use-case/patient/update-patient.usecase");
+const public_decorator_1 = require("../auth/public.decorator");
 let PatientController = class PatientController {
     createPatientUseCase;
     findPatientUseCase;
     findPatientByCpfUseCase;
     findPatientByEmailUseCase;
-    constructor(createPatientUseCase, findPatientUseCase, findPatientByCpfUseCase, findPatientByEmailUseCase) {
+    updatePatientUseCase;
+    findAllPatientsUseCase;
+    constructor(createPatientUseCase, findPatientUseCase, findPatientByCpfUseCase, findPatientByEmailUseCase, updatePatientUseCase, findAllPatientsUseCase) {
         this.createPatientUseCase = createPatientUseCase;
         this.findPatientUseCase = findPatientUseCase;
         this.findPatientByCpfUseCase = findPatientByCpfUseCase;
         this.findPatientByEmailUseCase = findPatientByEmailUseCase;
+        this.updatePatientUseCase = updatePatientUseCase;
+        this.findAllPatientsUseCase = findAllPatientsUseCase;
     }
     async findAll() {
-        return this.findPatientUseCase.execute();
+        return this.findAllPatientsUseCase.execute();
     }
     async findByEmail(email) {
         return this.findPatientByEmailUseCase.execute(email);
@@ -51,6 +57,9 @@ let PatientController = class PatientController {
             }
             throw error;
         }
+    }
+    async update(cpf, data) {
+        return await this.updatePatientUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf), data);
     }
 };
 exports.PatientController = PatientController;
@@ -75,12 +84,21 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PatientController.prototype, "findByCpf", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PatientController.prototype, "register", null);
+__decorate([
+    (0, common_1.Put)(':cpf'),
+    __param(0, (0, common_1.Param)('cpf')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PatientController.prototype, "update", null);
 exports.PatientController = PatientController = __decorate([
     (0, swagger_1.ApiTags)('patients'),
     (0, common_1.Controller)('/api/patients'),
@@ -88,6 +106,8 @@ exports.PatientController = PatientController = __decorate([
     __metadata("design:paramtypes", [create_patient_usecase_1.CreatePatientUseCase,
         find_patient_usecase_1.FindPatientUseCase,
         find_patient_by_cpf_usecase_1.FindPatientByCpfUseCase,
-        find_patient_by_email_usecase_1.FindPatientByEmailUseCase])
+        find_patient_by_email_usecase_1.FindPatientByEmailUseCase,
+        update_patient_usecase_1.UpdatePatientUseCase,
+        find_patient_usecase_1.FindPatientUseCase])
 ], PatientController);
 //# sourceMappingURL=patient.controller.js.map

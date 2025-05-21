@@ -18,7 +18,7 @@ let FindPatientByCpfUseCase = class FindPatientByCpfUseCase {
         this.patientRepository = patientRepository;
     }
     async execute(cpf) {
-        return this.patientRepository.findByCpf(cpf);
+        return this.patientRepository.findByCpf(cpf.toString());
     }
 };
 exports.FindPatientByCpfUseCase = FindPatientByCpfUseCase;

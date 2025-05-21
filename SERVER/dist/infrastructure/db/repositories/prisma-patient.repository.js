@@ -24,11 +24,11 @@ let PrismaPatientRepository = class PrismaPatientRepository {
         try {
             const created = await this.prismaService.patient.create({
                 data: {
-                    cpf: patient.cpf.toString(),
+                    cpf: patient.cpf,
                     name: patient.name,
                     email: patient.email,
                     password: patient.password,
-                    typeId: patient.type,
+                    typeId: patient.typeId,
                 },
             });
             return new patient_1.Patient({
@@ -36,7 +36,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
                 name: created.name,
                 email: created.email,
                 password: created.password,
-                type: created.typeId,
+                typeId: created.typeId,
             });
         }
         catch (error) {
@@ -71,12 +71,12 @@ let PrismaPatientRepository = class PrismaPatientRepository {
             name: patient.name,
             email: patient.email,
             password: patient.password,
-            type: patient.typeId,
+            typeId: patient.typeId,
         }));
     }
     async findByCpf(cpf) {
         const patient = await this.prismaService.patient.findUnique({
-            where: { cpf: cpf.toString() },
+            where: { cpf },
         });
         if (!patient)
             return null;
@@ -85,7 +85,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
             name: patient.name,
             email: patient.email,
             password: patient.password,
-            type: patient.typeId,
+            typeId: patient.typeId,
         });
     }
     async findByEmail(email) {
@@ -99,17 +99,17 @@ let PrismaPatientRepository = class PrismaPatientRepository {
             name: patient.name,
             email: patient.email,
             password: patient.password,
-            type: patient.typeId,
+            typeId: patient.typeId,
         });
     }
-    async update(cpf, data) {
+    async update(cpf, patient) {
         const updated = await this.prismaService.patient.update({
-            where: { cpf: cpf.toString() },
+            where: { cpf },
             data: {
-                name: data.name,
-                email: data.email,
-                password: data.password,
-                typeId: data.type,
+                name: patient.name,
+                email: patient.email,
+                password: patient.password,
+                typeId: patient.typeId,
             },
         });
         return new patient_1.Patient({
@@ -117,7 +117,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
             name: updated.name,
             email: updated.email,
             password: updated.password,
-            type: updated.typeId,
+            typeId: updated.typeId,
         });
     }
 };

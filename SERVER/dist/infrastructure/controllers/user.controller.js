@@ -24,6 +24,7 @@ const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const swagger_1 = require("@nestjs/swagger");
 const public_decorator_1 = require("../auth/public.decorator");
 const type_repository_1 = require("../../domain/repositories/type.repository");
+const create_first_admin_usecase_1 = require("../../use-case/user/create-first-admin.usecase");
 let UserController = class UserController {
     createUserUseCase;
     updateUserUseCase;
@@ -31,13 +32,15 @@ let UserController = class UserController {
     findUserByEmailUseCase;
     findUserUseCase;
     typeRepository;
-    constructor(createUserUseCase, updateUserUseCase, findUserByCpfUseCase, findUserByEmailUseCase, findUserUseCase, typeRepository) {
+    createFirstAdminUseCase;
+    constructor(createUserUseCase, updateUserUseCase, findUserByCpfUseCase, findUserByEmailUseCase, findUserUseCase, typeRepository, createFirstAdminUseCase) {
         this.createUserUseCase = createUserUseCase;
         this.updateUserUseCase = updateUserUseCase;
         this.findUserByCpfUseCase = findUserByCpfUseCase;
         this.findUserByEmailUseCase = findUserByEmailUseCase;
         this.findUserUseCase = findUserUseCase;
         this.typeRepository = typeRepository;
+        this.createFirstAdminUseCase = createFirstAdminUseCase;
     }
     async findAll() {
         return this.findUserUseCase.execute();
@@ -56,8 +59,8 @@ let UserController = class UserController {
             }
             return this.createUserUseCase.execute({
                 ...body,
-                cpf: new unique_entity_cpf_1.UniqueEntityCpf(body.cpf),
-                type: type.id
+                cpf: new unique_entity_cpf_1.UniqueEntityCpf(body.cpf).toString(),
+                type: body.type
             });
         }
         catch (error) {
@@ -73,15 +76,7 @@ let UserController = class UserController {
             throw new common_1.BadRequestException('Já existe um usuário cadastrado.');
         }
         try {
-            const type = await this.typeRepository.findByName('ADMIN');
-            if (!type) {
-                throw new common_1.BadRequestException('Tipo de usuário não encontrado.');
-            }
-            return this.createUserUseCase.execute({
-                ...body,
-                cpf: new unique_entity_cpf_1.UniqueEntityCpf(body.cpf),
-                type: type.id
-            });
+            return this.createFirstAdminUseCase.execute(body);
         }
         catch (error) {
             if (error.message && error.message.includes('CPF')) {
@@ -119,6 +114,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findByCpf", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/create_user'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -134,7 +130,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "createFirstUser", null);
 __decorate([
-    (0, common_1.Put)(':cpf'),
+    (0, common_1.Put)('cpf/:cpf'),
     __param(0, (0, common_1.Param)('cpf')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -142,7 +138,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':cpf'),
+    (0, common_1.Delete)('cpf/:cpf'),
     __param(0, (0, common_1.Param)('cpf')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -157,6 +153,7 @@ exports.UserController = UserController = __decorate([
         findByCpf_user_usecase_1.FindUserByCpfUseCase,
         findByEmail_user_usecase_1.FindUserByEmailUseCase,
         find_user_usecase_1.FindUserUseCase,
-        type_repository_1.TypeRepository])
+        type_repository_1.TypeRepository,
+        create_first_admin_usecase_1.CreateFirstAdminUseCase])
 ], UserController);
 //# sourceMappingURL=user.controller.js.map

@@ -1,7 +1,8 @@
 import { PatientRepository } from 'src/domain/repositories/patient.repository';
-import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
+import { Patient } from 'src/domain/entities/patient';
+import UniqueEntityCpf from 'src/core/entities/unique-entity-cpf';
 export declare class FindPatientByCpfUseCase {
     private readonly patientRepository;
     constructor(patientRepository: PatientRepository);
-    execute(cpf: UniqueEntityCpf): Promise<import("../../domain/entities/patient").Patient | null>;
+    execute(cpf: UniqueEntityCpf): Promise<Patient | null>;
 }

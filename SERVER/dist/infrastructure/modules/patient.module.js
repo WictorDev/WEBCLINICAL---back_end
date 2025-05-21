@@ -15,15 +15,22 @@ const create_patient_usecase_1 = require("../../use-case/patient/create-patient.
 const find_patient_usecase_1 = require("../../use-case/patient/find-patient.usecase");
 const find_patient_by_cpf_usecase_1 = require("../../use-case/patient/find-patient-by-cpf.usecase");
 const find_patient_by_email_usecase_1 = require("../../use-case/patient/find-patient-by-email.usecase");
+const update_patient_usecase_1 = require("../../use-case/patient/update-patient.usecase");
 const patient_repository_1 = require("../../domain/repositories/patient.repository");
 const type_module_1 = require("./type.module");
 const jwt_1 = require("@nestjs/jwt");
+const user_module_1 = require("./user.module");
 let PatientModule = class PatientModule {
 };
 exports.PatientModule = PatientModule;
 exports.PatientModule = PatientModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, type_module_1.TypeModule, jwt_1.JwtModule],
+        imports: [
+            prisma_module_1.PrismaModule,
+            type_module_1.TypeModule,
+            jwt_1.JwtModule,
+            (0, common_1.forwardRef)(() => user_module_1.UserModule)
+        ],
         controllers: [patient_controller_1.PatientController],
         providers: [
             {
@@ -35,6 +42,7 @@ exports.PatientModule = PatientModule = __decorate([
             find_patient_usecase_1.FindPatientUseCase,
             find_patient_by_cpf_usecase_1.FindPatientByCpfUseCase,
             find_patient_by_email_usecase_1.FindPatientByEmailUseCase,
+            update_patient_usecase_1.UpdatePatientUseCase,
         ],
         exports: [
             patient_repository_1.PatientRepository,
@@ -43,6 +51,7 @@ exports.PatientModule = PatientModule = __decorate([
             find_patient_usecase_1.FindPatientUseCase,
             find_patient_by_cpf_usecase_1.FindPatientByCpfUseCase,
             find_patient_by_email_usecase_1.FindPatientByEmailUseCase,
+            update_patient_usecase_1.UpdatePatientUseCase,
         ],
     })
 ], PatientModule);

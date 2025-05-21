@@ -23,14 +23,27 @@ model User {
   name      String
   companyId String?
   company   Company? @relation(fields: [companyId], references: [Cnpj])
-  type      Type?   @relation(fields: [typeId], references: [id])
-  typeId    String?
+  types     UserType[]
   active    Boolean
+  // Relacionamentos com as tabelas específicas
+  admin     Admin?
+  employee  Employee?
+  patient   Patient?
 }
 
-model Adimin {
-  Cpf    String @unique
+model UserType {
+  user      User   @relation(fields: [userId], references: [cpf])
+  userId    String
+  type      Type   @relation(fields: [typeId], references: [id])
+  typeId    String
+
+  @@id([userId, typeId])
+}
+
+model Admin {
+  cpf    String @unique
   name   String
+  user   User   @relation(fields: [cpf], references: [cpf])
   typeId String
   type   Type   @relation(fields: [typeId], references: [id])
 }
@@ -38,9 +51,9 @@ model Adimin {
 model Type {
   id        String     @id @default(uuid())
   name      String
-  users     User[]
+  users     UserType[]
   employees Employee[]
-  Admins    Adimin[]
+  admins    Admin[]
   patients  Patient[]
 }
 
@@ -55,6 +68,7 @@ model Employee {
   employeeTypeId String
   schedules      Schedule[]
   appointments   Appointment[] @relation("EmployeeAppointments")
+  user           User         @relation(fields: [cpf], references: [cpf])
 }
 
 //tipo do funcionario 
@@ -73,6 +87,7 @@ model Patient {
   type     Type?  @relation(fields: [typeId], references: [id])
   typeId   String
   appointments Appointment[]
+  user     User   @relation(fields: [cpf], references: [cpf])
 }
 
 model Schedule {

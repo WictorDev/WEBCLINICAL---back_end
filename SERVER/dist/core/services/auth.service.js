@@ -11,92 +11,69 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const prisma_service_1 = require("./prisma.service");
-const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
     prismaService;
-    configService;
     jwtService;
-    constructor(prismaService, configService, jwtService) {
+    constructor(prismaService, jwtService) {
         this.prismaService = prismaService;
-        this.configService = configService;
         this.jwtService = jwtService;
     }
-    async Login(login) {
-        const { identifier, password, tipo } = login;
+    async login(login) {
+        const { identifier, password } = login;
         const isCpf = !identifier.includes('@');
-        const paciente = await this.prismaService.patient.findUnique({
-            where: isCpf ? { cpf: identifier } : { email: identifier },
-            include: { type: true },
-        });
         const usuario = await this.prismaService.user.findUnique({
             where: isCpf ? { cpf: identifier } : { email: identifier },
-            include: { type: true },
+            include: { types: { include: { type: true } } },
         });
-        const senhaPacienteOk = paciente && await bcrypt.compare(password, paciente.password);
-        const senhaUsuarioOk = usuario && await bcrypt.compare(password, usuario.password);
-        if (tipo === 'paciente') {
-            if (!senhaPacienteOk)
-                throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
-            return this.gerarTokenPaciente(paciente);
-        }
-        if (tipo === 'profissional') {
-            if (!senhaUsuarioOk)
-                throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
-            if (!usuario.active)
-                throw new common_1.UnauthorizedException('Usuário inativo');
-            return this.gerarTokenUsuario(usuario);
-        }
-        if (!senhaPacienteOk && !senhaUsuarioOk) {
+        if (!usuario) {
             throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
         }
-        if (senhaPacienteOk && senhaUsuarioOk) {
-            return { multiplosPerfis: true };
+        const senhaUsuarioOk = await bcrypt.compare(password, usuario.password);
+        if (!senhaUsuarioOk) {
+            throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
         }
-        if (senhaPacienteOk) {
-            return this.gerarTokenPaciente(paciente);
-        }
-        if (senhaUsuarioOk) {
-            if (!usuario.active)
-                throw new common_1.UnauthorizedException('Usuário inativo');
-            return this.gerarTokenUsuario(usuario);
-        }
-    }
-    gerarTokenPaciente(paciente) {
-        const payload = {
-            id: paciente.cpf,
-            type: paciente.type?.name || 'unknown',
-            userType: 'paciente',
-        };
-        const secret = this.configService.get('JWT_SECRET');
-        const expiresIn = Number(this.configService.get('JWT_EXPIRES_IN')) || 36000;
-        if (!secret)
-            throw new Error('JWT_SECRET não definido no .env');
-        const accessToken = jwt.sign(payload, secret, { expiresIn });
-        return { token: accessToken, tipo: 'paciente', nome: paciente.name };
-    }
-    gerarTokenUsuario(usuario) {
+        const userType = usuario.types[0]?.type.name;
         const payload = {
             id: usuario.cpf,
-            type: usuario.type?.name || 'unknown',
-            userType: 'profissional',
+            type: userType,
+            userType: userType,
+            name: usuario.name
         };
-        const secret = this.configService.get('JWT_SECRET');
-        const expiresIn = Number(this.configService.get('JWT_EXPIRES_IN')) || 36000;
-        if (!secret)
-            throw new Error('JWT_SECRET não definido no .env');
-        const accessToken = jwt.sign(payload, secret, { expiresIn });
-        return { token: accessToken, tipo: 'profissional', nome: usuario.name };
+        const accessToken = this.jwtService.sign(payload);
+        return {
+            token: accessToken,
+            tipo: userType,
+            nome: usuario.name
+        };
+    }
+    async validateUser(email, password) {
+        const usuario = await this.prismaService.user.findUnique({
+            where: { email },
+            include: { types: { include: { type: true } } },
+        });
+        if (!usuario) {
+            throw new common_1.UnauthorizedException('Credenciais inválidas');
+        }
+        const isPasswordValid = await bcrypt.compare(password, usuario.password);
+        if (!isPasswordValid) {
+            throw new common_1.UnauthorizedException('Credenciais inválidas');
+        }
+        const userType = usuario.types[0]?.type.name;
+        return {
+            cpf: usuario.cpf,
+            email: usuario.email,
+            name: usuario.name,
+            type: userType,
+        };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        config_1.ConfigService,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -4,6 +4,7 @@ import { Company } from 'src/domain/entities/company';
 export declare class PrismaCompanyRepository implements CompanyRepository {
     private readonly prismaService;
     constructor(prismaService: PrismaService);
+    private removeCnpjFormat;
     create(company: Company): Promise<Company>;
     findAll(): Promise<Company[]>;
     findByEmail(email: string): Promise<Company | null>;

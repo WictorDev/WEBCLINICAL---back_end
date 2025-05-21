@@ -9,4 +9,5 @@ export declare class PrismaUserRepository implements UserRepository {
     findAll(): Promise<User[]>;
     findByEmail(email: string): Promise<User | null>;
     findByCpf(cpf: string): Promise<User | null>;
+    addType(cpf: string, typeId: string): Promise<void>;
 }

@@ -14,13 +14,13 @@ const common_1 = require("@nestjs/common");
 const employee_repository_1 = require("../../domain/repositories/employee.repository");
 const employee_1 = require("../../domain/entities/employee");
 let CreateEmployeeUseCase = class CreateEmployeeUseCase {
-    repo;
-    constructor(repo) {
-        this.repo = repo;
+    employeeRepository;
+    constructor(employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
     async execute(data) {
         const employee = new employee_1.Employee(data);
-        return this.repo.create(employee);
+        return await this.employeeRepository.create(employee);
     }
 };
 exports.CreateEmployeeUseCase = CreateEmployeeUseCase;

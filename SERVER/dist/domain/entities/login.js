@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.LoginResponse = exports.Login = void 0;
 class Login {
     identifier;
     password;
@@ -12,5 +13,13 @@ class Login {
         this.tipo = props.tipo;
     }
 }
-exports.default = Login;
+exports.Login = Login;
+class LoginResponse {
+    token;
+    tipo;
+    nome;
+    multiplosPerfis;
+    perfis;
+}
+exports.LoginResponse = LoginResponse;
 //# sourceMappingURL=login.js.map

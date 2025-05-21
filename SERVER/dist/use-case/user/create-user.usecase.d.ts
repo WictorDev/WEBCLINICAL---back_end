@@ -1,16 +1,18 @@
-import UniqueEntitycpf from "src/core/entities/unique-entity-cpf";
-import { User } from "src/domain/entities/user";
-import { UserRepository } from "src/domain/repositories/user.repository";
+import { UserRepository } from 'src/domain/repositories/user.repository';
+import { TypeRepository } from 'src/domain/repositories/type.repository';
+import { User } from 'src/domain/entities/user';
 export declare class CreateUserUseCase {
-    private userRepository;
-    constructor(userRepository: UserRepository);
+    private readonly userRepository;
+    private readonly typeRepository;
+    constructor(userRepository: UserRepository, typeRepository: TypeRepository);
     execute(data: {
         name: string;
-        cpf: UniqueEntitycpf;
+        cpf: string;
         email: string;
         password: string;
         companyId: string;
         type: string;
         active: boolean;
+        employeeTypeId?: string;
     }): Promise<User>;
 }

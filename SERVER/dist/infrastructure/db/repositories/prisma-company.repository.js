@@ -20,6 +20,9 @@ let PrismaCompanyRepository = class PrismaCompanyRepository {
     constructor(prismaService) {
         this.prismaService = prismaService;
     }
+    removeCnpjFormat(cnpj) {
+        return cnpj.replace(/[^\d]/g, '');
+    }
     async create(company) {
         try {
             const created = await this.prismaService.company.create({
@@ -88,7 +91,7 @@ let PrismaCompanyRepository = class PrismaCompanyRepository {
     }
     async findByCnpj(cnpj) {
         const company = await this.prismaService.company.findUnique({
-            where: { Cnpj: cnpj }
+            where: { Cnpj: this.removeCnpjFormat(cnpj) }
         });
         if (!company)
             return null;

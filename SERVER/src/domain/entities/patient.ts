@@ -1,23 +1,18 @@
-import { UniqueEntityCpf } from "src/core/entities/unique-entity-cpf";
+import UniqueEntityCpf from "src/core/entities/unique-entity-cpf";
 
 export interface PatientData {
   cpf: UniqueEntityCpf;
   name: string;
   email: string;
   password: string;
-  type: string; 
+  typeId: string;
 }
 
 export class Patient {
   constructor(private data: PatientData) {}
 
-  get cpf(): UniqueEntityCpf {
-    return this.data.cpf;
-  }
-
-  set cpf(cpf: string) {
-    if (!cpf) throw new Error("CPF é obrigatório.");
-    this.data.cpf = new UniqueEntityCpf(cpf);
+  get cpf(): string {
+    return this.data.cpf.toString();
   }
 
   get name(): string {
@@ -35,6 +30,7 @@ export class Patient {
 
   set email(email: string) {
     if (!email) throw new Error("Email é obrigatório.");
+    if (!email.includes('@')) throw new Error("Email inválido.");
     this.data.email = email;
   }
 
@@ -44,24 +40,25 @@ export class Patient {
 
   set password(password: string) {
     if (!password) throw new Error("Senha é obrigatória.");
+    if (password.length < 6) throw new Error("Senha deve ter no mínimo 6 caracteres.");
     this.data.password = password;
   }
 
-  get type(): string {
-    return this.data.type;
+  get typeId(): string {
+    return this.data.typeId;
   }
 
-  set type(type: string) {
-    if (!type) throw new Error("Tipo é obrigatório.");
-    this.data.type = type;
+  set typeId(typeId: string) {
+    if (!typeId) throw new Error("Tipo é obrigatório.");
+    this.data.typeId = typeId;
   }
 
   toJSON() {
     return {
-      cpf: this.cpf.toString(),
+      cpf: this.cpf,
       name: this.name,
       email: this.email,
-      type: this.type
+      typeId: this.typeId
     };
   }
 
@@ -71,7 +68,7 @@ export class Patient {
       name: data.name,
       email: data.email,
       password: data.password,
-      type: data.type
+      typeId: data.typeId
     };
   }
 }

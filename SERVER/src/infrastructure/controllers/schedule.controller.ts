@@ -60,7 +60,7 @@ export class ScheduleController {
   ) {
     return this.findScheduleByDate.findAvailableByDate(employeeId, new Date(date));
   }
-
+  
   @Post()
   async create(@Body() scheduleData: Omit<Schedule, 'id'>) {
     const schedule = new Schedule({
