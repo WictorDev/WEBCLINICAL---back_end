@@ -4,12 +4,18 @@ import { TypeRepository } from 'src/domain/repositories/type.repository';
 import { User } from 'src/domain/entities/user';
 import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
 import * as bcrypt from 'bcrypt';
+import { CreateAdminUseCase } from '../admin/create-admin.usecase';
+import { CreateEmployeeUseCase } from '../employee/create-employee.usecase';
+import { CreatePatientUseCase } from '../patient/create-patient.usecase';
 
 @Injectable()
 export class CreateUserUseCase {
     constructor(
         private readonly userRepository: UserRepository,
         private readonly typeRepository: TypeRepository,
+        private readonly createAdminUseCase: CreateAdminUseCase,
+        private readonly createEmployeeUseCase: CreateEmployeeUseCase,
+        private readonly createPatientUseCase: CreatePatientUseCase,
     ) { }
 
     async execute(data: { 
@@ -20,7 +26,8 @@ export class CreateUserUseCase {
         companyId: string, 
         type: string, 
         active: boolean,
-        employeeTypeId?: string 
+        employeeTypeId?: string,
+        advice?: string
     }) {
         // Busca o tipo pelo nome
         const type = await this.typeRepository.findByName(data.type);
@@ -47,6 +54,17 @@ export class CreateUserUseCase {
                     { types: updatedTypes }
                 );
 
+                // Cria o registro na tabela específica do tipo
+                await this.createInSpecificTable(data.type, {
+                    cpf: existingUser.cpf.toString(),
+                    name: existingUser.name,
+                    email: existingUser.email,
+                    password: existingUser.password,
+                    type: type.id,
+                    employeeTypeId: data.employeeTypeId || undefined,
+                    advice: data.advice
+                });
+
                 return updatedUser;
             }
             
@@ -68,6 +86,60 @@ export class CreateUserUseCase {
 
         const createdUser = await this.userRepository.create(user);
 
+        // Cria o registro na tabela específica do tipo
+        await this.createInSpecificTable(data.type, {
+            cpf: data.cpf,
+            name: data.name,
+            email: data.email,
+            password: hashedPassword,
+            type: type.id,
+            employeeTypeId: data.employeeTypeId || undefined,
+            advice: data.advice
+        });
+
         return createdUser;
+    }
+
+    private async createInSpecificTable(typeName: string, data: {
+        cpf: string,
+        name: string,
+        email: string,
+        password: string,
+        type: string,
+        employeeTypeId?: string,
+        advice?: string
+    }) {
+        switch (typeName.toUpperCase()) {
+            case 'ADMIN':
+                await this.createAdminUseCase.execute({
+                    cpf: data.cpf,
+                    name: data.name,
+                    type: typeName // O tipo será buscado dentro do createAdminUseCase
+                });
+                break;
+
+            case 'EMPLOYEE':
+                const result = await this.createEmployeeUseCase.execute({
+                    cpf: data.cpf,
+                    name: data.name,
+                    type: typeName,
+                    employeeTypeId: data.employeeTypeId,
+                    advice: data.advice
+                });
+                return result;
+
+            case 'PATIENT':
+                await this.createPatientUseCase.execute({
+                    cpf: data.cpf,
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+                    type: typeName
+                });
+                break;
+
+            default:
+                throw new BadRequestException(`Tipo ${typeName} não suportado`);
+        }
     }
 } 

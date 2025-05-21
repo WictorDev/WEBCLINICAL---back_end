@@ -1,13 +1,15 @@
 import { EmployeeRepository } from 'src/domain/repositories/employee.repository';
 import { Employee } from 'src/domain/entities/employee';
+import { TypeRepository } from 'src/domain/repositories/type.repository';
 export declare class CreateEmployeeUseCase {
     private readonly employeeRepository;
-    constructor(employeeRepository: EmployeeRepository);
+    private readonly typeRepository;
+    constructor(employeeRepository: EmployeeRepository, typeRepository: TypeRepository);
     execute(data: {
         cpf: string;
         name: string;
-        typeId: string;
-        employeeTypeId: string;
+        type: string;
+        employeeTypeId?: string;
         advice?: string;
     }): Promise<Employee>;
 }

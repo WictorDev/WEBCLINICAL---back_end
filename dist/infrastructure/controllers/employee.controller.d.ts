@@ -15,7 +15,7 @@ export declare class EmployeeController {
         name: string;
         advice?: string;
         type: string;
-        employeeType: string;
+        employeeType?: string;
     }): Promise<import("../../domain/entities/employee").Employee>;
     findAll(): Promise<import("../../domain/entities/employee").Employee[]>;
     update(cpf: string, body: Partial<{

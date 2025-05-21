@@ -3,7 +3,7 @@ export interface EmployeeData {
     name: string;
     advice?: string;
     typeId: string;
-    employeeTypeId: string;
+    employeeTypeId?: string;
 }
 export declare class Employee {
     private data;
@@ -15,20 +15,20 @@ export declare class Employee {
     set advice(advice: string | undefined);
     get typeId(): string;
     set typeId(typeId: string);
-    get employeeTypeId(): string;
-    set employeeTypeId(employeeTypeId: string);
+    get employeeTypeId(): string | undefined;
+    set employeeTypeId(employeeTypeId: string | undefined);
     toJSON(): {
         cpf: string;
         name: string;
         advice: string | undefined;
         typeId: string;
-        employeeTypeId: string;
+        employeeTypeId: string | undefined;
     };
     static create(data: EmployeeData): {
         cpf: string;
         name: string;
         advice: string | undefined;
         typeId: string;
-        employeeTypeId: string;
+        employeeTypeId: string | undefined;
     };
 }

@@ -50,7 +50,7 @@ model Admin {
 
 model Type {
   id        String     @id @default(uuid())
-  name      String
+  name      String     @unique
   users     UserType[]
   employees Employee[]
   admins    Admin[]
@@ -65,7 +65,7 @@ model Employee {
   typeId         String
   type           Type          @relation(fields: [typeId], references: [id])
   employeeType   EmployeeType? @relation(fields: [employeeTypeId], references: [id])
-  employeeTypeId String
+  employeeTypeId String?
   schedules      Schedule[]
   appointments   Appointment[] @relation("EmployeeAppointments")
   user           User         @relation(fields: [cpf], references: [cpf])

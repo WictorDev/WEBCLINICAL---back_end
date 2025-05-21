@@ -1,12 +1,9 @@
-import { Type } from './type';
-import { EmployeeType } from './employee-type';
-
 export interface EmployeeData {
   cpf: string;
   name: string;
   advice?: string;
   typeId: string;
-  employeeTypeId: string;
+  employeeTypeId?: string;
 }
 
 export class Employee {
@@ -42,12 +39,11 @@ export class Employee {
     this.data.typeId = typeId;
   }
 
-  get employeeTypeId(): string {
+  get employeeTypeId(): string | undefined {
     return this.data.employeeTypeId;
   }
 
-  set employeeTypeId(employeeTypeId: string) {
-    if (!employeeTypeId) throw new Error('employeeTypeId é obrigatório.');
+  set employeeTypeId(employeeTypeId: string | undefined) {
     this.data.employeeTypeId = employeeTypeId;
   }
 
@@ -57,7 +53,7 @@ export class Employee {
       name: this.name,
       advice: this.advice,
       typeId: this.typeId,
-      employeeTypeId: this.employeeTypeId
+      employeeTypeId: this.employeeTypeId || undefined
     };
   }
 
@@ -68,7 +64,7 @@ export class Employee {
       name: employee.name,
       advice: employee.advice,
       typeId: employee.typeId,
-      employeeTypeId: employee.employeeTypeId
+      employeeTypeId: employee.employeeTypeId || undefined
     };
   }
 }

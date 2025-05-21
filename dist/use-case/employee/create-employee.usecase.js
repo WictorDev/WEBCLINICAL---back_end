@@ -13,19 +13,33 @@ exports.CreateEmployeeUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const employee_repository_1 = require("../../domain/repositories/employee.repository");
 const employee_1 = require("../../domain/entities/employee");
+const type_repository_1 = require("../../domain/repositories/type.repository");
 let CreateEmployeeUseCase = class CreateEmployeeUseCase {
     employeeRepository;
-    constructor(employeeRepository) {
+    typeRepository;
+    constructor(employeeRepository, typeRepository) {
         this.employeeRepository = employeeRepository;
+        this.typeRepository = typeRepository;
     }
     async execute(data) {
-        const employee = new employee_1.Employee(data);
+        const type = await this.typeRepository.findByName(data.type);
+        if (!type) {
+            throw new common_1.BadRequestException(`Tipo ${data.type} não encontrado.`);
+        }
+        const employee = new employee_1.Employee({
+            cpf: data.cpf,
+            name: data.name,
+            typeId: type.id,
+            employeeTypeId: data.employeeTypeId,
+            advice: data.advice
+        });
         return await this.employeeRepository.create(employee);
     }
 };
 exports.CreateEmployeeUseCase = CreateEmployeeUseCase;
 exports.CreateEmployeeUseCase = CreateEmployeeUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [employee_repository_1.EmployeeRepository])
+    __metadata("design:paramtypes", [employee_repository_1.EmployeeRepository,
+        type_repository_1.TypeRepository])
 ], CreateEmployeeUseCase);
 //# sourceMappingURL=create-employee.usecase.js.map

@@ -18,7 +18,7 @@ export class EmployeeController {
   ) {}
 
   @Post()
-  async create(@Body() body: { cpf: string; name: string; advice?: string; type: string; employeeType: string }) {
+  async create(@Body() body: { cpf: string; name: string; advice?: string; type: string; employeeType?: string }) {
     try {
       // Buscar o Type pelo nome
       const type = await this.typeRepository.findByName(body.type);
@@ -26,18 +26,23 @@ export class EmployeeController {
         throw new BadRequestException('Tipo não encontrado.');
       }
 
-      // Buscar o EmployeeType pelo nome
-      const employeeType = await this.employeeTypeRepository.findByName(body.employeeType);
-      if (!employeeType) {
-        throw new BadRequestException('Tipo de funcionário não encontrado.');
+      let employeeTypeId: string | undefined;
+
+      // Buscar o EmployeeType pelo nome apenas se foi fornecido
+      if (body.employeeType) {
+        const employeeType = await this.employeeTypeRepository.findByName(body.employeeType);
+        if (!employeeType) {
+          throw new BadRequestException('Tipo de funcionário não encontrado.');
+        }
+        employeeTypeId = employeeType.id;
       }
       
       return await this.createUseCase.execute({
         cpf: body.cpf,
         name: body.name,
         advice: body.advice,
-        typeId: type.id,
-        employeeTypeId: employeeType.id
+        type: body.type,
+        employeeTypeId
       });
     } catch (error) {
       if (error.message && error.message.includes('CPF')) {

@@ -11,22 +11,12 @@ export class PrismaAdminRepository implements AdminRepository {
 
   async create(data: Admin): Promise<Admin> {
     try {
-      // Busca ou cria o tipo ADMIN
-      let type = await this.prisma.type.findFirst({
-        where: { name: data.type }
-      });
-
-      if (!type) {
-        type = await this.prisma.type.create({
-          data: { name: data.type }
-        });
-      }
-
+      // Usa o ID do tipo recebido
       const admin = await this.prisma.admin.create({
         data: {
           cpf: data.cpf.toString(),
           name: data.name,
-          typeId: type.id
+          typeId: data.type // Aqui data.type é o ID
         },
         include: {
           type: true
