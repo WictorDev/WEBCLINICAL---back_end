@@ -39,16 +39,20 @@ let EmployeeController = class EmployeeController {
             if (!type) {
                 throw new common_1.BadRequestException('Tipo não encontrado.');
             }
-            const employeeType = await this.employeeTypeRepository.findByName(body.employeeType);
-            if (!employeeType) {
-                throw new common_1.BadRequestException('Tipo de funcionário não encontrado.');
+            let employeeTypeId;
+            if (body.employeeType) {
+                const employeeType = await this.employeeTypeRepository.findByName(body.employeeType);
+                if (!employeeType) {
+                    throw new common_1.BadRequestException('Tipo de funcionário não encontrado.');
+                }
+                employeeTypeId = employeeType.id;
             }
             return await this.createUseCase.execute({
                 cpf: body.cpf,
                 name: body.name,
                 advice: body.advice,
-                typeId: type.id,
-                employeeTypeId: employeeType.id
+                type: body.type,
+                employeeTypeId
             });
         }
         catch (error) {

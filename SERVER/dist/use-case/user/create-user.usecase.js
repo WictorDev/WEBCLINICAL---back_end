@@ -16,12 +16,21 @@ const type_repository_1 = require("../../domain/repositories/type.repository");
 const user_1 = require("../../domain/entities/user");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const bcrypt = require("bcrypt");
+const create_admin_usecase_1 = require("../admin/create-admin.usecase");
+const create_employee_usecase_1 = require("../employee/create-employee.usecase");
+const create_patient_usecase_1 = require("../patient/create-patient.usecase");
 let CreateUserUseCase = class CreateUserUseCase {
     userRepository;
     typeRepository;
-    constructor(userRepository, typeRepository) {
+    createAdminUseCase;
+    createEmployeeUseCase;
+    createPatientUseCase;
+    constructor(userRepository, typeRepository, createAdminUseCase, createEmployeeUseCase, createPatientUseCase) {
         this.userRepository = userRepository;
         this.typeRepository = typeRepository;
+        this.createAdminUseCase = createAdminUseCase;
+        this.createEmployeeUseCase = createEmployeeUseCase;
+        this.createPatientUseCase = createPatientUseCase;
     }
     async execute(data) {
         const type = await this.typeRepository.findByName(data.type);
@@ -35,6 +44,15 @@ let CreateUserUseCase = class CreateUserUseCase {
             if (!existingUser.types.includes(type.id)) {
                 const updatedTypes = [...existingUser.types, type.id];
                 const updatedUser = await this.userRepository.update(existingUser.cpf.toString(), { types: updatedTypes });
+                await this.createInSpecificTable(data.type, {
+                    cpf: existingUser.cpf.toString(),
+                    name: existingUser.name,
+                    email: existingUser.email,
+                    password: existingUser.password,
+                    type: type.id,
+                    employeeTypeId: data.employeeTypeId || undefined,
+                    advice: data.advice
+                });
                 return updatedUser;
             }
             return existingUser;
@@ -50,13 +68,56 @@ let CreateUserUseCase = class CreateUserUseCase {
             active: data.active
         });
         const createdUser = await this.userRepository.create(user);
+        await this.createInSpecificTable(data.type, {
+            cpf: data.cpf,
+            name: data.name,
+            email: data.email,
+            password: hashedPassword,
+            type: type.id,
+            employeeTypeId: data.employeeTypeId || undefined,
+            advice: data.advice
+        });
         return createdUser;
+    }
+    async createInSpecificTable(typeName, data) {
+        switch (typeName.toUpperCase()) {
+            case 'ADMIN':
+                await this.createAdminUseCase.execute({
+                    cpf: data.cpf,
+                    name: data.name,
+                    type: typeName
+                });
+                break;
+            case 'EMPLOYEE':
+                const result = await this.createEmployeeUseCase.execute({
+                    cpf: data.cpf,
+                    name: data.name,
+                    type: typeName,
+                    employeeTypeId: data.employeeTypeId,
+                    advice: data.advice
+                });
+                return result;
+            case 'PATIENT':
+                await this.createPatientUseCase.execute({
+                    cpf: data.cpf,
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+                    type: typeName
+                });
+                break;
+            default:
+                throw new common_1.BadRequestException(`Tipo ${typeName} não suportado`);
+        }
     }
 };
 exports.CreateUserUseCase = CreateUserUseCase;
 exports.CreateUserUseCase = CreateUserUseCase = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [user_repository_1.UserRepository,
-        type_repository_1.TypeRepository])
+        type_repository_1.TypeRepository,
+        create_admin_usecase_1.CreateAdminUseCase,
+        create_employee_usecase_1.CreateEmployeeUseCase,
+        create_patient_usecase_1.CreatePatientUseCase])
 ], CreateUserUseCase);
 //# sourceMappingURL=create-user.usecase.js.map

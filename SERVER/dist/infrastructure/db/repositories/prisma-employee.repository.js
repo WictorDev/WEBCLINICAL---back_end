@@ -27,7 +27,7 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
                     name: employee.name,
                     advice: employee.advice,
                     typeId: employee.typeId,
-                    employeeTypeId: employee.employeeTypeId,
+                    employeeTypeId: employee.employeeTypeId || undefined,
                 },
             });
             return new employee_1.Employee({
@@ -35,7 +35,7 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
                 name: created.name,
                 advice: created.advice ?? undefined,
                 typeId: created.typeId,
-                employeeTypeId: created.employeeTypeId,
+                employeeTypeId: created.employeeTypeId || undefined,
             });
         }
         catch (error) {
@@ -64,7 +64,7 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
             name: employee.name,
             advice: employee.advice ?? undefined,
             typeId: employee.typeId,
-            employeeTypeId: employee.employeeTypeId,
+            employeeTypeId: employee.employeeTypeId || undefined,
         }));
     }
     async findByCpf(cpf) {
@@ -76,7 +76,7 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
             name: employee.name,
             advice: employee.advice ?? undefined,
             typeId: employee.typeId,
-            employeeTypeId: employee.employeeTypeId,
+            employeeTypeId: employee.employeeTypeId || undefined,
         });
     }
     async update(cpf, data) {
@@ -86,7 +86,7 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
                 name: data.name,
                 advice: data.advice,
                 typeId: data.typeId,
-                employeeTypeId: data.employeeTypeId,
+                employeeTypeId: data.employeeTypeId || undefined,
             },
         });
         return new employee_1.Employee({
@@ -94,7 +94,7 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
             name: updated.name,
             advice: updated.advice ?? undefined,
             typeId: updated.typeId,
-            employeeTypeId: updated.employeeTypeId,
+            employeeTypeId: updated.employeeTypeId || undefined,
         });
     }
 };

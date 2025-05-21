@@ -35,8 +35,6 @@ class Employee {
         return this.data.employeeTypeId;
     }
     set employeeTypeId(employeeTypeId) {
-        if (!employeeTypeId)
-            throw new Error('employeeTypeId é obrigatório.');
         this.data.employeeTypeId = employeeTypeId;
     }
     toJSON() {
@@ -45,7 +43,7 @@ class Employee {
             name: this.name,
             advice: this.advice,
             typeId: this.typeId,
-            employeeTypeId: this.employeeTypeId
+            employeeTypeId: this.employeeTypeId || undefined
         };
     }
     static create(data) {
@@ -55,7 +53,7 @@ class Employee {
             name: employee.name,
             advice: employee.advice,
             typeId: employee.typeId,
-            employeeTypeId: employee.employeeTypeId
+            employeeTypeId: employee.employeeTypeId || undefined
         };
     }
 }

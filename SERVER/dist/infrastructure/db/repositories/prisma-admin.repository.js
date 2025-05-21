@@ -22,19 +22,11 @@ let PrismaAdminRepository = class PrismaAdminRepository {
     }
     async create(data) {
         try {
-            let type = await this.prisma.type.findFirst({
-                where: { name: data.type }
-            });
-            if (!type) {
-                type = await this.prisma.type.create({
-                    data: { name: data.type }
-                });
-            }
             const admin = await this.prisma.admin.create({
                 data: {
                     cpf: data.cpf.toString(),
                     name: data.name,
-                    typeId: type.id
+                    typeId: data.type
                 },
                 include: {
                     type: true

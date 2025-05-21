@@ -14,16 +14,23 @@ const common_1 = require("@nestjs/common");
 const admin_repository_1 = require("../../domain/repositories/admin.repository");
 const admin_1 = require("../../domain/entities/admin");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
+const type_repository_1 = require("../../domain/repositories/type.repository");
 let CreateAdminUseCase = class CreateAdminUseCase {
     adminRepository;
-    constructor(adminRepository) {
+    typeRepository;
+    constructor(adminRepository, typeRepository) {
         this.adminRepository = adminRepository;
+        this.typeRepository = typeRepository;
     }
     async execute(data) {
+        const type = await this.typeRepository.findByName("ADMIN");
+        if (!type) {
+            throw new common_1.BadRequestException('Tipo ADMIN não encontrado.');
+        }
         const admin = new admin_1.Admin({
             cpf: new unique_entity_cpf_1.default(data.cpf),
             name: data.name,
-            type: data.type
+            type: type.id
         });
         return await this.adminRepository.create(admin);
     }
@@ -31,6 +38,7 @@ let CreateAdminUseCase = class CreateAdminUseCase {
 exports.CreateAdminUseCase = CreateAdminUseCase;
 exports.CreateAdminUseCase = CreateAdminUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [admin_repository_1.AdminRepository])
+    __metadata("design:paramtypes", [admin_repository_1.AdminRepository,
+        type_repository_1.TypeRepository])
 ], CreateAdminUseCase);
 //# sourceMappingURL=create-admin.usecase.js.map
