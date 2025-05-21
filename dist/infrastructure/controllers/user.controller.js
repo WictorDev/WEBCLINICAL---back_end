@@ -67,6 +67,29 @@ let UserController = class UserController {
             throw error;
         }
     }
+    async createFirstUser(body) {
+        const users = await this.findUserUseCase.execute();
+        if (users && users.length > 0) {
+            throw new common_1.BadRequestException('Já existe um usuário cadastrado.');
+        }
+        try {
+            const type = await this.typeRepository.findByName('ADMIN');
+            if (!type) {
+                throw new common_1.BadRequestException('Tipo de usuário não encontrado.');
+            }
+            return this.createUserUseCase.execute({
+                ...body,
+                cpf: new unique_entity_cpf_1.UniqueEntityCpf(body.cpf),
+                type: type.id
+            });
+        }
+        catch (error) {
+            if (error.message && error.message.includes('CPF')) {
+                throw new common_1.BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
     async update(cpf, body) {
         return this.updateUserUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf), body);
     }
@@ -96,13 +119,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findByCpf", null);
 __decorate([
-    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/create_user'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "create", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('/create_first_admin'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "createFirstUser", null);
 __decorate([
     (0, common_1.Put)(':cpf'),
     __param(0, (0, common_1.Param)('cpf')),

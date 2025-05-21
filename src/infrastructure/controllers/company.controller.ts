@@ -44,7 +44,7 @@ import {
     async findByCnpj(@Param('cnpj') cnpj: string) {
       return this.findCompanyByCnpjUseCase.execute(new UniqueEntityCnpj(cnpj));
     }
-    @Public()
+
     @Post('/create_company')
     async create(@Body() body: { cnpj: string; name: string; phone: string; email: string }) {
       try {
@@ -65,6 +65,24 @@ import {
       return this.updateCompanyUseCase.execute(new UniqueEntityCnpj(cnpj), body);
     }
   
-
+    @Public()
+    @Post('/create_first_company')
+    async createFirstCompany(@Body() body: { cnpj: string; name: string; phone: string; email: string }) {
+      const companies = await this.findCompanyUseCase.execute();
+      if (companies && companies.length > 0) {
+        throw new BadRequestException('Já existe uma companhia cadastrada.');
+      }
+      try {
+        return await this.createCompanyUseCase.execute({
+          ...body,
+          cnpj: new UniqueEntityCnpj(body.cnpj)
+        });
+      } catch (error) {
+        if (error.message && error.message.includes('CNPJ')) {
+          throw new BadRequestException(error.message);
+        }
+        throw error;
+      }
+    }
   }
   

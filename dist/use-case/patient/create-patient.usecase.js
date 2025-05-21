@@ -24,9 +24,9 @@ let CreatePatientUseCase = class CreatePatientUseCase {
         this.typeRepository = typeRepository;
     }
     async execute(data) {
-        const type = await this.typeRepository.findByName('Patient');
+        const type = await this.typeRepository.findByName('PATIENT');
         if (!type) {
-            throw new common_1.BadRequestException('Tipo padrão Patient não encontrado.');
+            throw new common_1.BadRequestException('Tipo padrão PATIENT não encontrado.');
         }
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const patient = new patient_1.Patient({

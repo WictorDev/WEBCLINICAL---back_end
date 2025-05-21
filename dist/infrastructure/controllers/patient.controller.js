@@ -20,7 +20,6 @@ const find_patient_by_cpf_usecase_1 = require("../../use-case/patient/find-patie
 const find_patient_by_email_usecase_1 = require("../../use-case/patient/find-patient-by-email.usecase");
 const jwt_guard_1 = require("../auth/jwt.guard");
 const swagger_1 = require("@nestjs/swagger");
-const public_decorator_1 = require("../auth/public.decorator");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 let PatientController = class PatientController {
     createPatientUseCase;
@@ -76,7 +75,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PatientController.prototype, "findByCpf", null);
 __decorate([
-    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

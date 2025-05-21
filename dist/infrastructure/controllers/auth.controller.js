@@ -36,7 +36,7 @@ let AuthController = class AuthController {
                 sameSite: 'lax',
                 maxAge: 1000 * 60 * 60 * 10
             });
-            return res.json({ tipo: result.tipo, nome: result.nome });
+            return res.json({ tipo: result.tipo, nome: result.nome, token: result.token });
         }
         return res.json(result);
     }

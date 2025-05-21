@@ -62,6 +62,24 @@ let CompanyController = class CompanyController {
     async update(cnpj, body) {
         return this.updateCompanyUseCase.execute(new unique_entity_cnpj_1.UniqueEntityCnpj(cnpj), body);
     }
+    async createFirstCompany(body) {
+        const companies = await this.findCompanyUseCase.execute();
+        if (companies && companies.length > 0) {
+            throw new common_1.BadRequestException('Já existe uma companhia cadastrada.');
+        }
+        try {
+            return await this.createCompanyUseCase.execute({
+                ...body,
+                cnpj: new unique_entity_cnpj_1.UniqueEntityCnpj(body.cnpj)
+            });
+        }
+        catch (error) {
+            if (error.message && error.message.includes('CNPJ')) {
+                throw new common_1.BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
 };
 exports.CompanyController = CompanyController;
 __decorate([
@@ -85,7 +103,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CompanyController.prototype, "findByCnpj", null);
 __decorate([
-    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/create_company'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -100,6 +117,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], CompanyController.prototype, "update", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('/create_first_company'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], CompanyController.prototype, "createFirstCompany", null);
 exports.CompanyController = CompanyController = __decorate([
     (0, swagger_1.ApiTags)('companies'),
     (0, common_1.Controller)('/api/companies'),

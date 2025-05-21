@@ -26,7 +26,7 @@ export class AuthController {
         sameSite: 'lax',
         maxAge: 1000 * 60 * 60 * 10 // 10 horas
       });
-      return res.json({ tipo: result.tipo, nome: result.nome });
+      return res.json({ tipo: result.tipo, nome: result.nome, token: result.token });
     }
     // Caso multiplosPerfis
     return res.json(result);

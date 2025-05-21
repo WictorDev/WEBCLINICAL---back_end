@@ -7,12 +7,19 @@
 
 ## 🚀 Tecnologias Utilizadas
 
-- NestJS
-- Prisma ORM
-- MySQL
-- TypeScript
-- Clean Architecture
-- Docker
+### Dependências Principais
+- NestJS: ^11.0.1
+- Prisma ORM: ^6.5.0
+- MySQL: 8.0
+- TypeScript: ^5.7.3
+- JWT: ^9.0.2
+- Bcrypt: ^5.1.1
+
+### Dependências de Desenvolvimento
+- ESLint: ^9.18.0
+- Prettier: ^3.4.2
+- Jest: ^29.7.0
+- Supertest: ^7.0.0
 
 ## 📋 Pré-requisitos
 
@@ -35,7 +42,7 @@ npm install
 Execute o seguinte comando para iniciar um container MySQL:
 
 ```bash
-docker run --name mysql-webclinical -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=webclinical -p 3306:3306 -d mysql:8.0
+docker run --name mysql-webclinical -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=webclinical -p 3306:3306 -d mysql:8.4.4
 ```
 
 > Este comando cria um container MySQL com as seguintes configurações:
@@ -124,12 +131,12 @@ Para criar um usuário no sistema WebClinical, é necessário seguir um fluxo es
 ### 1️⃣ Pré-requisitos
 
 Antes de criar um usuário, é necessário que existam:
-- Uma empresa (Company) cadastrada
+- Uma empresa (Company) cadastrada - lembre-se de guardar o CNPJ da empresa, pois seu uso será crucial mais a frente
 - Um tipo de usuário (Type) cadastrado
 
 ### 2️⃣ Cadastro da Empresa
 
-**Endpoint:** `POST /api/companies/create_company`
+**Endpoint:** `POST /api/companies/create_first_company`
 
 **Corpo da requisição:**
 ```json
@@ -145,33 +152,38 @@ Antes de criar um usuário, é necessário que existam:
 - O CNPJ deve ser único no sistema
 - O e-mail deve ser único no sistema
 - Todos os campos são obrigatórios
+- Esta rota só pode ser executada uma vez, na primeira criação do banco
 
 ### 3️⃣ Cadastro do Tipo de Usuário
 
-**Endpoint:** `POST /api/types`
+**Endpoint:** `POST /api/types/create_initial_types`
 
 **Corpo da requisição:**
 ```json
 {
-  "name": "Adimin"
+  "name": "ADMIN"
 }
 ```
 
 ```json
 {
-  "name": "Employee"
+  "name": "EMPLOYEE"
 }
 ```
 
 ```json
 {
-  "name": "Patient"
+  "name": "PATIENT"
 }
 ```
+
+**Observações:**
+- Esta rota só pode ser executada uma vez, na primeira criação do banco
+- Cria automaticamente os tipos ADMIN, EMPLOYEE e PATIENT
 
 ### 4️⃣ Criação do Usuário
 
-**Endpoint:** `POST /api/users/create_user`
+**Endpoint:** `POST /api/users/create_first_admin`
 
 **Corpo da requisição:**
 ```json
@@ -181,7 +193,6 @@ Antes de criar um usuário, é necessário que existam:
   "email": "joao.silva@clinicasaolucas.com.br",
   "password": "senha123",
   "companyId": "99006876000102",
-  "type": "Adimin",
   "active": true
 }
 ```
@@ -199,9 +210,9 @@ O sistema permite que pacientes se registrem e façam login para acessar funcion
 
 ### 1️⃣ Pré-requisitos
 
-Antes de registrar um paciente, é necessário que exista no sistema um **tipo chamado exatamente 'Patient'** (com P maiúsculo). Esse tipo é obrigatório e será atribuído automaticamente a todos os pacientes cadastrados.
+Antes de registrar um paciente, é necessário que exista no sistema um **tipo chamado exatamente 'PATIENT'** (maiúsculo). Esse tipo é obrigatório e será atribuído automaticamente a todos os pacientes cadastrados.
 
-> **Importante:** O campo `type` **não** deve ser enviado no corpo da requisição. O backend sempre usará o tipo padrão `Patient`.
+> **Importante:** O campo `type` **não** deve ser enviado no corpo da requisição. O backend sempre usará o tipo padrão `PATIENT`.
 
 ### 2️⃣ Registro de Paciente
 
@@ -218,11 +229,11 @@ Antes de registrar um paciente, é necessário que exista no sistema um **tipo c
 ```
 
 **Notas importantes:**
-- O tipo do paciente será sempre o tipo padrão `Patient`.
-- O tipo `Patient` deve existir previamente no sistema (crie via endpoint `/api/types` se necessário).
+- O tipo do paciente será sempre o tipo padrão `PATIENT`.
+- O tipo `PATIENT` deve existir previamente no sistema (crie via endpoint `/api/types` se necessário).
 - O CPF e email devem ser únicos no sistema.
 - A senha será automaticamente criptografada.
-- Se o tipo `Patient` não existir, será retornado um erro: "Tipo padrão Patient não encontrado."
+- Se o tipo `PATIENT` não existir, será retornado um erro: "Tipo padrão PATIENT não encontrado."
 
 ### 3️⃣ Login de Paciente
 
@@ -255,7 +266,8 @@ ou
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "userType": "patient"
+  "userType": "PATIENT",
+  "nome": "Ana Paula Silva" 
 }
 ```
 
@@ -270,7 +282,7 @@ ou
 }
 ```
 
-### Employee (Funcionário)
+### Employee (Funcionário)  AS
 
 **Endpoint:** `POST /api/employees`
 ```json
