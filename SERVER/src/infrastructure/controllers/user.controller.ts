@@ -48,7 +48,6 @@ import { TypeRepository } from 'src/domain/repositories/type.repository';
       return this.findUserByCpfUseCase.execute(new UniqueEntityCpf(cpf));
     }
   
-    @Public()
     @Post('/create_user')
     async create(
       @Body() body: { 
@@ -63,6 +62,31 @@ import { TypeRepository } from 'src/domain/repositories/type.repository';
     ) {
       try {
         const type = await this.typeRepository.findByName(body.type);
+        if (!type) {
+          throw new BadRequestException('Tipo de usuário não encontrado.');
+        }
+        return this.createUserUseCase.execute({
+          ...body,
+          cpf: new UniqueEntityCpf(body.cpf),
+          type: type.id
+        });
+      } catch (error) {
+        if (error.message && error.message.includes('CPF')) {
+          throw new BadRequestException(error.message);
+        }
+        throw error;
+      }
+    }
+  
+    @Public()
+    @Post('/create_first_admin')
+    async createFirstUser(@Body() body: { name: string; cpf: string; email: string; password: string; companyId: string; active: boolean }) {
+      const users = await this.findUserUseCase.execute();
+      if (users && users.length > 0) {
+        throw new BadRequestException('Já existe um usuário cadastrado.');
+      }
+      try {
+        const type = await this.typeRepository.findByName('ADMIN');
         if (!type) {
           throw new BadRequestException('Tipo de usuário não encontrado.');
         }

@@ -42,8 +42,7 @@ export class PatientController {
   async findByCpf(@Param('cpf') cpf: string) {
     return this.findPatientByCpfUseCase.execute(new UniqueEntityCpf(cpf));
   }
-
-  @Public()
+  
   @Post('/register')
   async register(
     @Body() body: { 

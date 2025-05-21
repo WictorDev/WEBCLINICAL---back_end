@@ -13,10 +13,10 @@ export class CreatePatientUseCase {
   ) {}
 
   async execute(data: { cpf: string; name: string; email: string; password: string }) {
-    // Buscar o tipo padrão "Patient"
-    const type = await this.typeRepository.findByName('Patient');
+    // Buscar o tipo padrão "PATIENT"
+    const type = await this.typeRepository.findByName('PATIENT');
     if (!type) {
-      throw new BadRequestException('Tipo padrão Patient não encontrado.');
+      throw new BadRequestException('Tipo padrão PATIENT não encontrado.');
     }
 
     // Hash da senha

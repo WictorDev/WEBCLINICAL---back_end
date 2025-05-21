@@ -20,4 +20,10 @@ export declare class CompanyController {
         email: string;
     }): Promise<import("../../domain/entities/company").Company>;
     update(cnpj: string, body: any): Promise<import("../../domain/entities/company").Company>;
+    createFirstCompany(body: {
+        cnpj: string;
+        name: string;
+        phone: string;
+        email: string;
+    }): Promise<import("../../domain/entities/company").Company>;
 }

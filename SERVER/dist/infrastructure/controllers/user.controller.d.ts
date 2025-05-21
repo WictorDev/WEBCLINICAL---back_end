@@ -24,6 +24,14 @@ export declare class UserController {
         type: string;
         active: boolean;
     }): Promise<import("../../domain/entities/user").User>;
+    createFirstUser(body: {
+        name: string;
+        cpf: string;
+        email: string;
+        password: string;
+        companyId: string;
+        active: boolean;
+    }): Promise<import("../../domain/entities/user").User>;
     update(cpf: string, body: any): Promise<import("../../domain/entities/user").User>;
     delete(cpf: string): Promise<import("../../domain/entities/user").User>;
 }

@@ -16,10 +16,14 @@ exports.TypeController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const create_type_usecase_1 = require("../../use-case/type/create-type.usecase");
+const type_repository_1 = require("../../domain/repositories/type.repository");
+const public_decorator_1 = require("../auth/public.decorator");
 let TypeController = class TypeController {
     createTypeUseCase;
-    constructor(createTypeUseCase) {
+    typeRepository;
+    constructor(createTypeUseCase, typeRepository) {
         this.createTypeUseCase = createTypeUseCase;
+        this.typeRepository = typeRepository;
     }
     async create(body) {
         try {
@@ -32,6 +36,28 @@ let TypeController = class TypeController {
             throw error;
         }
     }
+    async createInitialTypes() {
+        const types = await this.typeRepository.findAll();
+        if (types && types.length > 0) {
+            throw new common_1.BadRequestException('Já existem tipos cadastrados.');
+        }
+        const initialTypes = [
+            { name: 'ADMIN' },
+            { name: 'EMPLOYEE' },
+            { name: 'PATIENT' }
+        ];
+        const createdTypes = [];
+        for (const type of initialTypes) {
+            try {
+                const created = await this.createTypeUseCase.execute(type);
+                createdTypes.push(created);
+            }
+            catch (error) {
+                throw new common_1.BadRequestException(`Erro ao criar tipo ${type.name}: ${error.message}`);
+            }
+        }
+        return createdTypes;
+    }
 };
 exports.TypeController = TypeController;
 __decorate([
@@ -41,9 +67,17 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], TypeController.prototype, "create", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('/create_initial_types'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TypeController.prototype, "createInitialTypes", null);
 exports.TypeController = TypeController = __decorate([
     (0, swagger_1.ApiTags)('types'),
     (0, common_1.Controller)('/api/types'),
-    __metadata("design:paramtypes", [create_type_usecase_1.CreateTypeUseCase])
+    __metadata("design:paramtypes", [create_type_usecase_1.CreateTypeUseCase,
+        type_repository_1.TypeRepository])
 ], TypeController);
 //# sourceMappingURL=type.controller.js.map
