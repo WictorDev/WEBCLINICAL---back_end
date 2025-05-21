@@ -20,6 +20,18 @@ class Appointment {
         this.patientId = patientId;
         this.employeeId = employeeId;
     }
+    static create(data) {
+        return {
+            id: data.id,
+            date: data.date,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            status: data.status,
+            scheduleId: data.scheduleId,
+            patientId: data.patientId,
+            employeeId: data.employeeId
+        };
+    }
 }
 exports.Appointment = Appointment;
 //# sourceMappingURL=appointment.js.map

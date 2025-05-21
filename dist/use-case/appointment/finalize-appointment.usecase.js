@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FinalizeAppointmentUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const tokens_constants_1 = require("../../infrastructure/constants/tokens.constants");
+const unique_entity_id_1 = require("../../core/entities/unique-entity-id");
 let FinalizeAppointmentUseCase = class FinalizeAppointmentUseCase {
     medicalRecordRepository;
     appointmentRepository;
@@ -23,15 +24,14 @@ let FinalizeAppointmentUseCase = class FinalizeAppointmentUseCase {
         this.appointmentRepository = appointmentRepository;
     }
     async execute(appointmentId, data) {
-        const appointments = await this.appointmentRepository.findByEmployee('', undefined);
-        const appointment = appointments.find(a => a.id === appointmentId);
+        const appointment = await this.appointmentRepository.findById(new unique_entity_id_1.UniqueEntityID(appointmentId));
         if (!appointment) {
             throw new Error('Agendamento não encontrado.');
         }
         if (appointment.status !== 'CONFIRMADO') {
             throw new Error('Apenas agendamentos confirmados podem ser finalizados.');
         }
-        await this.appointmentRepository.updateStatus(appointmentId, 'FINALIZADO');
+        await this.appointmentRepository.updateStatus(new unique_entity_id_1.UniqueEntityID(appointmentId), 'FINALIZADO');
         const record = await this.medicalRecordRepository.create({
             ...data,
             id: '',

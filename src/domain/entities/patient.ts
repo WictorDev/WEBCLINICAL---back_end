@@ -55,4 +55,23 @@ export class Patient {
     if (!type) throw new Error("Tipo é obrigatório.");
     this.data.type = type;
   }
+
+  toJSON() {
+    return {
+      cpf: this.cpf.toString(),
+      name: this.name,
+      email: this.email,
+      type: this.type
+    };
+  }
+
+  static create(data: PatientData) {
+    return {
+      cpf: data.cpf.toString(),
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      type: data.type
+    };
+  }
 }

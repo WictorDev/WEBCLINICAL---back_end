@@ -6,4 +6,19 @@ export declare class MedicalRecord {
     createdAt: Date;
     appointmentId: string;
     constructor(id: string, symptoms: string, diagnosis: string, conduct: string, createdAt: Date, appointmentId: string);
+    static create(data: {
+        id: string;
+        symptoms: string;
+        diagnosis: string;
+        conduct: string;
+        createdAt: Date;
+        appointmentId: string;
+    }): {
+        id: string;
+        symptoms: string;
+        diagnosis: string;
+        conduct: string;
+        createdAt: Date;
+        appointmentId: string;
+    };
 }

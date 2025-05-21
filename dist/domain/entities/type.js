@@ -17,6 +17,18 @@ class Type {
             throw new Error("Nome do tipo é obrigatório.");
         this.data.name = name;
     }
+    toJSON() {
+        return {
+            id: this.id,
+            name: this.name
+        };
+    }
+    static create(data) {
+        return {
+            id: data.id,
+            name: data.name
+        };
+    }
 }
 exports.Type = Type;
 //# sourceMappingURL=type.js.map

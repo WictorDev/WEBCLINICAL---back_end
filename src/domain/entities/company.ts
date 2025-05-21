@@ -45,4 +45,22 @@ export class Company {
     if (!phone) throw new Error("Telefone da empresa é obrigatório.");
     this.data.phone = phone;
   }
+
+  toJSON() {
+    return {
+      name: this.name,
+      cnpj: this.cnpj,
+      email: this.email,
+      phone: this.phone
+    };
+  }
+
+  static create(data: CompanyData) {
+    return {
+      name: data.name,
+      cnpj: data.cnpj.toString(),
+      email: data.email,
+      phone: data.phone
+    };
+  }
 }

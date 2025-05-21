@@ -74,5 +74,29 @@ export class User {
   set active(value: boolean) {
     this.data.active = value;
   }
-  
+
+    toJSON() {
+    return {
+      cpf: this.cpf.toString(),
+      name: this.name,
+      email: this.email,
+      password: this.password,
+      companyId: this.companyId,
+      type: this.type,
+      active: this.active
+    };
+  }
+
+  static create(data: UserData) {
+    const user = new User(data);
+    return {
+      cpf: user.cpf.toString(),
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      companyId: user.companyId,
+      type: user.type,
+      active: user.active
+    };
+  }
 }

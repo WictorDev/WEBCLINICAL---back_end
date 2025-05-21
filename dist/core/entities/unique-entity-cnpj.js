@@ -14,7 +14,7 @@ class UniqueEntityCnpj {
         this.value = cleanCNPJ;
     }
     toString() {
-        return this.value;
+        return this.value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
     }
     isValidFormat(cnpj) {
         return /^\d{14}$/.test(cnpj);

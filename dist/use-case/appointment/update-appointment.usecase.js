@@ -12,34 +12,26 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateAppointmentStatusUseCase = void 0;
+exports.UpdateAppointmentUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const tokens_constants_1 = require("../../infrastructure/constants/tokens.constants");
-const unique_entity_id_1 = require("../../core/entities/unique-entity-id");
-let UpdateAppointmentStatusUseCase = class UpdateAppointmentStatusUseCase {
+let UpdateAppointmentUseCase = class UpdateAppointmentUseCase {
     appointmentRepository;
     constructor(appointmentRepository) {
         this.appointmentRepository = appointmentRepository;
     }
-    async execute(appointmentId, status) {
-        const validStatuses = ['PENDENTE', 'CONFIRMADO', 'FINALIZADO', 'CANCELADO'];
-        if (!validStatuses.includes(status)) {
-            throw new Error(`Status inválido. Use um dos seguintes: ${validStatuses.join(', ')}`);
-        }
-        const appointment = await this.appointmentRepository.findById(new unique_entity_id_1.UniqueEntityID(appointmentId));
+    async execute(id, data) {
+        const appointment = await this.appointmentRepository.findById(id);
         if (!appointment) {
             throw new Error('Agendamento não encontrado.');
         }
-        if (status === 'FINALIZADO' && appointment.status !== 'CONFIRMADO') {
-            throw new Error('Apenas agendamentos confirmados podem ser finalizados.');
-        }
-        return this.appointmentRepository.updateStatus(new unique_entity_id_1.UniqueEntityID(appointmentId), status);
+        return this.appointmentRepository.update(id, data);
     }
 };
-exports.UpdateAppointmentStatusUseCase = UpdateAppointmentStatusUseCase;
-exports.UpdateAppointmentStatusUseCase = UpdateAppointmentStatusUseCase = __decorate([
+exports.UpdateAppointmentUseCase = UpdateAppointmentUseCase;
+exports.UpdateAppointmentUseCase = UpdateAppointmentUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(tokens_constants_1.APPOINTMENT_REPOSITORY_TOKEN)),
     __metadata("design:paramtypes", [Object])
-], UpdateAppointmentStatusUseCase);
-//# sourceMappingURL=update-appointment-status.usecase.js.map
+], UpdateAppointmentUseCase);
+//# sourceMappingURL=update-appointment.usecase.js.map

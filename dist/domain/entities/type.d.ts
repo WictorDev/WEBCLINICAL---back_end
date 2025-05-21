@@ -8,4 +8,12 @@ export declare class Type {
     get id(): string;
     get name(): string;
     set name(name: string);
+    toJSON(): {
+        id: string;
+        name: string;
+    };
+    static create(data: TypeData): {
+        id: string;
+        name: string;
+    };
 }

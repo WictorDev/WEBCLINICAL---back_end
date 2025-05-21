@@ -39,6 +39,22 @@ class Company {
             throw new Error("Telefone da empresa é obrigatório.");
         this.data.phone = phone;
     }
+    toJSON() {
+        return {
+            name: this.name,
+            cnpj: this.cnpj,
+            email: this.email,
+            phone: this.phone
+        };
+    }
+    static create(data) {
+        return {
+            name: data.name,
+            cnpj: data.cnpj.toString(),
+            email: data.email,
+            phone: data.phone
+        };
+    }
 }
 exports.Company = Company;
 //# sourceMappingURL=company.js.map

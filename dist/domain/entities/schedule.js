@@ -14,6 +14,15 @@ class Schedule {
         this.endTime = endTime;
         this.employeeId = employeeId;
     }
+    static create(data) {
+        return {
+            id: data.id,
+            dayOfWeek: data.dayOfWeek,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            employeeId: data.employeeId
+        };
+    }
 }
 exports.Schedule = Schedule;
 //# sourceMappingURL=schedule.js.map

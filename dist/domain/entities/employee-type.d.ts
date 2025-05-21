@@ -9,4 +9,12 @@ export declare class EmployeeType {
     set id(id: string);
     get name(): string;
     set name(name: string);
+    toJSON(): {
+        id: string;
+        name: string;
+    };
+    static create(data: EmployeeTypeData): {
+        id: string;
+        name: string;
+    };
 }
