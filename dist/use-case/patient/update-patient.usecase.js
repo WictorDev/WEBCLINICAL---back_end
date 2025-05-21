@@ -12,26 +12,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdatePatientUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const patient_repository_1 = require("../../domain/repositories/patient.repository");
-const bcrypt = require("bcrypt");
+const patient_1 = require("../../domain/entities/patient");
+const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 let UpdatePatientUseCase = class UpdatePatientUseCase {
-    repo;
-    constructor(repo) {
-        this.repo = repo;
+    patientRepository;
+    constructor(patientRepository) {
+        this.patientRepository = patientRepository;
     }
     async execute(cpf, data) {
-        const patient = await this.repo.findByCpf(cpf);
-        if (!patient) {
-            throw new Error('Paciente não encontrado.');
-        }
-        const updateData = {};
-        if (data.name) {
-            updateData.name = data.name;
-        }
-        if (data.password) {
-            const hashedPassword = await bcrypt.hash(data.password, 10);
-            updateData.password = hashedPassword;
-        }
-        return this.repo.update(cpf, updateData);
+        const patient = await this.patientRepository.findByCpf(cpf.toString());
+        if (!patient)
+            throw new Error('Paciente não encontrado');
+        const updatedPatient = new patient_1.Patient({
+            cpf: new unique_entity_cpf_1.default(patient.cpf),
+            name: data.name || patient.name,
+            email: data.email || patient.email,
+            password: data.password || patient.password,
+            typeId: data.typeId || patient.typeId
+        });
+        return await this.patientRepository.update(cpf.toString(), updatedPatient);
     }
 };
 exports.UpdatePatientUseCase = UpdatePatientUseCase;

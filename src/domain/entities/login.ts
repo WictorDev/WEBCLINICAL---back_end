@@ -2,13 +2,13 @@ export interface LoginProps {
   identifier: string; // pode ser CPF ou email
   password: string;
   isPatient?: boolean; // flag para determinar se é login de paciente
-  tipo?: 'paciente' | 'profissional' | 'admin';}
+  tipo?: 'PATIENT' | 'EMPLOYEE' | 'ADMIN';}
 
-export default class Login {
+export class Login {
   identifier: string;
   password: string;
-  isPatient: boolean;
-  tipo?: 'paciente' | 'profissional' | 'admin';
+  isPatient?: boolean; // flag para determinar se é login de paciente
+  tipo?: 'PATIENT' | 'EMPLOYEE' | 'ADMIN';
 
   constructor(props: LoginProps) {
     this.identifier = props.identifier;
@@ -16,4 +16,12 @@ export default class Login {
     this.isPatient = props.isPatient || false;
     this.tipo = props.tipo;
   }
+}
+
+export class LoginResponse {
+  token?: string;
+  tipo?: 'PATIENT' | 'EMPLOYEE' | 'ADMIN';
+  nome?: string;
+  multiplosPerfis?: boolean;
+  perfis?: string[];
 }

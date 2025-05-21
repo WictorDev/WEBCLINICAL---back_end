@@ -4,8 +4,8 @@ export interface UserData {
     name: string;
     email: string;
     password: string;
-    companyId: string;
-    type: string;
+    companyId?: string;
+    types: string[];
     active?: boolean;
 }
 export declare class User {
@@ -19,10 +19,10 @@ export declare class User {
     set email(email: string);
     get password(): string;
     set password(password: string);
-    get companyId(): string;
-    set companyId(companyId: string);
-    get type(): string;
-    set type(type: string);
+    get companyId(): string | undefined;
+    set companyId(companyId: string | undefined);
+    get types(): string[];
+    set types(types: string[]);
     get active(): boolean | undefined;
     set active(value: boolean);
     toJSON(): {
@@ -30,8 +30,8 @@ export declare class User {
         name: string;
         email: string;
         password: string;
-        companyId: string;
-        type: string;
+        companyId: string | undefined;
+        types: string[];
         active: boolean | undefined;
     };
     static create(data: UserData): {
@@ -39,8 +39,8 @@ export declare class User {
         name: string;
         email: string;
         password: string;
-        companyId: string;
-        type: string;
+        companyId: string | undefined;
+        types: string[];
         active: boolean | undefined;
     };
 }

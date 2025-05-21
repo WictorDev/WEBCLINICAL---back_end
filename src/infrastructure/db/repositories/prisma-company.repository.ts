@@ -9,6 +9,10 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 export class PrismaCompanyRepository implements CompanyRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
+  private removeCnpjFormat(cnpj: string): string {
+    return cnpj.replace(/[^\d]/g, '');
+  }
+
   async create(company: Company): Promise<Company> {
     try {
       const created = await this.prismaService.company.create({
@@ -82,7 +86,7 @@ export class PrismaCompanyRepository implements CompanyRepository {
 
   async findByCnpj(cnpj: string): Promise<Company | null> {
     const company = await this.prismaService.company.findUnique({
-      where: { Cnpj: cnpj }
+      where: { Cnpj: this.removeCnpjFormat(cnpj) }
     });
 
     if (!company) return null;

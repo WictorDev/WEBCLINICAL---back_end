@@ -4,10 +4,10 @@ import { Employee } from 'src/domain/entities/employee';
 
 @Injectable()
 export class CreateEmployeeUseCase {
-  constructor(private readonly repo: EmployeeRepository) {}
+  constructor(private readonly employeeRepository: EmployeeRepository) {}
 
-  async execute(data: { cpf: string; name: string; advice?: string; typeId: string; employeeTypeId: string }) {
+  async execute(data: { cpf: string; name: string; typeId: string; employeeTypeId: string; advice?: string }) {
     const employee = new Employee(data);
-    return this.repo.create(employee);
+    return await this.employeeRepository.create(employee);
   }
 } 

@@ -5,8 +5,8 @@ export interface UserData {
   name: string;
   email: string;
   password: string;
-  companyId: string;
-  type: string;
+  companyId?: string;
+  types: string[];
   active?: boolean;
 }
 
@@ -49,22 +49,21 @@ export class User {
     this.data.password = password;
   }
 
-  get companyId(): string {
+  get companyId(): string | undefined {
     return this.data.companyId;
   }
 
-  set companyId(companyId: string) {
-    if (!companyId) throw new Error("Empresa é obrigatória.");
+  set companyId(companyId: string | undefined) {
     this.data.companyId = companyId;
   }
 
-  get type(): string {
-    return this.data.type;
+  get types(): string[] {
+    return this.data.types;
   }
 
-  set type(type: string) {
-    if (!type) throw new Error("Tipo é obrigatório.");
-    this.data.type = type;
+  set types(types: string[]) {
+    if (!types || types.length === 0) throw new Error("Pelo menos um tipo é obrigatório.");
+    this.data.types = types;
   }
 
   get active(): boolean | undefined {
@@ -75,14 +74,14 @@ export class User {
     this.data.active = value;
   }
 
-    toJSON() {
+  toJSON() {
     return {
       cpf: this.cpf.toString(),
       name: this.name,
       email: this.email,
       password: this.password,
       companyId: this.companyId,
-      type: this.type,
+      types: this.types,
       active: this.active
     };
   }
@@ -95,7 +94,7 @@ export class User {
       email: user.email,
       password: user.password,
       companyId: user.companyId,
-      type: user.type,
+      types: user.types,
       active: user.active
     };
   }

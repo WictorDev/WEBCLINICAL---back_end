@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../../core/services/auth.service");
-const login_1 = require("../../domain/entities/login");
 const swagger_1 = require("@nestjs/swagger");
 const public_decorator_1 = require("../auth/public.decorator");
 let AuthController = class AuthController {
@@ -23,29 +22,27 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async login(loginProps, res) {
-        const login = new login_1.default(loginProps);
-        if (loginProps.tipo) {
-            login.tipo = loginProps.tipo;
+    async login(loginData, res) {
+        try {
+            const result = await this.authService.login(loginData);
+            if (result.token) {
+                res.cookie('token', result.token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'lax',
+                    maxAge: 1000 * 60 * 60 * 10
+                });
+                return res.json({ tipo: result.tipo, nome: result.nome });
+            }
+            return res.json(result);
         }
-        const result = await this.authService.Login(login);
-        if (result.token) {
-            res.cookie('token', result.token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 1000 * 60 * 60 * 10
+        catch (error) {
+            return res.status(401).json({
+                message: 'Usuário ou senha inválidos',
+                error: 'Unauthorized',
+                statusCode: 401
             });
-            return res.json({ tipo: result.tipo, nome: result.nome, token: result.token });
         }
-        return res.json(result);
-    }
-    async loginPatient(loginProps) {
-        const login = new login_1.default({
-            ...loginProps,
-            isPatient: true
-        });
-        return this.authService.Login(login);
     }
     logout(res) {
         res.clearCookie('token');
@@ -62,14 +59,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
-__decorate([
-    (0, public_decorator_1.Public)(),
-    (0, common_1.Post)('login/patient'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "loginPatient", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('logout'),

@@ -43,17 +43,15 @@ class User {
         return this.data.companyId;
     }
     set companyId(companyId) {
-        if (!companyId)
-            throw new Error("Empresa é obrigatória.");
         this.data.companyId = companyId;
     }
-    get type() {
-        return this.data.type;
+    get types() {
+        return this.data.types;
     }
-    set type(type) {
-        if (!type)
-            throw new Error("Tipo é obrigatório.");
-        this.data.type = type;
+    set types(types) {
+        if (!types || types.length === 0)
+            throw new Error("Pelo menos um tipo é obrigatório.");
+        this.data.types = types;
     }
     get active() {
         return this.data.active;
@@ -68,7 +66,7 @@ class User {
             email: this.email,
             password: this.password,
             companyId: this.companyId,
-            type: this.type,
+            types: this.types,
             active: this.active
         };
     }
@@ -80,7 +78,7 @@ class User {
             email: user.email,
             password: user.password,
             companyId: user.companyId,
-            type: user.type,
+            types: user.types,
             active: user.active
         };
     }
