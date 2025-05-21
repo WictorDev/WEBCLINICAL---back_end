@@ -42,7 +42,7 @@ let AuthController = class AuthController {
             }
             const result = await this.authService.Login(login);
             if (result.token) {
-                res.cookie('auth_token', result.token, COOKIE_OPTIONS);
+                res.cookie('token', result.token, COOKIE_OPTIONS);
                 const responseBody = {
                     success: true,
                     tipo: result.tipo,
@@ -50,6 +50,9 @@ let AuthController = class AuthController {
                     multiplosPerfis: result.multiplosPerfis,
                 };
                 if (result.multiplosPerfis) {
+                    if (result.perfisDisponiveis) {
+                        responseBody.perfisDisponiveis = result.perfisDisponiveis;
+                    }
                     return res.status(200).json(responseBody);
                 }
                 return res.status(200).json(responseBody);
@@ -74,7 +77,7 @@ let AuthController = class AuthController {
             });
             const result = await this.authService.Login(login);
             if (result.token) {
-                res.cookie('auth_token', result.token, COOKIE_OPTIONS);
+                res.cookie('token', result.token, COOKIE_OPTIONS);
                 return res.status(200).json({
                     success: true,
                     tipo: result.tipo,
@@ -87,7 +90,6 @@ let AuthController = class AuthController {
             });
         }
         catch (error) {
-            console.error('Erro no login de paciente:', error);
             return res.status(401).json({
                 success: false,
                 message: error.message || 'Credenciais inválidas'
@@ -96,7 +98,7 @@ let AuthController = class AuthController {
     }
     async logout(res) {
         try {
-            res.clearCookie('auth_token', COOKIE_OPTIONS);
+            res.clearCookie('token', COOKIE_OPTIONS);
             return res.status(200).json({
                 success: true,
                 message: 'Logout realizado com sucesso'
@@ -189,7 +191,7 @@ let AuthController = class AuthController {
     async testAuth(req, headers) {
         return {
             cookies: {
-                auth_token: req.cookies?.auth_token ? 'PRESENTE' : 'AUSENTE'
+                token: req.cookies?.token ? 'PRESENTE' : 'AUSENTE'
             },
             headers: {
                 authorization: headers.authorization ? 'PRESENTE' : 'AUSENTE'

@@ -9,4 +9,5 @@ export declare class AuthService {
     Login(login: any): Promise<any>;
     private gerarTokenPaciente;
     private gerarTokenUsuario;
+    private gerarTokenAdmin;
 }

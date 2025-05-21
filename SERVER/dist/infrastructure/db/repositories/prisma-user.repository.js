@@ -35,6 +35,55 @@ let PrismaUserRepository = class PrismaUserRepository {
                     active: user.active ?? true,
                 },
             });
+            const userType = await this.prismaService.type.findUnique({
+                where: { id: user.type }
+            });
+            if (userType && userType.name === 'Admin') {
+                try {
+                    const existingAdmin = await this.prismaService.admin.findUnique({
+                        where: { Cpf: user.cpf.toString() }
+                    });
+                    if (!existingAdmin) {
+                        await this.prismaService.admin.create({
+                            data: {
+                                Cpf: user.cpf.toString(),
+                                name: user.name,
+                                typeId: user.type
+                            }
+                        });
+                        console.log(`Registro de Admin criado automaticamente para o usuário ${user.name} (CPF: ${user.cpf.toString()})`);
+                    }
+                }
+                catch (adminError) {
+                    console.error('Erro ao criar registro de Admin:', adminError);
+                }
+            }
+            else if (userType && userType.name === 'Employee') {
+                try {
+                    const existingEmployee = await this.prismaService.employee.findUnique({
+                        where: { cpf: user.cpf.toString() }
+                    });
+                    if (!existingEmployee) {
+                        const defaultEmployeeType = await this.prismaService.employeeType.findFirst();
+                        if (!defaultEmployeeType) {
+                            console.error('Não foi possível encontrar um EmployeeType padrão para o funcionário');
+                            throw new Error('EmployeeType não encontrado');
+                        }
+                        await this.prismaService.employee.create({
+                            data: {
+                                cpf: user.cpf.toString(),
+                                name: user.name,
+                                typeId: user.type,
+                                employeeTypeId: defaultEmployeeType.id
+                            }
+                        });
+                        console.log(`Registro de Employee criado automaticamente para o usuário ${user.name} (CPF: ${user.cpf.toString()})`);
+                    }
+                }
+                catch (employeeError) {
+                    console.error('Erro ao criar registro de Employee:', employeeError);
+                }
+            }
             return new user_1.User({
                 ...createdUser,
                 cpf: new unique_entity_cpf_1.default(createdUser.cpf),
@@ -82,6 +131,57 @@ let PrismaUserRepository = class PrismaUserRepository {
                 active: user.active ?? true
             }
         });
+        if (user.type) {
+            const userType = await this.prismaService.type.findUnique({
+                where: { id: user.type }
+            });
+            if (userType && userType.name === 'Admin') {
+                try {
+                    const existingAdmin = await this.prismaService.admin.findUnique({
+                        where: { Cpf: cpf.toString() }
+                    });
+                    if (!existingAdmin) {
+                        await this.prismaService.admin.create({
+                            data: {
+                                Cpf: cpf.toString(),
+                                name: updatedUser.name,
+                                typeId: user.type
+                            }
+                        });
+                        console.log(`Registro de Admin criado automaticamente para o usuário ${updatedUser.name} (CPF: ${cpf})`);
+                    }
+                }
+                catch (adminError) {
+                    console.error('Erro ao criar registro de Admin durante atualização:', adminError);
+                }
+            }
+            else if (userType && userType.name === 'Employee') {
+                try {
+                    const existingEmployee = await this.prismaService.employee.findUnique({
+                        where: { cpf: cpf.toString() }
+                    });
+                    if (!existingEmployee) {
+                        const defaultEmployeeType = await this.prismaService.employeeType.findFirst();
+                        if (!defaultEmployeeType) {
+                            console.error('Não foi possível encontrar um EmployeeType padrão para o funcionário');
+                            throw new Error('EmployeeType não encontrado');
+                        }
+                        await this.prismaService.employee.create({
+                            data: {
+                                cpf: cpf.toString(),
+                                name: updatedUser.name,
+                                typeId: user.type,
+                                employeeTypeId: defaultEmployeeType.id
+                            }
+                        });
+                        console.log(`Registro de Employee criado automaticamente para o usuário ${updatedUser.name} (CPF: ${cpf})`);
+                    }
+                }
+                catch (employeeError) {
+                    console.error('Erro ao criar registro de Employee durante atualização:', employeeError);
+                }
+            }
+        }
         return new user_1.User({
             ...updatedUser,
             cpf: new unique_entity_cpf_1.default(updatedUser.cpf.toString()),

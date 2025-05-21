@@ -103,7 +103,6 @@ O sistema implementa autenticação JWT moderna e segura, com as seguintes carac
 4. Logout remove o cookie e limpa o estado.
 
 ### 6. Boas Práticas
-- Nunca armazene JWT em localStorage/sessionStorage.
 - Sempre use cookies HttpOnly para tokens.
 - Proteja endpoints sensíveis com guards e validação de perfil.
 
@@ -174,7 +173,7 @@ Antes de criar um usuário, é necessário que existam:
 **Corpo da requisição:**
 ```json
 {
-  "name": "Adimin"
+  "name": "Admin"
 }
 ```
 
@@ -202,7 +201,7 @@ Antes de criar um usuário, é necessário que existam:
   "email": "joao.silva@clinicasaolucas.com.br",
   "password": "senha123",
   "companyId": "99006876000102",
-  "type": "Adimin",
+  "type": "Admin",
   "active": true
 }
 ```

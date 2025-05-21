@@ -18,7 +18,7 @@ export class AuthService {
     const { identifier, password, tipo } = login;
     const isCpf = !identifier.includes('@');
     
-    // Buscar paciente e usuário
+    // Buscar paciente, usuário e admin
     const paciente = await this.prismaService.patient.findUnique({
       where: isCpf ? { cpf: identifier } : { email: identifier },
       include: { type: true },
@@ -27,11 +27,28 @@ export class AuthService {
       where: isCpf ? { cpf: identifier } : { email: identifier },
       include: { type: true },
     });
+    const admin = await this.prismaService.admin.findUnique({
+      where: { Cpf: identifier },
+      include: { type: true },
+    });
+    
+    // Verificar se existe registro na tabela Employee usando o mesmo CPF
+    const employee = await this.prismaService.employee.findUnique({
+      where: { cpf: identifier },
+      include: { type: true },
+    });
 
     // Validar senha
     const senhaPacienteOk = paciente && await bcrypt.compare(password, paciente.password);
     const senhaUsuarioOk = usuario && await bcrypt.compare(password, usuario.password);
     
+    // Para Admin, devemos usar a senha do usuário correspondente (já que Admin não tem senha própria)
+    // Só autenticar Admin se o usuário existe e a senha for correta
+    const adminComSenhaValida = admin && usuario && senhaUsuarioOk;
+    
+    // Verificar se é um funcionário válido (precisa ter registro na tabela Employee e senha correta)
+    const funcionarioValido = employee && senhaUsuarioOk;
+
     // Se campo tipo for enviado, autentica apenas aquele perfil
     if (tipo === 'paciente') {
       if (!senhaPacienteOk) throw new UnauthorizedException('Usuário ou senha inválidos');
@@ -40,31 +57,42 @@ export class AuthService {
     if (tipo === 'profissional') {
       if (!senhaUsuarioOk) throw new UnauthorizedException('Usuário ou senha inválidos');
       if (!usuario.active) throw new UnauthorizedException('Usuário inativo');
+      if (!employee) throw new UnauthorizedException('Usuário não é um profissional cadastrado');
       return this.gerarTokenUsuario(usuario);
+    }
+    if (tipo === 'admin') {
+      if (!adminComSenhaValida) throw new UnauthorizedException('Usuário ou senha inválidos');
+      return this.gerarTokenAdmin(admin);
     }
 
     // Nenhum perfil válido
-    if (!senhaPacienteOk && !senhaUsuarioOk) {
+    if (!senhaPacienteOk && !senhaUsuarioOk && !adminComSenhaValida) {
       throw new UnauthorizedException('Usuário ou senha inválidos');
     }
 
-    // Ambos perfis válidos
-    if (senhaPacienteOk && senhaUsuarioOk) {
-      // Gerar token genérico para multiplos perfis
+    // Montar lista de perfis disponíveis
+    const perfis: string[] = [];
+    if (senhaPacienteOk) perfis.push('paciente');
+    // Só adicionar 'profissional' se também existir na tabela Employee
+    if (funcionarioValido) perfis.push('profissional');
+    if (adminComSenhaValida) perfis.push('admin');
+
+    // Se mais de um perfil, retorna multiplosPerfis
+    if (perfis.length > 1) {
       const payload = {
-        id: isCpf ? identifier : (paciente?.cpf || usuario?.cpf),
+        id: isCpf ? identifier : (paciente?.cpf || usuario?.cpf || admin?.Cpf),
         multiplosPerfis: true,
-        userType: 'multi'
+        userType: 'multi',
+        perfisDisponiveis: perfis
       };
       const secret = this.configService.get<string>('JWT_SECRET');
       const expiresIn = Number(this.configService.get<string>('JWT_EXPIRES_IN')) || 36000;
       if (!secret) throw new Error('JWT_SECRET não definido no .env');
       const accessToken = jwt.sign(payload, secret, { expiresIn });
-      
-      // Retorna info de múltiplos perfis com um token válido
-      return { 
-        multiplosPerfis: true, 
-        token: accessToken
+      return {
+        multiplosPerfis: true,
+        token: accessToken,
+        perfisDisponiveis: perfis
       };
     }
 
@@ -72,11 +100,14 @@ export class AuthService {
     if (senhaPacienteOk) {
       return this.gerarTokenPaciente(paciente);
     }
-
     // Apenas profissional
-    if (senhaUsuarioOk) {
+    if (funcionarioValido) {
       if (!usuario.active) throw new UnauthorizedException('Usuário inativo');
       return this.gerarTokenUsuario(usuario);
+    }
+    // Apenas admin
+    if (adminComSenhaValida) {
+      return this.gerarTokenAdmin(admin);
     }
   }
 
@@ -104,5 +135,18 @@ export class AuthService {
     if (!secret) throw new Error('JWT_SECRET não definido no .env');
     const accessToken = jwt.sign(payload, secret, { expiresIn });
     return { token: accessToken, tipo: 'profissional', nome: usuario.name };
+  }
+
+  private gerarTokenAdmin(admin: any) {
+    const payload = {
+      id: admin.Cpf,
+      type: admin.type?.name || 'unknown',
+      userType: 'admin',
+    };
+    const secret = this.configService.get<string>('JWT_SECRET');
+    const expiresIn = 3600;
+    if (!secret) throw new Error('JWT_SECRET não definido no .env');
+    const accessToken = jwt.sign(payload, secret, { expiresIn });
+    return { token: accessToken, tipo: 'admin', nome: admin.name };
   }
 }

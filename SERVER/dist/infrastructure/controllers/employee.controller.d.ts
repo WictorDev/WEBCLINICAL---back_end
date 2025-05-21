@@ -3,13 +3,15 @@ import { UpdateEmployeeUseCase } from 'src/use-case/employee/update-employee.use
 import { PrismaEmployeeRepository } from '../db/repositories/prisma-employee.repository';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
 import { EmployeeTypeRepository } from 'src/domain/repositories/employee-type.repository';
+import { PrismaService } from 'src/core/services/prisma.service';
 export declare class EmployeeController {
     private readonly createUseCase;
     private readonly updateUseCase;
     private readonly repo;
     private readonly typeRepository;
     private readonly employeeTypeRepository;
-    constructor(createUseCase: CreateEmployeeUseCase, updateUseCase: UpdateEmployeeUseCase, repo: PrismaEmployeeRepository, typeRepository: TypeRepository, employeeTypeRepository: EmployeeTypeRepository);
+    private readonly prismaService;
+    constructor(createUseCase: CreateEmployeeUseCase, updateUseCase: UpdateEmployeeUseCase, repo: PrismaEmployeeRepository, typeRepository: TypeRepository, employeeTypeRepository: EmployeeTypeRepository, prismaService: PrismaService);
     create(body: {
         cpf: string;
         name: string;
@@ -17,7 +19,15 @@ export declare class EmployeeController {
         type: string;
         employeeType: string;
     }): Promise<import("../../domain/entities/employee").Employee>;
-    findAll(): Promise<import("../../domain/entities/employee").Employee[]>;
+    findAll(): Promise<{
+        cpf: string;
+        name: string;
+        advice: string;
+        typeId: string;
+        employeeTypeId: string;
+        typeName: string;
+        employeeTypeName: string;
+    }[]>;
     update(cpf: string, body: Partial<{
         name: string;
         advice?: string;

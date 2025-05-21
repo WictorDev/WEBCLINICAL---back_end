@@ -8,35 +8,25 @@ import { ConfigService } from '@nestjs/config';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(configService: ConfigService) {
     const secretKey = configService.get<string>('JWT_SECRET');
-    console.log('JWT Strategy inicializada. Secret definida:', !!secretKey);
     
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Função para extrair token do cookie ou do header Authorization
         (req: Request) => {
-          // Log de depuração para verificar cabeçalhos
-          const hasCookie = !!req.cookies?.auth_token;
-          console.log('Cookie auth_token presente:', hasCookie);
-          
-          // Verificar o header Authorization
-          const authHeader = req.headers.authorization;
-          const hasAuthHeader = !!authHeader && authHeader.startsWith('Bearer ');
-          console.log('Header Authorization presente:', hasAuthHeader);
-          
+          // Tentar extrair do cookie primeiro
           let token: string | null = null;
           
-          // Tentar extrair do cookie primeiro
-          if (hasCookie) {
-            token = req.cookies.auth_token;
-            console.log('Token extraído do cookie auth_token');
+          if (req.cookies?.token) {
+            token = req.cookies.token;
           }
           // Se não encontrou no cookie, tentar do header Authorization
-          else if (hasAuthHeader) {
-            token = authHeader.substring(7); // Remove o prefixo 'Bearer '
-            console.log('Token extraído do header Authorization');
+          else {
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+              token = authHeader.substring(7); // Remove o prefixo 'Bearer '
+            }
           }
           
-          console.log('Token encontrado:', token ? 'SIM' : 'NÃO');
           return token;
         }
       ]),
@@ -58,13 +48,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         throw new UnauthorizedException('Token expirado');
       }
       
-      // Log seguro sem expor dados sensíveis
-      console.log('JWT validado para usuário:', payload.id, 'tipo:', payload.userType);
-      
       // Retorna o payload do token como req.user
       return payload;
     } catch (error) {
-      console.error('Erro ao validar JWT payload:', error.message);
       throw new UnauthorizedException('Token inválido');
     }
   }

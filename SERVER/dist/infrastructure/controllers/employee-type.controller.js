@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var EmployeeTypeController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmployeeTypeController = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,18 +20,21 @@ const create_employee_type_usecase_1 = require("../../use-case/employee/create-e
 const find_all_employee_type_usecase_1 = require("../../use-case/employee/find-all-employee-type.usecase");
 const jwt_guard_1 = require("../auth/jwt.guard");
 const public_decorator_1 = require("../auth/public.decorator");
-let EmployeeTypeController = class EmployeeTypeController {
+let EmployeeTypeController = EmployeeTypeController_1 = class EmployeeTypeController {
     createEmployeeTypeUseCase;
     findAllEmployeeTypeUseCase;
+    logger = new common_1.Logger(EmployeeTypeController_1.name);
     constructor(createEmployeeTypeUseCase, findAllEmployeeTypeUseCase) {
         this.createEmployeeTypeUseCase = createEmployeeTypeUseCase;
         this.findAllEmployeeTypeUseCase = findAllEmployeeTypeUseCase;
     }
     async create(body) {
         try {
-            return await this.createEmployeeTypeUseCase.execute(body);
+            const result = await this.createEmployeeTypeUseCase.execute(body);
+            return result;
         }
         catch (error) {
+            this.logger.error(`Erro ao criar tipo de funcionário: ${error.message}`);
             if (error.message && error.message.includes('Tipo')) {
                 throw new common_1.BadRequestException(error.message);
             }
@@ -38,7 +42,23 @@ let EmployeeTypeController = class EmployeeTypeController {
         }
     }
     async findAll() {
-        return this.findAllEmployeeTypeUseCase.execute();
+        try {
+            const result = await this.findAllEmployeeTypeUseCase.execute();
+            if (!result) {
+                return [];
+            }
+            const serializedResult = Array.isArray(result)
+                ? result.map(item => ({
+                    id: item.id,
+                    name: item.name
+                }))
+                : [];
+            return serializedResult;
+        }
+        catch (error) {
+            this.logger.error(`Erro ao buscar tipos de funcionário: ${error.message}`);
+            throw new common_1.InternalServerErrorException('Erro ao buscar tipos de funcionário');
+        }
     }
 };
 exports.EmployeeTypeController = EmployeeTypeController;
@@ -55,7 +75,7 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], EmployeeTypeController.prototype, "findAll", null);
-exports.EmployeeTypeController = EmployeeTypeController = __decorate([
+exports.EmployeeTypeController = EmployeeTypeController = EmployeeTypeController_1 = __decorate([
     (0, swagger_1.ApiTags)('employee-types'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     (0, public_decorator_1.Public)(),

@@ -24,17 +24,14 @@ let JwtAuthGuard = class JwtAuthGuard {
             token = request.headers['authorization']?.split(' ')[1];
         }
         if (!token) {
-            console.log('Nenhum token encontrado (cookie ou header)');
             throw new common_1.UnauthorizedException('Token não encontrado');
         }
-        console.log('Token encontrado:', token ? `${token.substring(0, 10)}...` : 'NULO');
         try {
             const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
             request.user = payload;
             return true;
         }
         catch (error) {
-            console.error('Erro ao verificar token:', error.message);
             throw new common_1.UnauthorizedException('Token inválido ou expirado');
         }
     }

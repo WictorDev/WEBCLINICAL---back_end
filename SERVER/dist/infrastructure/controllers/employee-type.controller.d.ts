@@ -3,9 +3,13 @@ import { FindAllEmployeeTypeUseCase } from 'src/use-case/employee/find-all-emplo
 export declare class EmployeeTypeController {
     private readonly createEmployeeTypeUseCase;
     private readonly findAllEmployeeTypeUseCase;
+    private readonly logger;
     constructor(createEmployeeTypeUseCase: CreateEmployeeTypeUseCase, findAllEmployeeTypeUseCase: FindAllEmployeeTypeUseCase);
     create(body: {
         name: string;
     }): Promise<import("../../domain/entities/employee-type").EmployeeType>;
-    findAll(): Promise<import("../../domain/entities/employee-type").EmployeeType[]>;
+    findAll(): Promise<{
+        id: string;
+        name: string;
+    }[]>;
 }

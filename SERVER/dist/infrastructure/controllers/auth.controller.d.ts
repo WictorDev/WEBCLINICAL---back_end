@@ -12,7 +12,7 @@ export declare class AuthController {
     getMe(req: any): Promise<any>;
     testAuth(req: any, headers: any): Promise<{
         cookies: {
-            auth_token: string;
+            token: string;
         };
         headers: {
             authorization: string;

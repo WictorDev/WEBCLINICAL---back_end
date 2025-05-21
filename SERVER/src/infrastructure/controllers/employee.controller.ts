@@ -5,6 +5,7 @@ import { UpdateEmployeeUseCase } from 'src/use-case/employee/update-employee.use
 import { PrismaEmployeeRepository } from '../db/repositories/prisma-employee.repository';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
 import { EmployeeTypeRepository } from 'src/domain/repositories/employee-type.repository';
+import { PrismaService } from 'src/core/services/prisma.service';
 
 @ApiTags('employees')
 @Controller('/api/employees')
@@ -14,7 +15,8 @@ export class EmployeeController {
     private readonly updateUseCase: UpdateEmployeeUseCase,
     private readonly repo: PrismaEmployeeRepository,
     private readonly typeRepository: TypeRepository,
-    private readonly employeeTypeRepository: EmployeeTypeRepository
+    private readonly employeeTypeRepository: EmployeeTypeRepository,
+    private readonly prismaService: PrismaService
   ) {}
 
   @Post()
@@ -49,7 +51,30 @@ export class EmployeeController {
 
   @Get()
   async findAll() {
-    return this.repo.findAll();
+    try {
+      // Buscar funcionários com dados relacionados (tipo e tipo de funcionário)
+      const employees = await this.prismaService.employee.findMany({
+        include: {
+          type: true,
+          employeeType: true
+        }
+      });
+      
+      // Mapear para um formato mais detalhado para o frontend
+      return employees.map(employee => ({
+        cpf: employee.cpf,
+        name: employee.name,
+        advice: employee.advice || '',
+        typeId: employee.typeId,
+        employeeTypeId: employee.employeeTypeId,
+        // Adicionar informações extras
+        typeName: employee.type?.name || '',
+        employeeTypeName: employee.employeeType?.name || ''
+      }));
+    } catch (error) {
+      console.error('Erro ao buscar funcionários:', error);
+      throw new BadRequestException('Erro ao buscar funcionários');
+    }
   }
 
   @Put(':cpf')

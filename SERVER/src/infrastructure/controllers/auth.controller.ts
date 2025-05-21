@@ -37,20 +37,22 @@ export class AuthController {
       
       if (result.token) {
         // Configura o cookie HttpOnly (não acessível por JavaScript)
-        res.cookie('auth_token', result.token, COOKIE_OPTIONS);
+        res.cookie('token', result.token, COOKIE_OPTIONS);
         
         // Não envia o token no corpo da resposta (segurança)
-        const responseBody = {
+        const responseBody: any = {
           success: true,
           // Informações não sensíveis que o frontend precisa
           tipo: result.tipo,
           nome: result.nome,
           multiplosPerfis: result.multiplosPerfis,
-          // Não incluir o token aqui
         };
         
         // Se for múltiplos perfis, informa ao frontend
         if (result.multiplosPerfis) {
+          if (result.perfisDisponiveis) {
+            responseBody.perfisDisponiveis = result.perfisDisponiveis;
+          }
           return res.status(200).json(responseBody);
         }
         
@@ -82,7 +84,7 @@ export class AuthController {
       
       if (result.token) {
         // Configura o cookie HttpOnly (não acessível por JavaScript)
-        res.cookie('auth_token', result.token, COOKIE_OPTIONS);
+        res.cookie('token', result.token, COOKIE_OPTIONS);
         
         // Não envia o token no corpo da resposta (segurança)
         return res.status(200).json({
@@ -97,7 +99,6 @@ export class AuthController {
         message: 'Falha na autenticação'
       });
     } catch (error) {
-      console.error('Erro no login de paciente:', error);
       return res.status(401).json({ 
         success: false, 
         message: error.message || 'Credenciais inválidas' 
@@ -109,8 +110,8 @@ export class AuthController {
   @Post('logout')
   async logout(@Res() res: Response) {
     try {
-      // Remove o cookie auth_token
-      res.clearCookie('auth_token', COOKIE_OPTIONS);
+      // Remove o cookie de token
+      res.clearCookie('token', COOKIE_OPTIONS);
       
       return res.status(200).json({
         success: true,
@@ -218,7 +219,7 @@ export class AuthController {
   async testAuth(@Req() req, @Headers() headers) {
     return {
       cookies: {
-        auth_token: req.cookies?.auth_token ? 'PRESENTE' : 'AUSENTE'
+        token: req.cookies?.token ? 'PRESENTE' : 'AUSENTE'
       },
       headers: {
         authorization: headers.authorization ? 'PRESENTE' : 'AUSENTE'

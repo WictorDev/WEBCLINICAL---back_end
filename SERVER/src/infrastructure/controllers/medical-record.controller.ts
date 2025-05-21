@@ -5,7 +5,7 @@ import { MedicalRecord } from '../../domain/entities/medical-record';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { MEDICAL_RECORD_REPOSITORY_TOKEN } from '../constants/tokens.constants';
 
-@Controller('medical-records')
+@Controller('/api/medical-records')
 @UseGuards(JwtAuthGuard)
 export class MedicalRecordController {
   constructor(

@@ -36,8 +36,18 @@ let AuthService = class AuthService {
             where: isCpf ? { cpf: identifier } : { email: identifier },
             include: { type: true },
         });
+        const admin = await this.prismaService.admin.findUnique({
+            where: { Cpf: identifier },
+            include: { type: true },
+        });
+        const employee = await this.prismaService.employee.findUnique({
+            where: { cpf: identifier },
+            include: { type: true },
+        });
         const senhaPacienteOk = paciente && await bcrypt.compare(password, paciente.password);
         const senhaUsuarioOk = usuario && await bcrypt.compare(password, usuario.password);
+        const adminComSenhaValida = admin && usuario && senhaUsuarioOk;
+        const funcionarioValido = employee && senhaUsuarioOk;
         if (tipo === 'paciente') {
             if (!senhaPacienteOk)
                 throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
@@ -48,16 +58,31 @@ let AuthService = class AuthService {
                 throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
             if (!usuario.active)
                 throw new common_1.UnauthorizedException('Usuário inativo');
+            if (!employee)
+                throw new common_1.UnauthorizedException('Usuário não é um profissional cadastrado');
             return this.gerarTokenUsuario(usuario);
         }
-        if (!senhaPacienteOk && !senhaUsuarioOk) {
+        if (tipo === 'admin') {
+            if (!adminComSenhaValida)
+                throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
+            return this.gerarTokenAdmin(admin);
+        }
+        if (!senhaPacienteOk && !senhaUsuarioOk && !adminComSenhaValida) {
             throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
         }
-        if (senhaPacienteOk && senhaUsuarioOk) {
+        const perfis = [];
+        if (senhaPacienteOk)
+            perfis.push('paciente');
+        if (funcionarioValido)
+            perfis.push('profissional');
+        if (adminComSenhaValida)
+            perfis.push('admin');
+        if (perfis.length > 1) {
             const payload = {
-                id: isCpf ? identifier : (paciente?.cpf || usuario?.cpf),
+                id: isCpf ? identifier : (paciente?.cpf || usuario?.cpf || admin?.Cpf),
                 multiplosPerfis: true,
-                userType: 'multi'
+                userType: 'multi',
+                perfisDisponiveis: perfis
             };
             const secret = this.configService.get('JWT_SECRET');
             const expiresIn = Number(this.configService.get('JWT_EXPIRES_IN')) || 36000;
@@ -66,16 +91,20 @@ let AuthService = class AuthService {
             const accessToken = jwt.sign(payload, secret, { expiresIn });
             return {
                 multiplosPerfis: true,
-                token: accessToken
+                token: accessToken,
+                perfisDisponiveis: perfis
             };
         }
         if (senhaPacienteOk) {
             return this.gerarTokenPaciente(paciente);
         }
-        if (senhaUsuarioOk) {
+        if (funcionarioValido) {
             if (!usuario.active)
                 throw new common_1.UnauthorizedException('Usuário inativo');
             return this.gerarTokenUsuario(usuario);
+        }
+        if (adminComSenhaValida) {
+            return this.gerarTokenAdmin(admin);
         }
     }
     gerarTokenPaciente(paciente) {
@@ -103,6 +132,19 @@ let AuthService = class AuthService {
             throw new Error('JWT_SECRET não definido no .env');
         const accessToken = jwt.sign(payload, secret, { expiresIn });
         return { token: accessToken, tipo: 'profissional', nome: usuario.name };
+    }
+    gerarTokenAdmin(admin) {
+        const payload = {
+            id: admin.Cpf,
+            type: admin.type?.name || 'unknown',
+            userType: 'admin',
+        };
+        const secret = this.configService.get('JWT_SECRET');
+        const expiresIn = 3600;
+        if (!secret)
+            throw new Error('JWT_SECRET não definido no .env');
+        const accessToken = jwt.sign(payload, secret, { expiresIn });
+        return { token: accessToken, tipo: 'admin', nome: admin.name };
     }
 };
 exports.AuthService = AuthService;

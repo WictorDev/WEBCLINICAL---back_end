@@ -28,7 +28,7 @@ model User {
   active    Boolean
 }
 
-model Adimin {
+model Admin {
   Cpf    String @unique
   name   String
   typeId String
@@ -40,7 +40,7 @@ model Type {
   name      String
   users     User[]
   employees Employee[]
-  Admins    Adimin[]
+  Admins    Admin[]
   patients  Patient[]
 }
 

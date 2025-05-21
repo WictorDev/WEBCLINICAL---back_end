@@ -52,7 +52,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MedicalRecordController.prototype, "getByAppointment", null);
 exports.MedicalRecordController = MedicalRecordController = __decorate([
-    (0, common_1.Controller)('medical-records'),
+    (0, common_1.Controller)('/api/medical-records'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __param(1, (0, common_1.Inject)(tokens_constants_1.MEDICAL_RECORD_REPOSITORY_TOKEN)),
     __metadata("design:paramtypes", [finalize_appointment_usecase_1.FinalizeAppointmentUseCase, Object])

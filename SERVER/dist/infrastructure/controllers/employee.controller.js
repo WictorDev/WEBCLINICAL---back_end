@@ -20,18 +20,21 @@ const update_employee_usecase_1 = require("../../use-case/employee/update-employ
 const prisma_employee_repository_1 = require("../db/repositories/prisma-employee.repository");
 const type_repository_1 = require("../../domain/repositories/type.repository");
 const employee_type_repository_1 = require("../../domain/repositories/employee-type.repository");
+const prisma_service_1 = require("../../core/services/prisma.service");
 let EmployeeController = class EmployeeController {
     createUseCase;
     updateUseCase;
     repo;
     typeRepository;
     employeeTypeRepository;
-    constructor(createUseCase, updateUseCase, repo, typeRepository, employeeTypeRepository) {
+    prismaService;
+    constructor(createUseCase, updateUseCase, repo, typeRepository, employeeTypeRepository, prismaService) {
         this.createUseCase = createUseCase;
         this.updateUseCase = updateUseCase;
         this.repo = repo;
         this.typeRepository = typeRepository;
         this.employeeTypeRepository = employeeTypeRepository;
+        this.prismaService = prismaService;
     }
     async create(body) {
         try {
@@ -59,7 +62,27 @@ let EmployeeController = class EmployeeController {
         }
     }
     async findAll() {
-        return this.repo.findAll();
+        try {
+            const employees = await this.prismaService.employee.findMany({
+                include: {
+                    type: true,
+                    employeeType: true
+                }
+            });
+            return employees.map(employee => ({
+                cpf: employee.cpf,
+                name: employee.name,
+                advice: employee.advice || '',
+                typeId: employee.typeId,
+                employeeTypeId: employee.employeeTypeId,
+                typeName: employee.type?.name || '',
+                employeeTypeName: employee.employeeType?.name || ''
+            }));
+        }
+        catch (error) {
+            console.error('Erro ao buscar funcionários:', error);
+            throw new common_1.BadRequestException('Erro ao buscar funcionários');
+        }
     }
     async update(cpf, body) {
         try {
@@ -117,6 +140,7 @@ exports.EmployeeController = EmployeeController = __decorate([
         update_employee_usecase_1.UpdateEmployeeUseCase,
         prisma_employee_repository_1.PrismaEmployeeRepository,
         type_repository_1.TypeRepository,
-        employee_type_repository_1.EmployeeTypeRepository])
+        employee_type_repository_1.EmployeeTypeRepository,
+        prisma_service_1.PrismaService])
 ], EmployeeController);
 //# sourceMappingURL=employee.controller.js.map
