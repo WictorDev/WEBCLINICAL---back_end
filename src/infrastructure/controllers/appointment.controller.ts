@@ -20,16 +20,16 @@ export class AppointmentController {
 
   @Post()
   async create(@Body() body: Omit<Appointment, 'id'>) {
-    const appointment = new Appointment(
-      randomUUID(),
-      new Date(body.date),
-      body.startTime,
-      body.endTime,
-      body.status || 'PENDENTE',
-      body.scheduleId,
-      body.patientId,
-      body.employeeId
-    );
+    const appointment = new Appointment({
+      id: randomUUID(),
+      date: new Date(body.date),
+      startTime: body.startTime,
+      endTime: body.endTime,
+      status: body.status || 'PENDENTE',
+      scheduleId: body.scheduleId,
+      patientId: body.patientId,
+      employeeId: body.employeeId
+    });
     return this.createAppointment.execute(appointment);
   }
 

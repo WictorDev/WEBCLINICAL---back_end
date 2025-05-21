@@ -9,7 +9,13 @@ export class PrismaPrescriptionRepository implements PrescriptionRepository {
 
   async findByMedicalRecord(medicalRecordId: string): Promise<Prescription[]> {
     const prescriptions = await this.prisma.prescription.findMany({ where: { medicalRecordId } });
-    return prescriptions.map(p => new Prescription(p.id, p.medication, p.dosage, p.instructions, p.medicalRecordId));
+    return prescriptions.map(p => new Prescription({
+      id: p.id,
+      medication: p.medication,
+      dosage: p.dosage,
+      instructions: p.instructions,
+      medicalRecordId: p.medicalRecordId
+    }));
   }
 
   async create(prescription: Prescription): Promise<Prescription> {
@@ -22,6 +28,12 @@ export class PrismaPrescriptionRepository implements PrescriptionRepository {
         medicalRecordId: prescription.medicalRecordId,
       },
     });
-    return new Prescription(p.id, p.medication, p.dosage, p.instructions, p.medicalRecordId);
+    return new Prescription({
+      id: p.id,
+      medication: p.medication,
+      dosage: p.dosage,
+      instructions: p.instructions,
+      medicalRecordId: p.medicalRecordId
+    });
   }
 } 

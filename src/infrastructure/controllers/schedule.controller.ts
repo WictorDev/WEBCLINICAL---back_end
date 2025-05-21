@@ -20,13 +20,13 @@ export class ScheduleController {
   
   @Post()
   async create(@Body() scheduleData: Omit<Schedule, 'id'>) {
-    const schedule = new Schedule(
-      randomUUID(),
-      scheduleData.dayOfWeek,
-      scheduleData.startTime,
-      scheduleData.endTime,
-      scheduleData.employeeId
-    );
+    const schedule = new Schedule({
+      id: randomUUID(),
+      dayOfWeek: scheduleData.dayOfWeek,
+      startTime: scheduleData.startTime,
+      endTime: scheduleData.endTime,
+      employeeId: scheduleData.employeeId
+    });
     
     return this.createSchedule.execute(schedule);
   }

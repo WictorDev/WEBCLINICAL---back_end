@@ -33,7 +33,16 @@ let AppointmentController = class AppointmentController {
         this.updateAppointmentStatus = updateAppointmentStatus;
     }
     async create(body) {
-        const appointment = new appointment_1.Appointment((0, crypto_1.randomUUID)(), new Date(body.date), body.startTime, body.endTime, body.status || 'PENDENTE', body.scheduleId, body.patientId, body.employeeId);
+        const appointment = new appointment_1.Appointment({
+            id: (0, crypto_1.randomUUID)(),
+            date: new Date(body.date),
+            startTime: body.startTime,
+            endTime: body.endTime,
+            status: body.status || 'PENDENTE',
+            scheduleId: body.scheduleId,
+            patientId: body.patientId,
+            employeeId: body.employeeId
+        });
         return this.createAppointment.execute(appointment);
     }
     async getByEmployee(employeeId, date) {

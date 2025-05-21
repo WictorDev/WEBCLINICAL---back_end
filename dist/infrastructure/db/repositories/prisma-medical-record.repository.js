@@ -22,7 +22,14 @@ let PrismaMedicalRecordRepository = class PrismaMedicalRecordRepository {
         const record = await this.prisma.medicalRecord.findUnique({ where: { appointmentId } });
         if (!record)
             return null;
-        return new medical_record_1.MedicalRecord(record.id, record.symptoms, record.diagnosis, record.conduct, record.createdAt, record.appointmentId);
+        return new medical_record_1.MedicalRecord({
+            id: record.id,
+            symptoms: record.symptoms,
+            diagnosis: record.diagnosis,
+            conduct: record.conduct,
+            createdAt: record.createdAt,
+            appointmentId: record.appointmentId
+        });
     }
     async create(medicalRecord) {
         const r = await this.prisma.medicalRecord.create({
@@ -35,7 +42,14 @@ let PrismaMedicalRecordRepository = class PrismaMedicalRecordRepository {
                 appointmentId: medicalRecord.appointmentId,
             },
         });
-        return new medical_record_1.MedicalRecord(r.id, r.symptoms, r.diagnosis, r.conduct, r.createdAt, r.appointmentId);
+        return new medical_record_1.MedicalRecord({
+            id: r.id,
+            symptoms: r.symptoms,
+            diagnosis: r.diagnosis,
+            conduct: r.conduct,
+            createdAt: r.createdAt,
+            appointmentId: r.appointmentId
+        });
     }
 };
 exports.PrismaMedicalRecordRepository = PrismaMedicalRecordRepository;
