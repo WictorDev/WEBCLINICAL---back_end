@@ -47,6 +47,23 @@ class Patient {
             throw new Error("Tipo é obrigatório.");
         this.data.type = type;
     }
+    toJSON() {
+        return {
+            cpf: this.cpf.toString(),
+            name: this.name,
+            email: this.email,
+            type: this.type
+        };
+    }
+    static create(data) {
+        return {
+            cpf: data.cpf.toString(),
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            type: data.type
+        };
+    }
 }
 exports.Patient = Patient;
 //# sourceMappingURL=patient.js.map

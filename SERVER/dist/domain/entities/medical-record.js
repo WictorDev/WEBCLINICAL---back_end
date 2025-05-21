@@ -16,6 +16,16 @@ class MedicalRecord {
         this.createdAt = createdAt;
         this.appointmentId = appointmentId;
     }
+    static create(data) {
+        return {
+            id: data.id,
+            symptoms: data.symptoms,
+            diagnosis: data.diagnosis,
+            conduct: data.conduct,
+            createdAt: data.createdAt,
+            appointmentId: data.appointmentId
+        };
+    }
 }
 exports.MedicalRecord = MedicalRecord;
 //# sourceMappingURL=medical-record.js.map

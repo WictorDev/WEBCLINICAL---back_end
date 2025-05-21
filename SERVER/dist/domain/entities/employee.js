@@ -39,6 +39,25 @@ class Employee {
             throw new Error('employeeTypeId é obrigatório.');
         this.data.employeeTypeId = employeeTypeId;
     }
+    toJSON() {
+        return {
+            cpf: this.cpf,
+            name: this.name,
+            advice: this.advice,
+            typeId: this.typeId,
+            employeeTypeId: this.employeeTypeId
+        };
+    }
+    static create(data) {
+        const employee = new Employee(data);
+        return {
+            cpf: employee.cpf,
+            name: employee.name,
+            advice: employee.advice,
+            typeId: employee.typeId,
+            employeeTypeId: employee.employeeTypeId
+        };
+    }
 }
 exports.Employee = Employee;
 //# sourceMappingURL=employee.js.map

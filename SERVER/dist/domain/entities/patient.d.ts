@@ -19,4 +19,17 @@ export declare class Patient {
     set password(password: string);
     get type(): string;
     set type(type: string);
+    toJSON(): {
+        cpf: string;
+        name: string;
+        email: string;
+        type: string;
+    };
+    static create(data: PatientData): {
+        cpf: string;
+        name: string;
+        email: string;
+        password: string;
+        type: string;
+    };
 }

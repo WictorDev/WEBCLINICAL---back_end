@@ -18,4 +18,17 @@ export class Type {
     if (!name) throw new Error("Nome do tipo é obrigatório.");
     this.data.name = name;
   }
+
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name
+    };
+  }
+  static create(data: TypeData) {
+    return {
+      id: data.id,
+      name: data.name
+    };
+  }
 } 

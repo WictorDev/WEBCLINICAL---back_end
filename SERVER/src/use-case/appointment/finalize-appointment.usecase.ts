@@ -3,6 +3,7 @@ import { MedicalRecordRepository } from '../../domain/repositories/medical-recor
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 import { MedicalRecord } from '../../domain/entities/medical-record';
 import { APPOINTMENT_REPOSITORY_TOKEN, MEDICAL_RECORD_REPOSITORY_TOKEN } from '../../infrastructure/constants/tokens.constants';
+import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 
 @Injectable()
 export class FinalizeAppointmentUseCase {
@@ -15,8 +16,7 @@ export class FinalizeAppointmentUseCase {
 
   async execute(appointmentId: string, data: Omit<MedicalRecord, 'id' | 'createdAt'>): Promise<MedicalRecord> {
     // Verificar se o agendamento pode ser finalizado
-    const appointments = await this.appointmentRepository.findByEmployee('', undefined);
-    const appointment = appointments.find(a => a.id === appointmentId);
+    const appointment = await this.appointmentRepository.findById(new UniqueEntityID(appointmentId));
     
     if (!appointment) {
       throw new Error('Agendamento não encontrado.');
@@ -27,7 +27,7 @@ export class FinalizeAppointmentUseCase {
     }
 
     // Finalizar o agendamento
-    await this.appointmentRepository.updateStatus(appointmentId, 'FINALIZADO');
+    await this.appointmentRepository.updateStatus(new UniqueEntityID(appointmentId), 'FINALIZADO');
     // Cria o prontuário
     const record = await this.medicalRecordRepository.create({
       ...data,

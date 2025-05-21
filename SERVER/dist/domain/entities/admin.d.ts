@@ -14,4 +14,18 @@ export declare class Admin {
     set name(name: string);
     get type(): string;
     set type(type: string);
+    get password(): string;
+    set password(password: string);
+    toJSON(): {
+        cpf: string;
+        name: string;
+        type: string;
+        password: string;
+    };
+    static create(data: AdminData): {
+        cpf: string;
+        name: string;
+        type: string;
+        password: string;
+    };
 }

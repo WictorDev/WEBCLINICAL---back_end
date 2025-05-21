@@ -16,4 +16,16 @@ export declare class Company {
     set email(email: string);
     get phone(): string;
     set phone(phone: string);
+    toJSON(): {
+        name: string;
+        cnpj: string;
+        email: string;
+        phone: string;
+    };
+    static create(data: CompanyData): {
+        name: string;
+        cnpj: string;
+        email: string;
+        phone: string;
+    };
 }

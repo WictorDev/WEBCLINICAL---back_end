@@ -17,4 +17,18 @@ export declare class Employee {
     set typeId(typeId: string);
     get employeeTypeId(): string;
     set employeeTypeId(employeeTypeId: string);
+    toJSON(): {
+        cpf: string;
+        name: string;
+        advice: string | undefined;
+        typeId: string;
+        employeeTypeId: string;
+    };
+    static create(data: EmployeeData): {
+        cpf: string;
+        name: string;
+        advice: string | undefined;
+        typeId: string;
+        employeeTypeId: string;
+    };
 }

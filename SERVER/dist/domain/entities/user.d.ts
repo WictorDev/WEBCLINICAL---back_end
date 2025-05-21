@@ -25,4 +25,22 @@ export declare class User {
     set type(type: string);
     get active(): boolean | undefined;
     set active(value: boolean);
+    toJSON(): {
+        cpf: string;
+        name: string;
+        email: string;
+        password: string;
+        companyId: string;
+        type: string;
+        active: boolean | undefined;
+    };
+    static create(data: UserData): {
+        cpf: string;
+        name: string;
+        email: string;
+        password: string;
+        companyId: string;
+        type: string;
+        active: boolean | undefined;
+    };
 }

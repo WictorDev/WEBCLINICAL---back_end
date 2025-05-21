@@ -22,6 +22,19 @@ class EmployeeType {
             throw new Error("Nome é obrigatório.");
         this.data.name = name;
     }
+    toJSON() {
+        return {
+            id: this.id,
+            name: this.name
+        };
+    }
+    static create(data) {
+        const employeeType = new EmployeeType(data);
+        return {
+            id: employeeType.id,
+            name: employeeType.name
+        };
+    }
 }
 exports.EmployeeType = EmployeeType;
 //# sourceMappingURL=employee-type.js.map

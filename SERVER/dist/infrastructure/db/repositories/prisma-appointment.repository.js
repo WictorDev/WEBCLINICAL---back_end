@@ -18,36 +18,120 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async findByEmployee(employeeId, date) {
-        const where = { employeeId };
-        if (date) {
-            where.date = date;
-        }
-        const appointments = await this.prisma.appointment.findMany({ where });
-        return appointments.map(a => new appointment_1.Appointment(a.id, a.date, a.startTime, a.endTime, a.status, a.scheduleId, a.patientId, a.employeeId));
+    async findById(id) {
+        const appointment = await this.prisma.appointment.findUnique({
+            where: { id: id.toString() }
+        });
+        if (!appointment)
+            return null;
+        return appointment_1.Appointment.create({
+            id: appointment.id,
+            date: appointment.date,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
+            status: appointment.status,
+            scheduleId: appointment.scheduleId,
+            patientId: appointment.patientId,
+            employeeId: appointment.employeeId
+        });
+    }
+    async update(id, data) {
+        const updated = await this.prisma.appointment.update({
+            where: { id: id.toString() },
+            data: {
+                date: data.date,
+                startTime: data.startTime,
+                endTime: data.endTime,
+                status: data.status,
+                scheduleId: data.scheduleId,
+                patientId: data.patientId,
+                employeeId: data.employeeId
+            }
+        });
+        return appointment_1.Appointment.create({
+            id: updated.id,
+            date: updated.date,
+            startTime: updated.startTime,
+            endTime: updated.endTime,
+            status: updated.status,
+            scheduleId: updated.scheduleId,
+            patientId: updated.patientId,
+            employeeId: updated.employeeId
+        });
     }
     async findByPatient(patientId) {
-        const appointments = await this.prisma.appointment.findMany({ where: { patientId } });
-        return appointments.map(a => new appointment_1.Appointment(a.id, a.date, a.startTime, a.endTime, a.status, a.scheduleId, a.patientId, a.employeeId));
+        const appointments = await this.prisma.appointment.findMany({
+            where: { patientId }
+        });
+        return appointments.map(appointment => appointment_1.Appointment.create({
+            id: appointment.id,
+            date: appointment.date,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
+            status: appointment.status,
+            scheduleId: appointment.scheduleId,
+            patientId: appointment.patientId,
+            employeeId: appointment.employeeId
+        }));
+    }
+    async findByEmployee(employeeId, date) {
+        const where = date ? {
+            employeeId,
+            date: {
+                gte: new Date(date.setHours(0, 0, 0, 0)),
+                lt: new Date(date.setHours(23, 59, 59, 999))
+            }
+        } : { employeeId };
+        const appointments = await this.prisma.appointment.findMany({ where });
+        return appointments.map(appointment => appointment_1.Appointment.create({
+            id: appointment.id,
+            date: appointment.date,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
+            status: appointment.status,
+            scheduleId: appointment.scheduleId,
+            patientId: appointment.patientId,
+            employeeId: appointment.employeeId
+        }));
     }
     async create(appointment) {
-        const a = await this.prisma.appointment.create({
+        const created = await this.prisma.appointment.create({
             data: {
-                id: appointment.id,
                 date: appointment.date,
                 startTime: appointment.startTime,
                 endTime: appointment.endTime,
                 status: appointment.status,
                 scheduleId: appointment.scheduleId,
                 patientId: appointment.patientId,
-                employeeId: appointment.employeeId,
-            },
+                employeeId: appointment.employeeId
+            }
         });
-        return new appointment_1.Appointment(a.id, a.date, a.startTime, a.endTime, a.status, a.scheduleId, a.patientId, a.employeeId);
+        return appointment_1.Appointment.create({
+            id: created.id,
+            date: created.date,
+            startTime: created.startTime,
+            endTime: created.endTime,
+            status: created.status,
+            scheduleId: created.scheduleId,
+            patientId: created.patientId,
+            employeeId: created.employeeId
+        });
     }
     async updateStatus(id, status) {
-        const a = await this.prisma.appointment.update({ where: { id }, data: { status } });
-        return new appointment_1.Appointment(a.id, a.date, a.startTime, a.endTime, a.status, a.scheduleId, a.patientId, a.employeeId);
+        const updated = await this.prisma.appointment.update({
+            where: { id: id.toString() },
+            data: { status }
+        });
+        return appointment_1.Appointment.create({
+            id: updated.id,
+            date: updated.date,
+            startTime: updated.startTime,
+            endTime: updated.endTime,
+            status: updated.status,
+            scheduleId: updated.scheduleId,
+            patientId: updated.patientId,
+            employeeId: updated.employeeId
+        });
     }
 };
 exports.PrismaAppointmentRepository = PrismaAppointmentRepository;

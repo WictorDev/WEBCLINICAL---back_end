@@ -14,6 +14,15 @@ class Prescription {
         this.instructions = instructions;
         this.medicalRecordId = medicalRecordId;
     }
+    static create(data) {
+        return {
+            id: data.id,
+            medication: data.medication,
+            dosage: data.dosage,
+            instructions: data.instructions,
+            medicalRecordId: data.medicalRecordId
+        };
+    }
 }
 exports.Prescription = Prescription;
 //# sourceMappingURL=prescription.js.map
