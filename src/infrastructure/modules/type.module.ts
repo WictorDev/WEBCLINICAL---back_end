@@ -3,6 +3,7 @@ import { PrismaModule } from 'src/infrastructure/modules/prisma.module';
 import { TypeController } from '../controllers/type.controller';
 import { PrismaTypeRepository } from '../db/repositories/prisma-type.repository';
 import { CreateTypeUseCase } from 'src/use-case/type/create-type.usecase';
+import { FindTypeUseCase } from 'src/use-case/type/find-type.usecase';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
 
 @Module({
@@ -14,11 +15,13 @@ import { TypeRepository } from 'src/domain/repositories/type.repository';
       useClass: PrismaTypeRepository,
     },
     PrismaTypeRepository,
+    FindTypeUseCase,
     CreateTypeUseCase
   ],
   exports: [
     TypeRepository,
     PrismaTypeRepository,
+    FindTypeUseCase,
     CreateTypeUseCase
   ],
 })

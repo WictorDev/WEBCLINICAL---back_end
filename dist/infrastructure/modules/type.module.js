@@ -12,6 +12,7 @@ const prisma_module_1 = require("./prisma.module");
 const type_controller_1 = require("../controllers/type.controller");
 const prisma_type_repository_1 = require("../db/repositories/prisma-type.repository");
 const create_type_usecase_1 = require("../../use-case/type/create-type.usecase");
+const find_type_usecase_1 = require("../../use-case/type/find-type.usecase");
 const type_repository_1 = require("../../domain/repositories/type.repository");
 let TypeModule = class TypeModule {
 };
@@ -26,11 +27,13 @@ exports.TypeModule = TypeModule = __decorate([
                 useClass: prisma_type_repository_1.PrismaTypeRepository,
             },
             prisma_type_repository_1.PrismaTypeRepository,
+            find_type_usecase_1.FindTypeUseCase,
             create_type_usecase_1.CreateTypeUseCase
         ],
         exports: [
             type_repository_1.TypeRepository,
             prisma_type_repository_1.PrismaTypeRepository,
+            find_type_usecase_1.FindTypeUseCase,
             create_type_usecase_1.CreateTypeUseCase
         ],
     })

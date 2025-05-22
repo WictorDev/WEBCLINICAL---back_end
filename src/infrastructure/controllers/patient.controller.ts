@@ -16,7 +16,7 @@ import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
 import { UpdatePatientUseCase } from 'src/use-case/patient/update-patient.usecase';
-import { Public } from 'src/infrastructure/auth/public.decorator';
+import { Public } from '../auth/public.decorator';
 
 @ApiTags('patients')
 @Controller('/api/patients')

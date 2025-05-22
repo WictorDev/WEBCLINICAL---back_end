@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../../core/services/auth.service");
 const swagger_1 = require("@nestjs/swagger");
 const public_decorator_1 = require("../auth/public.decorator");
+const jwt_guard_1 = require("../auth/jwt.guard");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -24,7 +25,9 @@ let AuthController = class AuthController {
     }
     async login(loginData, res) {
         try {
+            console.log('Controller - Recebendo login:', loginData);
             const result = await this.authService.login(loginData);
+            console.log('Controller - Resultado do AuthService:', result);
             if (result.token) {
                 res.cookie('token', result.token, {
                     httpOnly: true,
@@ -32,11 +35,15 @@ let AuthController = class AuthController {
                     sameSite: 'lax',
                     maxAge: 1000 * 60 * 60 * 10
                 });
-                return res.json({ tipo: result.tipo, nome: result.nome });
+                const { token, ...rest } = result;
+                console.log('Controller - Cookie setado, resposta:', rest);
+                return res.json(rest);
             }
+            console.log('Controller - Resultado sem token:', result);
             return res.json(result);
         }
         catch (error) {
+            console.log('Controller - Erro no login:', error);
             return res.status(401).json({
                 message: 'Usuário ou senha inválidos',
                 error: 'Unauthorized',
@@ -47,6 +54,19 @@ let AuthController = class AuthController {
     logout(res) {
         res.clearCookie('token');
         return res.json({ message: 'Logout realizado com sucesso!' });
+    }
+    getProfile(req) {
+        if (!req.user) {
+            throw new common_1.UnauthorizedException('Usuário não autenticado');
+        }
+        return {
+            id: req.user.id,
+            tipos: req.user.tipos,
+            name: req.user.name,
+            iat: req.user.iat,
+            exp: req.user.exp,
+            companyId: req.user.companyId
+        };
     }
 };
 exports.AuthController = AuthController;
@@ -67,9 +87,17 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Get)('me'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "getProfile", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('/api/auth'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

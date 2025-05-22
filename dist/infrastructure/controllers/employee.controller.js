@@ -20,6 +20,7 @@ const update_employee_usecase_1 = require("../../use-case/employee/update-employ
 const prisma_employee_repository_1 = require("../db/repositories/prisma-employee.repository");
 const type_repository_1 = require("../../domain/repositories/type.repository");
 const employee_type_repository_1 = require("../../domain/repositories/employee-type.repository");
+const jwt_guard_1 = require("../auth/jwt.guard");
 let EmployeeController = class EmployeeController {
     createUseCase;
     updateUseCase;
@@ -117,6 +118,7 @@ __decorate([
 exports.EmployeeController = EmployeeController = __decorate([
     (0, swagger_1.ApiTags)('employees'),
     (0, common_1.Controller)('/api/employees'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_employee_usecase_1.CreateEmployeeUseCase,
         update_employee_usecase_1.UpdateEmployeeUseCase,
         prisma_employee_repository_1.PrismaEmployeeRepository,

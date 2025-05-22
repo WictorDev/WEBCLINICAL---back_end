@@ -33,6 +33,9 @@ export class PrismaTypeRepository implements TypeRepository {
   }
 
   async findById(id: string): Promise<Type | null> {
+    if (!id) {
+      throw new Error('ID do tipo não informado');
+    }
     const type = await this.prismaService.type.findUnique({ where: { id } });
     if (!type) return null;
     return new Type({ id: type.id, name: type.name });

@@ -22,27 +22,34 @@ let JwtAuthGuard = class JwtAuthGuard {
         this.reflector = reflector;
     }
     canActivate(context) {
+        const request = context.switchToHttp().getRequest();
+        let token = request.cookies?.token;
+        console.log('JwtGuard - Token do cookie:', token);
+        if (!token) {
+            token = request.headers['authorization']?.split(' ')[1];
+            console.log('JwtGuard - Token do header Authorization:', token);
+        }
         const isPublic = this.reflector.getAllAndOverride(public_decorator_1.IS_PUBLIC_KEY, [
             context.getHandler(),
             context.getClass(),
         ]);
+        console.log('JwtGuard - isPublic:', isPublic);
         if (isPublic) {
+            console.log('JwtGuard - Rota pública, liberando acesso.');
             return true;
         }
-        const request = context.switchToHttp().getRequest();
-        let token = request.cookies?.token;
         if (!token) {
-            token = request.headers['authorization']?.split(' ')[1];
-        }
-        if (!token) {
+            console.log('JwtGuard - Token não encontrado!');
             throw new common_1.UnauthorizedException('Token não encontrado');
         }
         try {
             const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+            console.log('JwtGuard - Payload decodificado:', payload);
             request.user = payload;
             return true;
         }
         catch (error) {
+            console.log('JwtGuard - Erro ao verificar token:', error);
             throw new common_1.UnauthorizedException('Token inválido ou expirado');
         }
     }

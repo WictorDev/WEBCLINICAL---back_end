@@ -86,11 +86,11 @@ export class PrismaUserRepository implements UserRepository {
     }
 
     const updateData: any = {
-      name: user.name,
-      email: user.email,
-      password: password,
-      companyId: user.companyId,
-      active: user.active ?? true
+        name: user.name,
+        email: user.email,
+        password: password,
+        companyId: user.companyId,
+        active: user.active ?? true
     };
 
     // Se houver tipos para atualizar

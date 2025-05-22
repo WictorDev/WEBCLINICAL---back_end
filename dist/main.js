@@ -3,8 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const swagger_1 = require("@nestjs/swagger");
 const app_module_1 = require("./infrastructure/modules/app.module");
+const cookieParser = require("cookie-parser");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.use(cookieParser());
     const config = new swagger_1.DocumentBuilder()
         .setTitle('WebClinical api')
         .setDescription('The webclinical api documentation')
