@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
 const create_admin_usecase_1 = require("../../use-case/admin/create-admin.usecase");
+const jwt_guard_1 = require("../auth/jwt.guard");
 let AdminController = class AdminController {
     createAdminUseCase;
     constructor(createAdminUseCase) {
@@ -34,6 +35,7 @@ __decorate([
 ], AdminController.prototype, "create", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('admins'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_admin_usecase_1.CreateAdminUseCase])
 ], AdminController);
 //# sourceMappingURL=admin.controller.js.map

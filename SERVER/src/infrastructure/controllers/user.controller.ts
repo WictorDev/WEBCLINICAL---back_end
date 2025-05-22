@@ -81,7 +81,6 @@ export class UserController {
     }
   }
 
-  @Public()
   @Post('/create_first_admin')
   async createFirstUser(@Body() body: { name: string; cpf: string; email: string; password: string; companyId: string; active: boolean }) {
     const users = await this.findUserUseCase.execute();

@@ -16,13 +16,17 @@ exports.TypeController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const create_type_usecase_1 = require("../../use-case/type/create-type.usecase");
+const find_type_usecase_1 = require("../../use-case/type/find-type.usecase");
 const type_repository_1 = require("../../domain/repositories/type.repository");
 const public_decorator_1 = require("../auth/public.decorator");
+const jwt_guard_1 = require("../auth/jwt.guard");
 let TypeController = class TypeController {
     createTypeUseCase;
+    findTypeUseCase;
     typeRepository;
-    constructor(createTypeUseCase, typeRepository) {
+    constructor(createTypeUseCase, findTypeUseCase, typeRepository) {
         this.createTypeUseCase = createTypeUseCase;
+        this.findTypeUseCase = findTypeUseCase;
         this.typeRepository = typeRepository;
     }
     async create(body) {
@@ -31,6 +35,20 @@ let TypeController = class TypeController {
         }
         catch (error) {
             if (error.message && error.message.includes('Tipo')) {
+                throw new common_1.BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
+    async findAll() {
+        return await this.typeRepository.findAll();
+    }
+    async findById(typeId) {
+        try {
+            return await this.findTypeUseCase.execute(typeId);
+        }
+        catch (error) {
+            if (error.message === 'ID do tipo não informado') {
                 throw new common_1.BadRequestException(error.message);
             }
             throw error;
@@ -68,6 +86,19 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TypeController.prototype, "create", null);
 __decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TypeController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TypeController.prototype, "findById", null);
+__decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/create_initial_types'),
     __metadata("design:type", Function),
@@ -77,7 +108,9 @@ __decorate([
 exports.TypeController = TypeController = __decorate([
     (0, swagger_1.ApiTags)('types'),
     (0, common_1.Controller)('/api/types'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_type_usecase_1.CreateTypeUseCase,
+        find_type_usecase_1.FindTypeUseCase,
         type_repository_1.TypeRepository])
 ], TypeController);
 //# sourceMappingURL=type.controller.js.map

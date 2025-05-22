@@ -14,36 +14,46 @@ export class AuthService {
     const { identifier, password } = login;
     const isCpf = !identifier.includes('@');
 
+    console.log('AuthService - Tentando login com:', identifier);
     // Buscar usuário
     const usuario = await this.prismaService.user.findUnique({
       where: isCpf ? { cpf: identifier } : { email: identifier },
       include: { types: { include: { type: true } } },
     });
 
+    console.log('AuthService - Usuário encontrado:', usuario);
+
     if (!usuario) {
+      console.log('AuthService - Usuário não encontrado!');
       throw new UnauthorizedException('Usuário ou senha inválidos');
     }
 
+    console.log('AuthService - Senha digitada:', password);
+    console.log('AuthService - Hash no banco:', usuario.password);
     const senhaUsuarioOk = await bcrypt.compare(password, usuario.password);
+    console.log('AuthService - Resultado bcrypt.compare:', senhaUsuarioOk);
 
     if (!senhaUsuarioOk) {
+      console.log('AuthService - Senha inválida!');
       throw new UnauthorizedException('Usuário ou senha inválidos');
     }
 
-    const userType = usuario.types[0]?.type.name;
+    // Pega todos os tipos do usuário
+    const tipos = usuario.types.map((t: any) => t.type.name);
 
     const payload = {
       id: usuario.cpf,
-      type: userType,
-      userType: userType,
-      name: usuario.name
+      tipos: tipos,
+      name: usuario.name,
+      companyId: usuario.companyId
     };
 
     const accessToken = this.jwtService.sign(payload);
     return { 
       token: accessToken, 
-      tipo: userType, 
-      nome: usuario.name 
+      tipos: tipos, 
+      nome: usuario.name,
+      companyId: usuario.companyId
     };
   }
 

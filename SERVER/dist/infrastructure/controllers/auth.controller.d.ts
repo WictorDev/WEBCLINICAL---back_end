@@ -8,4 +8,12 @@ export declare class AuthController {
         password: string;
     }, res: Response): Promise<Response<any, Record<string, any>>>;
     logout(res: Response): Response<any, Record<string, any>>;
+    getProfile(req: any): {
+        id: any;
+        tipos: any;
+        name: any;
+        iat: any;
+        exp: any;
+        companyId: any;
+    };
 }

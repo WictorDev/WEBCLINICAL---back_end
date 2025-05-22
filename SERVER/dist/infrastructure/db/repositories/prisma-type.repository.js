@@ -41,6 +41,9 @@ let PrismaTypeRepository = class PrismaTypeRepository {
         return types.map((type) => new type_1.Type({ id: type.id, name: type.name }));
     }
     async findById(id) {
+        if (!id) {
+            throw new Error('ID do tipo não informado');
+        }
         const type = await this.prismaService.type.findUnique({ where: { id } });
         if (!type)
             return null;

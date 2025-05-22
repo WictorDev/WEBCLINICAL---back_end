@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { CreateAdminUseCase } from 'src/use-case/admin/create-admin.usecase';
-import { Admin } from 'src/domain/entities/admin';
+import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
 
 @Controller('admins')
+@UseGuards(JwtAuthGuard)
 export class AdminController {
   constructor(
     private readonly createAdminUseCase: CreateAdminUseCase,
