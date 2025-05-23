@@ -13,24 +13,51 @@ exports.CreateScheduleUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const schedule_repository_1 = require("../../domain/repositories/schedule.repository");
 const schedule_1 = require("../../domain/entities/schedule");
+const crypto_1 = require("crypto");
 let CreateScheduleUseCase = class CreateScheduleUseCase {
     scheduleRepository;
     constructor(scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
+    hasTimeConflict(existingSchedules, newStartTime, newEndTime) {
+        return existingSchedules.some(schedule => {
+            const [newStartHours, newStartMinutes] = newStartTime.split(':').map(Number);
+            const [newEndHours, newEndMinutes] = newEndTime.split(':').map(Number);
+            const [existingStartHours, existingStartMinutes] = schedule.startTime.split(':').map(Number);
+            const [existingEndHours, existingEndMinutes] = schedule.endTime.split(':').map(Number);
+            const newStartInMinutes = newStartHours * 60 + newStartMinutes;
+            const newEndInMinutes = newEndHours * 60 + newEndMinutes;
+            const existingStartInMinutes = existingStartHours * 60 + existingStartMinutes;
+            const existingEndInMinutes = existingEndHours * 60 + existingEndMinutes;
+            return ((newStartInMinutes >= existingStartInMinutes && newStartInMinutes < existingEndInMinutes) ||
+                (newEndInMinutes > existingStartInMinutes && newEndInMinutes <= existingEndInMinutes) ||
+                (newStartInMinutes <= existingStartInMinutes && newEndInMinutes >= existingEndInMinutes));
+        });
+    }
     async execute(data) {
+        const [hours, minutes] = data.startTime.split(':').map(Number);
+        const startTimeInMinutes = hours * 60 + minutes;
+        const totalDurationInMinutes = data.duration * data.totalSlots;
+        const endTimeInMinutes = startTimeInMinutes + totalDurationInMinutes;
+        const endHours = Math.floor(endTimeInMinutes / 60);
+        const endMinutes = endTimeInMinutes % 60;
+        const endTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+        const existingSchedules = await this.scheduleRepository.findByDate(data.employeeId, data.date);
+        if (this.hasTimeConflict(existingSchedules, data.startTime, endTime)) {
+            throw new common_1.ConflictException('Já existe uma agenda para este funcionário no mesmo horário');
+        }
         const schedule = new schedule_1.Schedule({
-            id: crypto.randomUUID(),
+            id: (0, crypto_1.randomUUID)(),
             date: data.date,
             startTime: data.startTime,
-            endTime: data.endTime,
-            duration: data.duration,
+            endTime,
+            duration: Number(data.duration),
             totalSlots: data.totalSlots,
-            availableSlots: data.availableSlots,
+            availableSlots: data.totalSlots,
             employeeId: data.employeeId,
-            active: data.active
+            active: true
         });
-        return await this.scheduleRepository.create(schedule);
+        return this.scheduleRepository.create(schedule);
     }
 };
 exports.CreateScheduleUseCase = CreateScheduleUseCase;

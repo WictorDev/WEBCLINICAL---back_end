@@ -12,7 +12,7 @@ interface UpdateScheduleUseCaseRequest {
     active?: boolean;
 }
 export declare class UpdateScheduleUseCase {
-    private scheduleRepository;
+    private readonly scheduleRepository;
     constructor(scheduleRepository: ScheduleRepository);
     execute(data: UpdateScheduleUseCaseRequest): Promise<Schedule>;
 }

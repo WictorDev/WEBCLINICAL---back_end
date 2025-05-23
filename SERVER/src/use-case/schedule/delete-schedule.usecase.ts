@@ -1,16 +1,15 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { ScheduleRepository } from 'src/domain/repositories/schedule.repository';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ScheduleRepository } from '../../domain/repositories/schedule.repository';
 
 @Injectable()
 export class DeleteScheduleUseCase {
-  constructor(
-    private readonly scheduleRepository: ScheduleRepository
-  ) {}
+  constructor(private readonly scheduleRepository: ScheduleRepository) {}
 
-  async execute(id: string) {
+  async execute(id: string): Promise<void> {
     const schedule = await this.scheduleRepository.findById(id);
+
     if (!schedule) {
-      throw new BadRequestException('Agenda não encontrada.');
+      throw new NotFoundException('Agenda não encontrada.');
     }
 
     await this.scheduleRepository.delete(id);

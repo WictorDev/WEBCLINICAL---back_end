@@ -20,7 +20,7 @@ let DeleteScheduleUseCase = class DeleteScheduleUseCase {
     async execute(id) {
         const schedule = await this.scheduleRepository.findById(id);
         if (!schedule) {
-            throw new common_1.BadRequestException('Agenda não encontrada.');
+            throw new common_1.NotFoundException('Agenda não encontrada.');
         }
         await this.scheduleRepository.delete(id);
     }

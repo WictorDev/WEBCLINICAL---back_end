@@ -9,25 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FindScheduleByIdUseCase = void 0;
+exports.FindAllEmployeesUseCase = void 0;
 const common_1 = require("@nestjs/common");
-const schedule_repository_1 = require("../../domain/repositories/schedule.repository");
-let FindScheduleByIdUseCase = class FindScheduleByIdUseCase {
-    scheduleRepository;
-    constructor(scheduleRepository) {
-        this.scheduleRepository = scheduleRepository;
+const employee_repository_1 = require("../../domain/repositories/employee.repository");
+let FindAllEmployeesUseCase = class FindAllEmployeesUseCase {
+    employeeRepository;
+    constructor(employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
-    async execute(id) {
-        const schedule = await this.scheduleRepository.findById(id);
-        if (!schedule) {
-            throw new common_1.NotFoundException('Agenda não encontrada.');
-        }
-        return schedule;
+    async execute() {
+        return this.employeeRepository.findAll();
     }
 };
-exports.FindScheduleByIdUseCase = FindScheduleByIdUseCase;
-exports.FindScheduleByIdUseCase = FindScheduleByIdUseCase = __decorate([
+exports.FindAllEmployeesUseCase = FindAllEmployeesUseCase;
+exports.FindAllEmployeesUseCase = FindAllEmployeesUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [schedule_repository_1.ScheduleRepository])
-], FindScheduleByIdUseCase);
-//# sourceMappingURL=find-schedule-by-id.usecase.js.map
+    __metadata("design:paramtypes", [employee_repository_1.EmployeeRepository])
+], FindAllEmployeesUseCase);
+//# sourceMappingURL=find-all-employees.usecase.js.map

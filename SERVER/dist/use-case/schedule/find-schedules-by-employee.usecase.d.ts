@@ -1,6 +1,7 @@
 import { ScheduleRepository } from '../../domain/repositories/schedule.repository';
-export declare class DeleteScheduleUseCase {
+import { Schedule } from '../../domain/entities/schedule';
+export declare class FindSchedulesByEmployeeUseCase {
     private readonly scheduleRepository;
     constructor(scheduleRepository: ScheduleRepository);
-    execute(id: string): Promise<void>;
+    execute(employeeId: string, date?: Date): Promise<Schedule[]>;
 }
