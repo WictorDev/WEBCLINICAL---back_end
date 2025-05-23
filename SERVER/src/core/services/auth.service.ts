@@ -10,50 +10,91 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async login(login: any): Promise<any> {
-    const { identifier, password } = login;
-    const isCpf = !identifier.includes('@');
+  async login(loginData: { identifier: string; password: string }) {
+    console.log('AuthService - Tentando login com:', loginData.identifier);
 
-    console.log('AuthService - Tentando login com:', identifier);
-    // Buscar usuário
-    const usuario = await this.prismaService.user.findUnique({
-      where: isCpf ? { cpf: identifier } : { email: identifier },
-      include: { types: { include: { type: true } } },
-    });
+    // Busca nas duas tabelas
+    const [userData, patient] = await Promise.all([
+      this.prismaService.user.findUnique({
+        where: { cpf: loginData.identifier },
+        include: { types: { include: { type: true } } }
+      }),
+      this.prismaService.patient.findUnique({
+        where: { cpf: loginData.identifier },
+        include: { type: true }
+      })
+    ]);
 
-    console.log('AuthService - Usuário encontrado:', usuario);
-
-    if (!usuario) {
+    // Se não encontrou em nenhuma tabela
+    if (!userData && !patient) {
       console.log('AuthService - Usuário não encontrado!');
       throw new UnauthorizedException('Usuário ou senha inválidos');
     }
 
-    console.log('AuthService - Senha digitada:', password);
-    console.log('AuthService - Hash no banco:', usuario.password);
-    const senhaUsuarioOk = await bcrypt.compare(password, usuario.password);
-    console.log('AuthService - Resultado bcrypt.compare:', senhaUsuarioOk);
+    let user: any;
 
-    if (!senhaUsuarioOk) {
-      console.log('AuthService - Senha inválida!');
+    // Se encontrou apenas na tabela Patient
+    if (!userData && patient) {
+      user = {
+        cpf: patient.cpf,
+        email: patient.email,
+        password: patient.password,
+        name: patient.name,
+        active: true,
+        companyId: null,
+        types: [{
+          userId: patient.cpf,
+          typeId: patient.typeId,
+          type: patient.type || { id: patient.typeId, name: 'PATIENT' }
+        }]
+      };
+    }
+    // Se encontrou na tabela User e também é Patient
+    else if (userData && patient) {
+      user = {
+        ...userData,
+        types: [
+          ...userData.types,
+          {
+            userId: patient.cpf,
+            typeId: patient.typeId,
+            type: patient.type || { id: patient.typeId, name: 'PATIENT' }
+          }
+        ]
+      };
+    } else {
+      user = userData;
+    }
+
+    console.log('AuthService - Usuário encontrado:', user);
+
+    const isPasswordValid = await bcrypt.compare(loginData.password, user.password);
+    console.log('AuthService - Senha digitada:', loginData.password);
+    console.log('AuthService - Hash no banco:', user.password);
+    console.log('AuthService - Resultado bcrypt.compare:', isPasswordValid);
+
+    if (!isPasswordValid) {
       throw new UnauthorizedException('Usuário ou senha inválidos');
     }
 
-    // Pega todos os tipos do usuário
-    const tipos = usuario.types.map((t: any) => t.type.name);
+    const tipos = user.types.map((t: any) => t.type.name);
 
     const payload = {
-      id: usuario.cpf,
+      id: user.cpf,
       tipos: tipos,
-      name: usuario.name,
-      companyId: usuario.companyId
+      name: user.name,
+      companyId: user.companyId
     };
 
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const now = Math.floor(Date.now() / 1000);
     return { 
       token: accessToken, 
       tipos: tipos, 
-      nome: usuario.name,
-      companyId: usuario.companyId
+      nome: user.name,
+      iat: now,
+      exp: now + 3600,
+      companyId: user.companyId
     };
   }
 

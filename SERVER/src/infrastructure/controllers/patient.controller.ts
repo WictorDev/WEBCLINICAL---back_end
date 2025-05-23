@@ -8,7 +8,6 @@ import {
   UseGuards,
   BadRequestException
 } from '@nestjs/common';
-import { CreatePatientUseCase } from 'src/use-case/patient/create-patient.usecase';
 import { FindPatientUseCase } from 'src/use-case/patient/find-patient.usecase';
 import { FindPatientByCpfUseCase } from 'src/use-case/patient/find-patient-by-cpf.usecase';
 import { FindPatientByEmailUseCase } from 'src/use-case/patient/find-patient-by-email.usecase';
@@ -16,6 +15,8 @@ import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
 import { UpdatePatientUseCase } from 'src/use-case/patient/update-patient.usecase';
+import { TypeRepository } from 'src/domain/repositories/type.repository';
+import { CreatePatientUseCase } from 'src/use-case/patient/create-patient.usecase';
 import { Public } from '../auth/public.decorator';
 
 @ApiTags('patients')
@@ -23,8 +24,8 @@ import { Public } from '../auth/public.decorator';
 @UseGuards(JwtAuthGuard)
 export class PatientController {
   constructor(
+    private readonly typeRepository: TypeRepository,
     private readonly createPatientUseCase: CreatePatientUseCase,
-    private readonly findPatientUseCase: FindPatientUseCase,
     private readonly findPatientByCpfUseCase: FindPatientByCpfUseCase,
     private readonly findPatientByEmailUseCase: FindPatientByEmailUseCase,
     private readonly updatePatientUseCase: UpdatePatientUseCase,
@@ -54,7 +55,6 @@ export class PatientController {
       name: string; 
       email: string;
       password: string;
-      type: `PATIENT`;
     }
   ) {
     try {

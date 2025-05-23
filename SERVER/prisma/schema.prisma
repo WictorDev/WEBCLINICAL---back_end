@@ -28,7 +28,6 @@ model User {
   // Relacionamentos com as tabelas específicas
   admin     Admin?
   employee  Employee?
-  patient   Patient?
 }
 
 model UserType {
@@ -87,7 +86,6 @@ model Patient {
   type     Type?  @relation(fields: [typeId], references: [id])
   typeId   String
   appointments Appointment[]
-  user     User   @relation(fields: [cpf], references: [cpf])
 }
 
 model Schedule {

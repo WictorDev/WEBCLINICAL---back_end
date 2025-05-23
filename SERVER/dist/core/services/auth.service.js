@@ -21,40 +21,78 @@ let AuthService = class AuthService {
         this.prismaService = prismaService;
         this.jwtService = jwtService;
     }
-    async login(login) {
-        const { identifier, password } = login;
-        const isCpf = !identifier.includes('@');
-        console.log('AuthService - Tentando login com:', identifier);
-        const usuario = await this.prismaService.user.findUnique({
-            where: isCpf ? { cpf: identifier } : { email: identifier },
-            include: { types: { include: { type: true } } },
-        });
-        console.log('AuthService - Usuário encontrado:', usuario);
-        if (!usuario) {
+    async login(loginData) {
+        console.log('AuthService - Tentando login com:', loginData.identifier);
+        const [userData, patient] = await Promise.all([
+            this.prismaService.user.findUnique({
+                where: { cpf: loginData.identifier },
+                include: { types: { include: { type: true } } }
+            }),
+            this.prismaService.patient.findUnique({
+                where: { cpf: loginData.identifier },
+                include: { type: true }
+            })
+        ]);
+        if (!userData && !patient) {
             console.log('AuthService - Usuário não encontrado!');
             throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
         }
-        console.log('AuthService - Senha digitada:', password);
-        console.log('AuthService - Hash no banco:', usuario.password);
-        const senhaUsuarioOk = await bcrypt.compare(password, usuario.password);
-        console.log('AuthService - Resultado bcrypt.compare:', senhaUsuarioOk);
-        if (!senhaUsuarioOk) {
-            console.log('AuthService - Senha inválida!');
+        let user;
+        if (!userData && patient) {
+            user = {
+                cpf: patient.cpf,
+                email: patient.email,
+                password: patient.password,
+                name: patient.name,
+                active: true,
+                companyId: null,
+                types: [{
+                        userId: patient.cpf,
+                        typeId: patient.typeId,
+                        type: patient.type || { id: patient.typeId, name: 'PATIENT' }
+                    }]
+            };
+        }
+        else if (userData && patient) {
+            user = {
+                ...userData,
+                types: [
+                    ...userData.types,
+                    {
+                        userId: patient.cpf,
+                        typeId: patient.typeId,
+                        type: patient.type || { id: patient.typeId, name: 'PATIENT' }
+                    }
+                ]
+            };
+        }
+        else {
+            user = userData;
+        }
+        console.log('AuthService - Usuário encontrado:', user);
+        const isPasswordValid = await bcrypt.compare(loginData.password, user.password);
+        console.log('AuthService - Senha digitada:', loginData.password);
+        console.log('AuthService - Hash no banco:', user.password);
+        console.log('AuthService - Resultado bcrypt.compare:', isPasswordValid);
+        if (!isPasswordValid) {
             throw new common_1.UnauthorizedException('Usuário ou senha inválidos');
         }
-        const tipos = usuario.types.map((t) => t.type.name);
+        const tipos = user.types.map((t) => t.type.name);
         const payload = {
-            id: usuario.cpf,
+            id: user.cpf,
             tipos: tipos,
-            name: usuario.name,
-            companyId: usuario.companyId
+            name: user.name,
+            companyId: user.companyId
         };
-        const accessToken = this.jwtService.sign(payload);
+        const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+        const now = Math.floor(Date.now() / 1000);
         return {
             token: accessToken,
             tipos: tipos,
-            nome: usuario.name,
-            companyId: usuario.companyId
+            nome: user.name,
+            iat: now,
+            exp: now + 3600,
+            companyId: user.companyId
         };
     }
     async validateUser(email, password) {

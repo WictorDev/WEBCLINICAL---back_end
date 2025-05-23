@@ -17,7 +17,6 @@ import { FindUserUseCase } from 'src/use-case/user/find-user.usecase';
 import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
 import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
 import { ApiTags } from '@nestjs/swagger';
-import { Public } from 'src/infrastructure/auth/public.decorator';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
 import { CreateFirstAdminUseCase } from 'src/use-case/user/create-first-admin.usecase';
 
@@ -50,7 +49,6 @@ export class UserController {
     return this.findUserByCpfUseCase.execute(new UniqueEntityCpf(cpf));
   }
 
-  @Public()
   @Post('/create_user')
   async create(
     @Body() body: { 

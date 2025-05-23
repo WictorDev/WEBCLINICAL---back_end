@@ -18,19 +18,16 @@ const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const bcrypt = require("bcrypt");
 const create_admin_usecase_1 = require("../admin/create-admin.usecase");
 const create_employee_usecase_1 = require("../employee/create-employee.usecase");
-const create_patient_usecase_1 = require("../patient/create-patient.usecase");
 let CreateUserUseCase = class CreateUserUseCase {
     userRepository;
     typeRepository;
     createAdminUseCase;
     createEmployeeUseCase;
-    createPatientUseCase;
-    constructor(userRepository, typeRepository, createAdminUseCase, createEmployeeUseCase, createPatientUseCase) {
+    constructor(userRepository, typeRepository, createAdminUseCase, createEmployeeUseCase) {
         this.userRepository = userRepository;
         this.typeRepository = typeRepository;
         this.createAdminUseCase = createAdminUseCase;
         this.createEmployeeUseCase = createEmployeeUseCase;
-        this.createPatientUseCase = createPatientUseCase;
     }
     async execute(data) {
         const type = await this.typeRepository.findByName(data.type);
@@ -97,15 +94,6 @@ let CreateUserUseCase = class CreateUserUseCase {
                     advice: data.advice
                 });
                 return result;
-            case 'PATIENT':
-                await this.createPatientUseCase.execute({
-                    cpf: data.cpf,
-                    name: data.name,
-                    email: data.email,
-                    password: data.password,
-                    type: typeName
-                });
-                break;
             default:
                 throw new common_1.BadRequestException(`Tipo ${typeName} não suportado`);
         }
@@ -117,7 +105,6 @@ exports.CreateUserUseCase = CreateUserUseCase = __decorate([
     __metadata("design:paramtypes", [user_repository_1.UserRepository,
         type_repository_1.TypeRepository,
         create_admin_usecase_1.CreateAdminUseCase,
-        create_employee_usecase_1.CreateEmployeeUseCase,
-        create_patient_usecase_1.CreatePatientUseCase])
+        create_employee_usecase_1.CreateEmployeeUseCase])
 ], CreateUserUseCase);
 //# sourceMappingURL=create-user.usecase.js.map

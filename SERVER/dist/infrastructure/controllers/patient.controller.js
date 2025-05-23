@@ -14,7 +14,6 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PatientController = void 0;
 const common_1 = require("@nestjs/common");
-const create_patient_usecase_1 = require("../../use-case/patient/create-patient.usecase");
 const find_patient_usecase_1 = require("../../use-case/patient/find-patient.usecase");
 const find_patient_by_cpf_usecase_1 = require("../../use-case/patient/find-patient-by-cpf.usecase");
 const find_patient_by_email_usecase_1 = require("../../use-case/patient/find-patient-by-email.usecase");
@@ -22,17 +21,19 @@ const jwt_guard_1 = require("../auth/jwt.guard");
 const swagger_1 = require("@nestjs/swagger");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const update_patient_usecase_1 = require("../../use-case/patient/update-patient.usecase");
+const type_repository_1 = require("../../domain/repositories/type.repository");
+const create_patient_usecase_1 = require("../../use-case/patient/create-patient.usecase");
 const public_decorator_1 = require("../auth/public.decorator");
 let PatientController = class PatientController {
+    typeRepository;
     createPatientUseCase;
-    findPatientUseCase;
     findPatientByCpfUseCase;
     findPatientByEmailUseCase;
     updatePatientUseCase;
     findAllPatientsUseCase;
-    constructor(createPatientUseCase, findPatientUseCase, findPatientByCpfUseCase, findPatientByEmailUseCase, updatePatientUseCase, findAllPatientsUseCase) {
+    constructor(typeRepository, createPatientUseCase, findPatientByCpfUseCase, findPatientByEmailUseCase, updatePatientUseCase, findAllPatientsUseCase) {
+        this.typeRepository = typeRepository;
         this.createPatientUseCase = createPatientUseCase;
-        this.findPatientUseCase = findPatientUseCase;
         this.findPatientByCpfUseCase = findPatientByCpfUseCase;
         this.findPatientByEmailUseCase = findPatientByEmailUseCase;
         this.updatePatientUseCase = updatePatientUseCase;
@@ -103,8 +104,8 @@ exports.PatientController = PatientController = __decorate([
     (0, swagger_1.ApiTags)('patients'),
     (0, common_1.Controller)('/api/patients'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
-    __metadata("design:paramtypes", [create_patient_usecase_1.CreatePatientUseCase,
-        find_patient_usecase_1.FindPatientUseCase,
+    __metadata("design:paramtypes", [type_repository_1.TypeRepository,
+        create_patient_usecase_1.CreatePatientUseCase,
         find_patient_by_cpf_usecase_1.FindPatientByCpfUseCase,
         find_patient_by_email_usecase_1.FindPatientByEmailUseCase,
         update_patient_usecase_1.UpdatePatientUseCase,
