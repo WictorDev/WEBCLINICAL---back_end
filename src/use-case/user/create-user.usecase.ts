@@ -6,7 +6,6 @@ import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
 import * as bcrypt from 'bcrypt';
 import { CreateAdminUseCase } from '../admin/create-admin.usecase';
 import { CreateEmployeeUseCase } from '../employee/create-employee.usecase';
-import { CreatePatientUseCase } from '../patient/create-patient.usecase';
 
 @Injectable()
 export class CreateUserUseCase {
@@ -15,7 +14,6 @@ export class CreateUserUseCase {
         private readonly typeRepository: TypeRepository,
         private readonly createAdminUseCase: CreateAdminUseCase,
         private readonly createEmployeeUseCase: CreateEmployeeUseCase,
-        private readonly createPatientUseCase: CreatePatientUseCase,
     ) { }
 
     async execute(data: { 
@@ -127,16 +125,6 @@ export class CreateUserUseCase {
                     advice: data.advice
                 });
                 return result;
-
-            case 'PATIENT':
-                await this.createPatientUseCase.execute({
-                    cpf: data.cpf,
-                    name: data.name,
-                    email: data.email,
-                    password: data.password,
-                    type: typeName
-                });
-                break;
 
             default:
                 throw new BadRequestException(`Tipo ${typeName} não suportado`);

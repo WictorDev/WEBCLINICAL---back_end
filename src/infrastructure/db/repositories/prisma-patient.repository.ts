@@ -13,7 +13,7 @@ export class PrismaPatientRepository implements PatientRepository {
     try {
       const created = await this.prismaService.patient.create({
         data: {
-          cpf: patient.cpf,
+          cpf: patient.cpf.toString(),
           name: patient.name,
           email: patient.email,
           password: patient.password,
@@ -94,14 +94,14 @@ export class PrismaPatientRepository implements PatientRepository {
     });
   }
 
-  async update(cpf: string, patient: Patient): Promise<Patient> {
+  async update(cpf: string, data: Partial<Patient>): Promise<Patient> {
     const updated = await this.prismaService.patient.update({
       where: { cpf },
       data: {
-        name: patient.name,
-        email: patient.email,
-        password: patient.password,
-        typeId: patient.typeId,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        typeId: data.typeId,
       },
     });
     return new Patient({
