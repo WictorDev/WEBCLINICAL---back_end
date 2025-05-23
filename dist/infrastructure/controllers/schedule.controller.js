@@ -14,123 +14,107 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleController = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_guard_1 = require("../auth/jwt.guard");
-const schedule_1 = require("../../domain/entities/schedule");
-const crypto_1 = require("crypto");
 const create_schedule_usecase_1 = require("../../use-case/schedule/create-schedule.usecase");
 const update_schedule_usecase_1 = require("../../use-case/schedule/update-schedule.usecase");
 const delete_schedule_usecase_1 = require("../../use-case/schedule/delete-schedule.usecase");
 const find_schedule_by_id_usecase_1 = require("../../use-case/schedule/find-schedule-by-id.usecase");
-const find_schedule_by_employee_usecase_1 = require("../../use-case/schedule/find-schedule-by-employee.usecase");
-const find_schedule_by_date_usecase_1 = require("../../use-case/schedule/find-schedule-by-date.usecase");
-const find_all_schedules_usecase_1 = require("../../use-case/schedule/find-all-schedules.usecase");
+const find_schedules_by_employee_usecase_1 = require("../../use-case/schedule/find-schedules-by-employee.usecase");
+const find_available_schedules_usecase_1 = require("../../use-case/schedule/find-available-schedules.usecase");
 const swagger_1 = require("@nestjs/swagger");
+const jwt_guard_1 = require("../auth/jwt.guard");
 let ScheduleController = class ScheduleController {
-    createSchedule;
-    updateSchedule;
-    deleteSchedule;
-    findScheduleById;
-    findScheduleByEmployee;
-    findScheduleByDate;
-    findAllSchedules;
-    constructor(createSchedule, updateSchedule, deleteSchedule, findScheduleById, findScheduleByEmployee, findScheduleByDate, findAllSchedules) {
-        this.createSchedule = createSchedule;
-        this.updateSchedule = updateSchedule;
-        this.deleteSchedule = deleteSchedule;
-        this.findScheduleById = findScheduleById;
-        this.findScheduleByEmployee = findScheduleByEmployee;
-        this.findScheduleByDate = findScheduleByDate;
-        this.findAllSchedules = findAllSchedules;
+    createScheduleUseCase;
+    updateScheduleUseCase;
+    deleteScheduleUseCase;
+    findScheduleByIdUseCase;
+    findSchedulesByEmployeeUseCase;
+    findAvailableSchedulesUseCase;
+    constructor(createScheduleUseCase, updateScheduleUseCase, deleteScheduleUseCase, findScheduleByIdUseCase, findSchedulesByEmployeeUseCase, findAvailableSchedulesUseCase) {
+        this.createScheduleUseCase = createScheduleUseCase;
+        this.updateScheduleUseCase = updateScheduleUseCase;
+        this.deleteScheduleUseCase = deleteScheduleUseCase;
+        this.findScheduleByIdUseCase = findScheduleByIdUseCase;
+        this.findSchedulesByEmployeeUseCase = findSchedulesByEmployeeUseCase;
+        this.findAvailableSchedulesUseCase = findAvailableSchedulesUseCase;
     }
-    async findAll() {
-        return this.findAllSchedules.execute();
+    async create(data) {
+        return this.createScheduleUseCase.execute(data);
     }
-    async findById(id) {
-        return this.findScheduleById.execute(id);
-    }
-    async findByEmployee(employeeId) {
-        return this.findScheduleByEmployee.findAllByEmployee(employeeId);
-    }
-    async findAvailableByEmployee(employeeId) {
-        return this.findScheduleByEmployee.findAvailableByEmployee(employeeId);
-    }
-    async findByDate(employeeId, date) {
-        return this.findScheduleByDate.findByDate(employeeId, new Date(date));
-    }
-    async findAvailableByDate(employeeId, date) {
-        return this.findScheduleByDate.findAvailableByDate(employeeId, new Date(date));
-    }
-    async create(scheduleData) {
-        const schedule = new schedule_1.Schedule({
-            id: (0, crypto_1.randomUUID)(),
-            date: new Date(scheduleData.date),
-            startTime: scheduleData.startTime,
-            endTime: scheduleData.endTime,
-            duration: scheduleData.duration,
-            totalSlots: scheduleData.totalSlots,
-            availableSlots: scheduleData.availableSlots,
-            employeeId: scheduleData.employeeId,
-            active: scheduleData.active,
-        });
-        return this.createSchedule.execute(schedule);
-    }
-    async update(id, scheduleData) {
-        return this.updateSchedule.execute({
-            id,
-            ...scheduleData,
-            date: scheduleData.date ? new Date(scheduleData.date) : undefined,
-        });
+    async update(id, data) {
+        return this.updateScheduleUseCase.execute({ id, ...data });
     }
     async delete(id) {
-        return this.deleteSchedule.execute(id);
+        return this.deleteScheduleUseCase.execute(id);
+    }
+    async findById(id) {
+        return this.findScheduleByIdUseCase.execute(id);
+    }
+    async findByEmployee(employeeId, date) {
+        return this.findSchedulesByEmployeeUseCase.execute(employeeId, date);
+    }
+    async findAvailable(employeeId, date) {
+        return this.findAvailableSchedulesUseCase.execute(employeeId, date);
     }
 };
 exports.ScheduleController = ScheduleController;
 __decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], ScheduleController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ScheduleController.prototype, "findById", null);
-__decorate([
-    (0, common_1.Get)('employee/:employeeId'),
-    __param(0, (0, common_1.Param)('employeeId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ScheduleController.prototype, "findByEmployee", null);
-__decorate([
-    (0, common_1.Get)('employee/:employeeId/available'),
-    __param(0, (0, common_1.Param)('employeeId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ScheduleController.prototype, "findAvailableByEmployee", null);
-__decorate([
-    (0, common_1.Get)('date/:employeeId'),
-    __param(0, (0, common_1.Param)('employeeId')),
-    __param(1, (0, common_1.Query)('date')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", Promise)
-], ScheduleController.prototype, "findByDate", null);
-__decorate([
-    (0, common_1.Get)('date/:employeeId/available'),
-    __param(0, (0, common_1.Param)('employeeId')),
-    __param(1, (0, common_1.Query)('date')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", Promise)
-], ScheduleController.prototype, "findAvailableByDate", null);
-__decorate([
     (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Criar uma nova agenda' }),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                date: {
+                    type: 'string',
+                    format: 'date-time',
+                    example: '2024-03-20T10:00:00Z',
+                    description: 'Data da agenda'
+                },
+                startTime: {
+                    type: 'string',
+                    example: '09:00',
+                    description: 'Horário de início no formato HH:mm'
+                },
+                duration: {
+                    type: 'number',
+                    example: 30,
+                    description: 'Duração de cada consulta em minutos'
+                },
+                totalSlots: {
+                    type: 'number',
+                    example: 4,
+                    description: 'Número total de vagas disponíveis'
+                },
+                employeeId: {
+                    type: 'string',
+                    example: '98765432100',
+                    description: 'CPF do funcionário'
+                }
+            },
+            required: ['date', 'startTime', 'duration', 'totalSlots', 'employeeId']
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'Agenda criada com sucesso',
+        schema: {
+            type: 'object',
+            properties: {
+                id: { type: 'string', example: '123e4567-e89b-12d3-a456-426614174000' },
+                date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
+                startTime: { type: 'string', example: '09:00' },
+                endTime: { type: 'string', example: '11:00' },
+                duration: { type: 'number', example: 30 },
+                totalSlots: { type: 'number', example: 4 },
+                availableSlots: { type: 'number', example: 4 },
+                employeeId: { type: 'string', example: '987.654.321-00' },
+                active: { type: 'boolean', example: true }
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Dados inválidos' }),
+    (0, swagger_1.ApiResponse)({ status: 409, description: 'Conflito de horário' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -138,6 +122,25 @@ __decorate([
 ], ScheduleController.prototype, "create", null);
 __decorate([
     (0, common_1.Put)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Atualizar uma agenda existente' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID da agenda' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
+                startTime: { type: 'string', example: '09:00' },
+                endTime: { type: 'string', example: '17:00' },
+                duration: { type: 'number', example: 30 },
+                totalSlots: { type: 'number', example: 16 },
+                availableSlots: { type: 'number', example: 16 },
+                employeeId: { type: 'string', example: '123.456.789-00' },
+                active: { type: 'boolean', example: true }
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Agenda atualizada com sucesso' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Agenda não encontrada' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -146,21 +149,59 @@ __decorate([
 ], ScheduleController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Excluir uma agenda' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID da agenda' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Agenda excluída com sucesso' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Agenda não encontrada' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ScheduleController.prototype, "delete", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Buscar uma agenda por ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID da agenda' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Agenda encontrada' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Agenda não encontrada' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findById", null);
+__decorate([
+    (0, common_1.Get)('employee/:employeeId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Listar agendas de um funcionário' }),
+    (0, swagger_1.ApiParam)({ name: 'employeeId', description: 'CPF do funcionário' }),
+    (0, swagger_1.ApiQuery)({ name: 'date', required: false, type: Date, description: 'Data para filtrar as agendas' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de agendas encontrada' }),
+    __param(0, (0, common_1.Param)('employeeId')),
+    __param(1, (0, common_1.Query)('date', new common_1.ParseDatePipe({ optional: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Date]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findByEmployee", null);
+__decorate([
+    (0, common_1.Get)('available/:employeeId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Listar agendas disponíveis de um funcionário' }),
+    (0, swagger_1.ApiParam)({ name: 'employeeId', description: 'CPF do funcionário' }),
+    (0, swagger_1.ApiQuery)({ name: 'date', required: false, type: Date, description: 'Data para filtrar as agendas' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de agendas disponíveis encontrada' }),
+    __param(0, (0, common_1.Param)('employeeId')),
+    __param(1, (0, common_1.Query)('date', new common_1.ParseDatePipe({ optional: true }))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Date]),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findAvailable", null);
 exports.ScheduleController = ScheduleController = __decorate([
     (0, swagger_1.ApiTags)('schedules'),
-    (0, common_1.Controller)('schedules'),
+    (0, common_1.Controller)('api/schedules'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_schedule_usecase_1.CreateScheduleUseCase,
         update_schedule_usecase_1.UpdateScheduleUseCase,
         delete_schedule_usecase_1.DeleteScheduleUseCase,
         find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
-        find_schedule_by_employee_usecase_1.FindScheduleByEmployeeUseCase,
-        find_schedule_by_date_usecase_1.FindScheduleByDateUseCase,
-        find_all_schedules_usecase_1.FindAllSchedulesUseCase])
+        find_schedules_by_employee_usecase_1.FindSchedulesByEmployeeUseCase,
+        find_available_schedules_usecase_1.FindAvailableSchedulesUseCase])
 ], ScheduleController);
 //# sourceMappingURL=schedule.controller.js.map

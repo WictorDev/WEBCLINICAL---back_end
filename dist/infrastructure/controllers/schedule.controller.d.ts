@@ -1,27 +1,37 @@
-import { Schedule } from '../../domain/entities/schedule';
 import { CreateScheduleUseCase } from '../../use-case/schedule/create-schedule.usecase';
 import { UpdateScheduleUseCase } from '../../use-case/schedule/update-schedule.usecase';
 import { DeleteScheduleUseCase } from '../../use-case/schedule/delete-schedule.usecase';
 import { FindScheduleByIdUseCase } from '../../use-case/schedule/find-schedule-by-id.usecase';
-import { FindScheduleByEmployeeUseCase } from '../../use-case/schedule/find-schedule-by-employee.usecase';
-import { FindScheduleByDateUseCase } from '../../use-case/schedule/find-schedule-by-date.usecase';
-import { FindAllSchedulesUseCase } from '../../use-case/schedule/find-all-schedules.usecase';
+import { FindSchedulesByEmployeeUseCase } from '../../use-case/schedule/find-schedules-by-employee.usecase';
+import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-available-schedules.usecase';
+import { Schedule } from '../../domain/entities/schedule';
 export declare class ScheduleController {
-    private readonly createSchedule;
-    private readonly updateSchedule;
-    private readonly deleteSchedule;
-    private readonly findScheduleById;
-    private readonly findScheduleByEmployee;
-    private readonly findScheduleByDate;
-    private readonly findAllSchedules;
-    constructor(createSchedule: CreateScheduleUseCase, updateSchedule: UpdateScheduleUseCase, deleteSchedule: DeleteScheduleUseCase, findScheduleById: FindScheduleByIdUseCase, findScheduleByEmployee: FindScheduleByEmployeeUseCase, findScheduleByDate: FindScheduleByDateUseCase, findAllSchedules: FindAllSchedulesUseCase);
-    findAll(): Promise<Schedule[]>;
-    findById(id: string): Promise<Schedule | null>;
-    findByEmployee(employeeId: string): Promise<Schedule[]>;
-    findAvailableByEmployee(employeeId: string): Promise<Schedule[]>;
-    findByDate(employeeId: string, date: string): Promise<Schedule[]>;
-    findAvailableByDate(employeeId: string, date: string): Promise<Schedule[]>;
-    create(scheduleData: Omit<Schedule, 'id'>): Promise<Schedule>;
-    update(id: string, scheduleData: Partial<Schedule>): Promise<Schedule>;
+    private readonly createScheduleUseCase;
+    private readonly updateScheduleUseCase;
+    private readonly deleteScheduleUseCase;
+    private readonly findScheduleByIdUseCase;
+    private readonly findSchedulesByEmployeeUseCase;
+    private readonly findAvailableSchedulesUseCase;
+    constructor(createScheduleUseCase: CreateScheduleUseCase, updateScheduleUseCase: UpdateScheduleUseCase, deleteScheduleUseCase: DeleteScheduleUseCase, findScheduleByIdUseCase: FindScheduleByIdUseCase, findSchedulesByEmployeeUseCase: FindSchedulesByEmployeeUseCase, findAvailableSchedulesUseCase: FindAvailableSchedulesUseCase);
+    create(data: {
+        date: Date;
+        startTime: string;
+        duration: number;
+        totalSlots: number;
+        employeeId: string;
+    }): Promise<Schedule>;
+    update(id: string, data: {
+        date?: Date;
+        startTime?: string;
+        endTime?: string;
+        duration?: number;
+        totalSlots?: number;
+        availableSlots?: number;
+        employeeId?: string;
+        active?: boolean;
+    }): Promise<Schedule>;
     delete(id: string): Promise<void>;
+    findById(id: string): Promise<Schedule>;
+    findByEmployee(employeeId: string, date?: Date): Promise<Schedule[]>;
+    findAvailable(employeeId: string, date?: Date): Promise<Schedule[]>;
 }

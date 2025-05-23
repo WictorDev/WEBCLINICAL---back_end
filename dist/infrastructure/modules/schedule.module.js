@@ -11,23 +11,19 @@ const common_1 = require("@nestjs/common");
 const prisma_module_1 = require("./prisma.module");
 const schedule_controller_1 = require("../controllers/schedule.controller");
 const prisma_schedule_repository_1 = require("../db/repositories/prisma-schedule.repository");
+const schedule_repository_1 = require("../../domain/repositories/schedule.repository");
 const create_schedule_usecase_1 = require("../../use-case/schedule/create-schedule.usecase");
 const update_schedule_usecase_1 = require("../../use-case/schedule/update-schedule.usecase");
 const delete_schedule_usecase_1 = require("../../use-case/schedule/delete-schedule.usecase");
 const find_schedule_by_id_usecase_1 = require("../../use-case/schedule/find-schedule-by-id.usecase");
-const find_schedule_by_employee_usecase_1 = require("../../use-case/schedule/find-schedule-by-employee.usecase");
-const find_schedule_by_date_usecase_1 = require("../../use-case/schedule/find-schedule-by-date.usecase");
-const find_all_schedules_usecase_1 = require("../../use-case/schedule/find-all-schedules.usecase");
-const find_schedule_usecase_1 = require("../../use-case/schedule/find-schedule.usecase");
-const schedule_repository_1 = require("../../domain/repositories/schedule.repository");
+const find_schedules_by_employee_usecase_1 = require("../../use-case/schedule/find-schedules-by-employee.usecase");
+const find_available_schedules_usecase_1 = require("../../use-case/schedule/find-available-schedules.usecase");
 let ScheduleModule = class ScheduleModule {
 };
 exports.ScheduleModule = ScheduleModule;
 exports.ScheduleModule = ScheduleModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            prisma_module_1.PrismaModule,
-        ],
+        imports: [prisma_module_1.PrismaModule],
         controllers: [schedule_controller_1.ScheduleController],
         providers: [
             {
@@ -39,10 +35,8 @@ exports.ScheduleModule = ScheduleModule = __decorate([
             update_schedule_usecase_1.UpdateScheduleUseCase,
             delete_schedule_usecase_1.DeleteScheduleUseCase,
             find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
-            find_schedule_by_employee_usecase_1.FindScheduleByEmployeeUseCase,
-            find_schedule_by_date_usecase_1.FindScheduleByDateUseCase,
-            find_all_schedules_usecase_1.FindAllSchedulesUseCase,
-            find_schedule_usecase_1.FindScheduleUseCase,
+            find_schedules_by_employee_usecase_1.FindSchedulesByEmployeeUseCase,
+            find_available_schedules_usecase_1.FindAvailableSchedulesUseCase,
         ],
         exports: [
             schedule_repository_1.ScheduleRepository,
@@ -51,10 +45,8 @@ exports.ScheduleModule = ScheduleModule = __decorate([
             update_schedule_usecase_1.UpdateScheduleUseCase,
             delete_schedule_usecase_1.DeleteScheduleUseCase,
             find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
-            find_schedule_by_employee_usecase_1.FindScheduleByEmployeeUseCase,
-            find_schedule_by_date_usecase_1.FindScheduleByDateUseCase,
-            find_all_schedules_usecase_1.FindAllSchedulesUseCase,
-            find_schedule_usecase_1.FindScheduleUseCase,
+            find_schedules_by_employee_usecase_1.FindSchedulesByEmployeeUseCase,
+            find_available_schedules_usecase_1.FindAvailableSchedulesUseCase,
         ],
     })
 ], ScheduleModule);

@@ -1,97 +1,169 @@
-import { Controller, Get, Query, UseGuards, Post, Body, Param, Delete, Put } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt.guard';
-import { Schedule } from '../../domain/entities/schedule';
-import { randomUUID } from 'crypto';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, ParseDatePipe, UseGuards } from '@nestjs/common';
 import { CreateScheduleUseCase } from '../../use-case/schedule/create-schedule.usecase';
 import { UpdateScheduleUseCase } from '../../use-case/schedule/update-schedule.usecase';
 import { DeleteScheduleUseCase } from '../../use-case/schedule/delete-schedule.usecase';
 import { FindScheduleByIdUseCase } from '../../use-case/schedule/find-schedule-by-id.usecase';
-import { FindScheduleByEmployeeUseCase } from '../../use-case/schedule/find-schedule-by-employee.usecase';
-import { FindScheduleByDateUseCase } from '../../use-case/schedule/find-schedule-by-date.usecase';
-import { FindAllSchedulesUseCase } from '../../use-case/schedule/find-all-schedules.usecase';
-import { ApiTags } from '@nestjs/swagger';
+import { FindSchedulesByEmployeeUseCase } from '../../use-case/schedule/find-schedules-by-employee.usecase';
+import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-available-schedules.usecase';
+import { Schedule } from '../../domain/entities/schedule';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt.guard';
 
 @ApiTags('schedules')
-@Controller('schedules')
+@Controller('api/schedules')
 @UseGuards(JwtAuthGuard)
 export class ScheduleController {
   constructor(
-    private readonly createSchedule: CreateScheduleUseCase,
-    private readonly updateSchedule: UpdateScheduleUseCase,
-    private readonly deleteSchedule: DeleteScheduleUseCase,
-    private readonly findScheduleById: FindScheduleByIdUseCase,
-    private readonly findScheduleByEmployee: FindScheduleByEmployeeUseCase,
-    private readonly findScheduleByDate: FindScheduleByDateUseCase,
-    private readonly findAllSchedules: FindAllSchedulesUseCase,
+    private readonly createScheduleUseCase: CreateScheduleUseCase,
+    private readonly updateScheduleUseCase: UpdateScheduleUseCase,
+    private readonly deleteScheduleUseCase: DeleteScheduleUseCase,
+    private readonly findScheduleByIdUseCase: FindScheduleByIdUseCase,
+    private readonly findSchedulesByEmployeeUseCase: FindSchedulesByEmployeeUseCase,
+    private readonly findAvailableSchedulesUseCase: FindAvailableSchedulesUseCase,
   ) {}
 
-  @Get()
-  async findAll() {
-    return this.findAllSchedules.execute();
-  }
-
-  @Get(':id')
-  async findById(@Param('id') id: string) {
-    return this.findScheduleById.execute(id);
-  }
-
-  @Get('employee/:employeeId')
-  async findByEmployee(@Param('employeeId') employeeId: string) {
-    return this.findScheduleByEmployee.findAllByEmployee(employeeId);
-  }
-
-  @Get('employee/:employeeId/available')
-  async findAvailableByEmployee(@Param('employeeId') employeeId: string) {
-    return this.findScheduleByEmployee.findAvailableByEmployee(employeeId);
-  }
-
-  @Get('date/:employeeId')
-  async findByDate(
-    @Param('employeeId') employeeId: string,
-    @Query('date') date: string,
-  ) {
-    return this.findScheduleByDate.findByDate(employeeId, new Date(date));
-  }
-
-  @Get('date/:employeeId/available')
-  async findAvailableByDate(
-    @Param('employeeId') employeeId: string,
-    @Query('date') date: string,
-  ) {
-    return this.findScheduleByDate.findAvailableByDate(employeeId, new Date(date));
-  }
-  
   @Post()
-  async create(@Body() scheduleData: Omit<Schedule, 'id'>) {
-    const schedule = new Schedule({
-      id: randomUUID(),
-      date: new Date(scheduleData.date),
-      startTime: scheduleData.startTime,
-      endTime: scheduleData.endTime,
-      duration: scheduleData.duration,
-      totalSlots: scheduleData.totalSlots,
-      availableSlots: scheduleData.availableSlots,
-      employeeId: scheduleData.employeeId,
-      active: scheduleData.active,
-    });
-    
-    return this.createSchedule.execute(schedule);
+  @ApiOperation({ summary: 'Criar uma nova agenda' })
+  @ApiBearerAuth()
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        date: { 
+          type: 'string', 
+          format: 'date-time', 
+          example: '2024-03-20T10:00:00Z',
+          description: 'Data da agenda'
+        },
+        startTime: { 
+          type: 'string', 
+          example: '09:00',
+          description: 'Horário de início no formato HH:mm'
+        },
+        duration: { 
+          type: 'number', 
+          example: 30,
+          description: 'Duração de cada consulta em minutos'
+        },
+        totalSlots: { 
+          type: 'number', 
+          example: 4,
+          description: 'Número total de vagas disponíveis'
+        },
+        employeeId: { 
+          type: 'string', 
+          example: '98765432100',
+          description: 'CPF do funcionário'
+        }
+      },
+      required: ['date', 'startTime', 'duration', 'totalSlots', 'employeeId']
+    }
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Agenda criada com sucesso',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', example: '123e4567-e89b-12d3-a456-426614174000' },
+        date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
+        startTime: { type: 'string', example: '09:00' },
+        endTime: { type: 'string', example: '11:00' },
+        duration: { type: 'number', example: 30 },
+        totalSlots: { type: 'number', example: 4 },
+        availableSlots: { type: 'number', example: 4 },
+        employeeId: { type: 'string', example: '987.654.321-00' },
+        active: { type: 'boolean', example: true }
+      }
+    }
+  })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  @ApiResponse({ status: 409, description: 'Conflito de horário' })
+  async create(@Body() data: {
+    date: Date;
+    startTime: string;
+    duration: number;
+    totalSlots: number;
+    employeeId: string;
+  }): Promise<Schedule> {
+    return this.createScheduleUseCase.execute(data);
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Atualizar uma agenda existente' })
+  @ApiParam({ name: 'id', description: 'ID da agenda' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
+        startTime: { type: 'string', example: '09:00' },
+        endTime: { type: 'string', example: '17:00' },
+        duration: { type: 'number', example: 30 },
+        totalSlots: { type: 'number', example: 16 },
+        availableSlots: { type: 'number', example: 16 },
+        employeeId: { type: 'string', example: '123.456.789-00' },
+        active: { type: 'boolean', example: true }
+      }
+    }
+  })
+  @ApiResponse({ status: 200, description: 'Agenda atualizada com sucesso' })
+  @ApiResponse({ status: 404, description: 'Agenda não encontrada' })
   async update(
     @Param('id') id: string,
-    @Body() scheduleData: Partial<Schedule>,
-  ) {
-    return this.updateSchedule.execute({
-      id,
-      ...scheduleData,
-      date: scheduleData.date ? new Date(scheduleData.date) : undefined,
-    });
+    @Body() data: {
+      date?: Date;
+      startTime?: string;
+      endTime?: string;
+      duration?: number;
+      totalSlots?: number;
+      availableSlots?: number;
+      employeeId?: string;
+      active?: boolean;
+    },
+  ): Promise<Schedule> {
+    return this.updateScheduleUseCase.execute({ id, ...data });
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return this.deleteSchedule.execute(id);
+  @ApiOperation({ summary: 'Excluir uma agenda' })
+  @ApiParam({ name: 'id', description: 'ID da agenda' })
+  @ApiResponse({ status: 200, description: 'Agenda excluída com sucesso' })
+  @ApiResponse({ status: 404, description: 'Agenda não encontrada' })
+  async delete(@Param('id') id: string): Promise<void> {
+    return this.deleteScheduleUseCase.execute(id);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Buscar uma agenda por ID' })
+  @ApiParam({ name: 'id', description: 'ID da agenda' })
+  @ApiResponse({ status: 200, description: 'Agenda encontrada' })
+  @ApiResponse({ status: 404, description: 'Agenda não encontrada' })
+  async findById(@Param('id') id: string): Promise<Schedule> {
+    return this.findScheduleByIdUseCase.execute(id);
+  }
+
+  @Get('employee/:employeeId')
+  @ApiOperation({ summary: 'Listar agendas de um funcionário' })
+  @ApiParam({ name: 'employeeId', description: 'CPF do funcionário' })
+  @ApiQuery({ name: 'date', required: false, type: Date, description: 'Data para filtrar as agendas' })
+  @ApiResponse({ status: 200, description: 'Lista de agendas encontrada' })
+  async findByEmployee(
+    @Param('employeeId') employeeId: string,
+    @Query('date', new ParseDatePipe({ optional: true })) date?: Date,
+  ): Promise<Schedule[]> {
+    return this.findSchedulesByEmployeeUseCase.execute(employeeId, date);
+  }
+
+  @Get('available/:employeeId')
+  @ApiOperation({ summary: 'Listar agendas disponíveis de um funcionário' })
+  @ApiParam({ name: 'employeeId', description: 'CPF do funcionário' })
+  @ApiQuery({ name: 'date', required: false, type: Date, description: 'Data para filtrar as agendas' })
+  @ApiResponse({ status: 200, description: 'Lista de agendas disponíveis encontrada' })
+  async findAvailable(
+    @Param('employeeId') employeeId: string,
+    @Query('date', new ParseDatePipe({ optional: true })) date?: Date,
+  ): Promise<Schedule[]> {
+    return this.findAvailableSchedulesUseCase.execute(employeeId, date);
   }
 } 
