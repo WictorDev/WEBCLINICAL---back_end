@@ -20,6 +20,11 @@ export class CancelAppointmentUseCase {
       throw new BadRequestException('Agendamento já está cancelado.');
     }
 
+    // Verificar se o scheduleId existe
+    if (!appointment.scheduleId) {
+      throw new BadRequestException('Agenda não encontrada para este agendamento.');
+    }
+
     // Buscar a agenda
     const schedule = await this.scheduleRepository.findById(appointment.scheduleId);
     if (!schedule) {
@@ -29,9 +34,9 @@ export class CancelAppointmentUseCase {
     // Atualizar o status do agendamento
     await this.appointmentRepository.updateStatus(new UniqueEntityID(id), 'CANCELADO');
 
-    // Atualizar a quantidade de vagas disponíveis
+    // Liberar a agenda
     await this.scheduleRepository.update(schedule.id, {
-      availableSlots: schedule.availableSlots + 1
+      appointmentId: undefined
     });
   }
 } 

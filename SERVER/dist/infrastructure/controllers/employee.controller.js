@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const create_employee_usecase_1 = require("../../use-case/employee/create-employee.usecase");
 const update_employee_usecase_1 = require("../../use-case/employee/update-employee.usecase");
+const delete_employee_usecase_1 = require("../../use-case/employee/delete-employee.usecase");
 const prisma_employee_repository_1 = require("../db/repositories/prisma-employee.repository");
 const type_repository_1 = require("../../domain/repositories/type.repository");
 const employee_type_repository_1 = require("../../domain/repositories/employee-type.repository");
@@ -24,12 +25,14 @@ const jwt_guard_1 = require("../auth/jwt.guard");
 let EmployeeController = class EmployeeController {
     createUseCase;
     updateUseCase;
+    deleteUseCase;
     repo;
     typeRepository;
     employeeTypeRepository;
-    constructor(createUseCase, updateUseCase, repo, typeRepository, employeeTypeRepository) {
+    constructor(createUseCase, updateUseCase, deleteUseCase, repo, typeRepository, employeeTypeRepository) {
         this.createUseCase = createUseCase;
         this.updateUseCase = updateUseCase;
+        this.deleteUseCase = deleteUseCase;
         this.repo = repo;
         this.typeRepository = typeRepository;
         this.employeeTypeRepository = employeeTypeRepository;
@@ -92,6 +95,10 @@ let EmployeeController = class EmployeeController {
             throw error;
         }
     }
+    async delete(cpf) {
+        await this.deleteUseCase.execute(cpf);
+        return { message: 'Funcionário removido com sucesso' };
+    }
 };
 exports.EmployeeController = EmployeeController;
 __decorate([
@@ -115,12 +122,20 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], EmployeeController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':cpf'),
+    __param(0, (0, common_1.Param)('cpf')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EmployeeController.prototype, "delete", null);
 exports.EmployeeController = EmployeeController = __decorate([
     (0, swagger_1.ApiTags)('employees'),
     (0, common_1.Controller)('/api/employees'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_employee_usecase_1.CreateEmployeeUseCase,
         update_employee_usecase_1.UpdateEmployeeUseCase,
+        delete_employee_usecase_1.DeleteEmployeeUseCase,
         prisma_employee_repository_1.PrismaEmployeeRepository,
         type_repository_1.TypeRepository,
         employee_type_repository_1.EmployeeTypeRepository])

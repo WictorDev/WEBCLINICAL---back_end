@@ -17,14 +17,16 @@ export declare class UserController {
     findAll(): Promise<import("../../domain/entities/user").User[]>;
     findByEmail(email: string): Promise<import("../../domain/entities/user").User | null>;
     findByCpf(cpf: string): Promise<import("../../domain/entities/user").User | null>;
-    create(body: {
+    createUser(body: {
         name: string;
         cpf: string;
         email: string;
         password: string;
+        types: string[];
         companyId: string;
-        type: string;
-        active: boolean;
+        active?: boolean;
+        employeeTypeId?: string;
+        advice?: string;
     }): Promise<import("../../domain/entities/user").User>;
     createFirstUser(body: {
         name: string;

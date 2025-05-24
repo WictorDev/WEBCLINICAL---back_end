@@ -13,6 +13,7 @@ const employee_controller_1 = require("../controllers/employee.controller");
 const prisma_employee_repository_1 = require("../db/repositories/prisma-employee.repository");
 const create_employee_usecase_1 = require("../../use-case/employee/create-employee.usecase");
 const update_employee_usecase_1 = require("../../use-case/employee/update-employee.usecase");
+const delete_employee_usecase_1 = require("../../use-case/employee/delete-employee.usecase");
 const employee_repository_1 = require("../../domain/repositories/employee.repository");
 const type_module_1 = require("./type.module");
 const employee_type_module_1 = require("./employee-type.module");
@@ -31,12 +32,14 @@ exports.EmployeeModule = EmployeeModule = __decorate([
             prisma_employee_repository_1.PrismaEmployeeRepository,
             create_employee_usecase_1.CreateEmployeeUseCase,
             update_employee_usecase_1.UpdateEmployeeUseCase,
+            delete_employee_usecase_1.DeleteEmployeeUseCase,
         ],
         exports: [
             employee_repository_1.EmployeeRepository,
             prisma_employee_repository_1.PrismaEmployeeRepository,
             create_employee_usecase_1.CreateEmployeeUseCase,
             update_employee_usecase_1.UpdateEmployeeUseCase,
+            delete_employee_usecase_1.DeleteEmployeeUseCase,
         ],
     })
 ], EmployeeModule);

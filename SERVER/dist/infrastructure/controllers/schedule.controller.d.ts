@@ -17,7 +17,6 @@ export declare class ScheduleController {
         date: Date;
         startTime: string;
         duration: number;
-        totalSlots: number;
         employeeId: string;
     }): Promise<Schedule>;
     update(id: string, data: {
@@ -25,8 +24,6 @@ export declare class ScheduleController {
         startTime?: string;
         endTime?: string;
         duration?: number;
-        totalSlots?: number;
-        availableSlots?: number;
         employeeId?: string;
         active?: boolean;
     }): Promise<Schedule>;

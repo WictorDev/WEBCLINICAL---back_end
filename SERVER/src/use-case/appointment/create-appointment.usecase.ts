@@ -17,15 +17,15 @@ export class CreateAppointmentUseCase {
       throw new BadRequestException('Formato de hora inválido. Use o formato HH:mm.');
     }
 
+    // Verificar se o scheduleId foi fornecido
+    if (!appointment.scheduleId) {
+      throw new BadRequestException('ID da agenda é obrigatório.');
+    }
+
     // Buscar a agenda
     const schedule = await this.scheduleRepository.findById(appointment.scheduleId);
     if (!schedule) {
       throw new BadRequestException('Agenda não encontrada.');
-    }
-
-    // Verificar se há vagas disponíveis
-    if (schedule.availableSlots <= 0) {
-      throw new BadRequestException('Não há vagas disponíveis nesta agenda.');
     }
 
     // Verificar se o horário está dentro do horário da agenda
@@ -48,9 +48,9 @@ export class CreateAppointmentUseCase {
     // Criar o agendamento
     const newAppointment = await this.appointmentRepository.create(appointment);
 
-    // Atualizar a quantidade de vagas disponíveis
+    // Atualizar a agenda para indicar que está ocupada
     await this.scheduleRepository.update(schedule.id, {
-      availableSlots: schedule.availableSlots - 1
+      appointmentId: newAppointment.id
     });
 
     return newAppointment;

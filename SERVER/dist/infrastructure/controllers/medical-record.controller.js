@@ -59,7 +59,7 @@ __decorate([
 ], MedicalRecordController.prototype, "getByAppointment", null);
 exports.MedicalRecordController = MedicalRecordController = __decorate([
     (0, swagger_1.ApiTags)('medical-records'),
-    (0, common_1.Controller)('medical-records'),
+    (0, common_1.Controller)('/api/medical-records'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
         medical_record_repository_1.MedicalRecordRepository])

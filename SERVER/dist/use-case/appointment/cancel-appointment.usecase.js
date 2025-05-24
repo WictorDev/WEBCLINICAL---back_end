@@ -29,13 +29,16 @@ let CancelAppointmentUseCase = class CancelAppointmentUseCase {
         if (appointment.status === 'CANCELADO') {
             throw new common_1.BadRequestException('Agendamento já está cancelado.');
         }
+        if (!appointment.scheduleId) {
+            throw new common_1.BadRequestException('Agenda não encontrada para este agendamento.');
+        }
         const schedule = await this.scheduleRepository.findById(appointment.scheduleId);
         if (!schedule) {
             throw new common_1.BadRequestException('Agenda não encontrada.');
         }
         await this.appointmentRepository.updateStatus(new unique_entity_id_1.UniqueEntityID(id), 'CANCELADO');
         await this.scheduleRepository.update(schedule.id, {
-            availableSlots: schedule.availableSlots + 1
+            appointmentId: undefined
         });
     }
 };

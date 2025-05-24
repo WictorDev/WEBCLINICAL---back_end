@@ -8,7 +8,7 @@ import { JwtAuthGuard } from '../auth/jwt.guard';
 import { randomUUID } from 'crypto';
 import { MedicalRecord } from '../../domain/entities/medical-record';
 
-@Controller('appointments')
+@Controller('/api/appointments')
 @UseGuards(JwtAuthGuard)
 export class AppointmentController {
   constructor(

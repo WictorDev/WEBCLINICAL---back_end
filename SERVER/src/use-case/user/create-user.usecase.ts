@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
 import { UserRepository } from 'src/domain/repositories/user.repository';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
 import { User } from 'src/domain/entities/user';
@@ -16,84 +16,68 @@ export class CreateUserUseCase {
         private readonly createEmployeeUseCase: CreateEmployeeUseCase,
     ) { }
 
-    async execute(data: { 
-        name: string, 
-        cpf: string, 
-        email: string, 
-        password: string, 
-        companyId: string, 
-        type: string, 
-        active: boolean,
-        employeeTypeId?: string,
-        advice?: string
+    async execute(data: {
+        name: string;
+        cpf: string;
+        email: string;
+        password: string;
+        types: string[];
+        companyId: string;
+        active?: boolean;
+        employeeTypeId?: string;
+        advice?: string;
     }) {
-        // Busca o tipo pelo nome
-        const type = await this.typeRepository.findByName(data.type);
-        if (!type) {
-            throw new BadRequestException(`Tipo ${data.type} não encontrado.`);
+        // Verifica se o usuário já existe
+        const existingUser = await this.userRepository.findByCpf(data.cpf);
+        if (existingUser) {
+            throw new ConflictException('CPF já cadastrado.');
         }
 
-        // Verifica se já existe um usuário com o mesmo CPF
-        const existingUserByCpf = await this.userRepository.findByCpf(data.cpf);
-        // Verifica se já existe um usuário com o mesmo email
-        const existingUserByEmail = await this.userRepository.findByEmail(data.email);
-
-        // Se encontrou usuário com mesmo CPF ou email
-        const existingUser = existingUserByCpf || existingUserByEmail;
-        if (existingUser) {            
-            // Verifica se o tipo já existe para o usuário
-            if (!existingUser.types.includes(type.id)) {
-                // Adiciona o novo tipo ao array de tipos existente
-                const updatedTypes = [...existingUser.types, type.id];
-                
-                // Atualiza o usuário com o novo array de tipos
-                const updatedUser = await this.userRepository.update(
-                    existingUser.cpf.toString(),
-                    { types: updatedTypes }
-                );
-
-                // Cria o registro na tabela específica do tipo
-                await this.createInSpecificTable(data.type, {
-                    cpf: existingUser.cpf.toString(),
-                    name: existingUser.name,
-                    email: existingUser.email,
-                    password: existingUser.password,
-                    type: type.id,
-                    employeeTypeId: data.employeeTypeId || undefined,
-                    advice: data.advice
-                });
-
-                return updatedUser;
-            }
-            
-            return existingUser; // Retorna o usuário sem alterações se o tipo já existir
+        // Verifica se o email já existe
+        const existingEmail = await this.userRepository.findByEmail(data.email);
+        if (existingEmail) {
+            throw new ConflictException('E-mail já cadastrado.');
         }
 
-        // Se não encontrou usuário existente, cria um novo
+        // Verifica e obtém os tipos
+        const types = await Promise.all(
+            data.types.map(async (typeName) => {
+                const type = await this.typeRepository.findByName(typeName);
+                if (!type) {
+                    throw new BadRequestException(`Tipo ${typeName} não encontrado.`);
+                }
+                return type;
+            })
+        );
+
+        // Hash da senha
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
+        // Cria o usuário
         const user = new User({
-            name: data.name,
             cpf: new UniqueEntityCpf(data.cpf),
+            name: data.name,
             email: data.email,
             password: hashedPassword,
             companyId: data.companyId,
-            types: [type.id],
-            active: data.active
+            types: data.types,
+            active: data.active ?? true,
         });
 
         const createdUser = await this.userRepository.create(user);
 
-        // Cria o registro na tabela específica do tipo
-        await this.createInSpecificTable(data.type, {
-            cpf: data.cpf,
-            name: data.name,
-            email: data.email,
-            password: hashedPassword,
-            type: type.id,
-            employeeTypeId: data.employeeTypeId || undefined,
-            advice: data.advice
-        });
+        // Cria registros nas tabelas específicas para cada tipo
+        for (const type of types) {
+            await this.createInSpecificTable(type.name, {
+                cpf: data.cpf,
+                name: data.name,
+                email: data.email,
+                password: hashedPassword,
+                type: type.name,
+                employeeTypeId: data.employeeTypeId,
+                advice: data.advice
+            });
+        }
 
         return createdUser;
     }
@@ -107,24 +91,26 @@ export class CreateUserUseCase {
         employeeTypeId?: string,
         advice?: string
     }) {
+        if (!typeName) return;
+
         switch (typeName.toUpperCase()) {
             case 'ADMIN':
                 await this.createAdminUseCase.execute({
                     cpf: data.cpf,
                     name: data.name,
-                    type: typeName // O tipo será buscado dentro do createAdminUseCase
+                    type: typeName
                 });
                 break;
 
             case 'EMPLOYEE':
-                const result = await this.createEmployeeUseCase.execute({
+                await this.createEmployeeUseCase.execute({
                     cpf: data.cpf,
                     name: data.name,
                     type: typeName,
                     employeeTypeId: data.employeeTypeId,
                     advice: data.advice
                 });
-                return result;
+                break;
 
             default:
                 throw new BadRequestException(`Tipo ${typeName} não suportado`);

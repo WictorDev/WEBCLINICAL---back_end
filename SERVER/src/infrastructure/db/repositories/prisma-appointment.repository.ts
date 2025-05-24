@@ -22,7 +22,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       startTime: appointment.startTime,
       endTime: appointment.endTime,
       status: appointment.status,
-      scheduleId: appointment.scheduleId,
+      scheduleId: appointment.scheduleId || undefined,
       patientId: appointment.patientId,
       employeeId: appointment.employeeId
     });
@@ -49,7 +49,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
         startTime: updated.startTime,
         endTime: updated.endTime,
         status: updated.status,
-        scheduleId: updated.scheduleId,
+        scheduleId: updated.scheduleId || undefined,
         patientId: updated.patientId,
         employeeId: updated.employeeId
       });
@@ -72,7 +72,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       startTime: appointment.startTime,
       endTime: appointment.endTime,
       status: appointment.status,
-      scheduleId: appointment.scheduleId,
+      scheduleId: appointment.scheduleId || undefined,
       patientId: appointment.patientId,
       employeeId: appointment.employeeId
     }));
@@ -95,7 +95,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       startTime: appointment.startTime,
       endTime: appointment.endTime,
       status: appointment.status,
-      scheduleId: appointment.scheduleId,
+      scheduleId: appointment.scheduleId || undefined,
       patientId: appointment.patientId,
       employeeId: appointment.employeeId
     }));
@@ -121,7 +121,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
         startTime: created.startTime,
         endTime: created.endTime,
         status: created.status,
-        scheduleId: created.scheduleId,
+        scheduleId: created.scheduleId || undefined,
         patientId: created.patientId,
         employeeId: created.employeeId
       });
@@ -151,7 +151,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
         startTime: updated.startTime,
         endTime: updated.endTime,
         status: updated.status,
-        scheduleId: updated.scheduleId,
+        scheduleId: updated.scheduleId || undefined,
         patientId: updated.patientId,
         employeeId: updated.employeeId
       });

@@ -8,4 +8,5 @@ export declare class PrismaAdminRepository implements AdminRepository {
     update(cpf: string, data: Partial<Admin>): Promise<Admin>;
     findByCpf(cpf: string): Promise<Admin | null>;
     findAll(): Promise<Admin[]>;
+    delete(cpf: string): Promise<void>;
 }

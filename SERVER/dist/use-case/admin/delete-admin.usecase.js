@@ -9,21 +9,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FindAllEmployeesUseCase = void 0;
+exports.DeleteAdminUseCase = void 0;
 const common_1 = require("@nestjs/common");
-const employee_repository_1 = require("../../domain/repositories/employee.repository");
-let FindAllEmployeesUseCase = class FindAllEmployeesUseCase {
-    employeeRepository;
-    constructor(employeeRepository) {
-        this.employeeRepository = employeeRepository;
+const admin_repository_1 = require("../../domain/repositories/admin.repository");
+let DeleteAdminUseCase = class DeleteAdminUseCase {
+    adminRepository;
+    constructor(adminRepository) {
+        this.adminRepository = adminRepository;
     }
-    async execute() {
-        return this.employeeRepository.findAll();
+    async execute(cpf) {
+        const admin = await this.adminRepository.findByCpf(cpf);
+        if (!admin) {
+            throw new common_1.BadRequestException('Admin não encontrado.');
+        }
+        await this.adminRepository.delete(cpf);
     }
 };
-exports.FindAllEmployeesUseCase = FindAllEmployeesUseCase;
-exports.FindAllEmployeesUseCase = FindAllEmployeesUseCase = __decorate([
+exports.DeleteAdminUseCase = DeleteAdminUseCase;
+exports.DeleteAdminUseCase = DeleteAdminUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [employee_repository_1.EmployeeRepository])
-], FindAllEmployeesUseCase);
-//# sourceMappingURL=find-all-employees.usecase.js.map
+    __metadata("design:paramtypes", [admin_repository_1.AdminRepository])
+], DeleteAdminUseCase);
+//# sourceMappingURL=delete-admin.usecase.js.map

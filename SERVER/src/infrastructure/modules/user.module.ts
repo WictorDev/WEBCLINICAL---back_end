@@ -20,6 +20,11 @@ import { EmployeeModule } from './employee.module';
 import { PatientModule } from './patient.module';
 import { AdminModule } from './admin.module';
 import { CreateFirstAdminUseCase } from 'src/use-case/user/create-first-admin.usecase';
+import { TypeModule } from './type.module';
+import { EmployeeTypeModule } from './employee-type.module';
+import { PrismaEmployeeTypeRepository } from 'src/infrastructure/db/repositories/prisma-employee-type.repository';
+import { PrismaEmployeeRepository } from 'src/infrastructure/db/repositories/prisma-employee.repository';
+import { DeleteUserUseCase } from 'src/use-case/user/delete-user.usecase';
 
 @Module({
   imports: [
@@ -28,7 +33,9 @@ import { CreateFirstAdminUseCase } from 'src/use-case/user/create-first-admin.us
     JwtModule, // Apenas importa, não registra
     AdminModule,
     EmployeeModule,
-    forwardRef(() => PatientModule)
+    forwardRef(() => PatientModule),
+    TypeModule,
+    EmployeeTypeModule
   ],
   controllers: [UserController],
   providers: [
@@ -42,6 +49,14 @@ import { CreateFirstAdminUseCase } from 'src/use-case/user/create-first-admin.us
       useClass: PrismaTypeRepository,
     },
     PrismaTypeRepository,
+    {
+      provide: 'EmployeeTypeRepository',
+      useClass: PrismaEmployeeTypeRepository,
+    },
+    {
+      provide: 'EmployeeRepository',
+      useClass: PrismaEmployeeRepository,
+    },
     // UseCases
     CreateUserUseCase,
     FindUserUseCase,
@@ -53,6 +68,7 @@ import { CreateFirstAdminUseCase } from 'src/use-case/user/create-first-admin.us
     CreateEmployeeUseCase,
     CreatePatientUseCase,
     CreateFirstAdminUseCase,
+    DeleteUserUseCase,
   ],
   exports: [
     // Exporta tudo que pode ser útil em outros módulos
@@ -70,6 +86,7 @@ import { CreateFirstAdminUseCase } from 'src/use-case/user/create-first-admin.us
     CreateEmployeeUseCase,
     CreatePatientUseCase,
     CreateFirstAdminUseCase,
+    DeleteUserUseCase,
   ],
 })
 export class UserModule {}

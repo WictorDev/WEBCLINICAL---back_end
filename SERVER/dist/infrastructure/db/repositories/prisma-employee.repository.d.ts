@@ -5,7 +5,8 @@ export declare class PrismaEmployeeRepository implements EmployeeRepository {
     private readonly prismaService;
     constructor(prismaService: PrismaService);
     create(employee: Employee): Promise<Employee>;
-    findAll(): Promise<Employee[]>;
+    findAll(): Promise<any[]>;
     findByCpf(cpf: string): Promise<Employee | null>;
     update(cpf: string, data: Partial<Employee>): Promise<Employee>;
+    delete(cpf: string): Promise<void>;
 }

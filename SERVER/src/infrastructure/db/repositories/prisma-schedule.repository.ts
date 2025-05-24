@@ -12,13 +12,13 @@ export class PrismaScheduleRepository implements ScheduleRepository {
     try {
       const created = await this.prisma.schedule.create({
         data: {
+          id: schedule.id,
           date: schedule.date,
           startTime: schedule.startTime,
           endTime: schedule.endTime,
           duration: schedule.duration,
-          totalSlots: schedule.totalSlots,
-          availableSlots: schedule.availableSlots,
           employeeId: schedule.employeeId,
+          appointmentId: schedule.appointmentId,
           active: schedule.active
         }
       });
@@ -29,9 +29,8 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         startTime: created.startTime,
         endTime: created.endTime,
         duration: created.duration,
-        totalSlots: created.totalSlots,
-        availableSlots: created.availableSlots,
         employeeId: created.employeeId,
+        appointmentId: created.appointmentId || undefined,
         active: created.active
       });
     } catch (error) {
@@ -53,8 +52,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
           startTime: data.startTime,
           endTime: data.endTime,
           duration: data.duration,
-          totalSlots: data.totalSlots,
-          availableSlots: data.availableSlots,
+          appointmentId: data.appointmentId,
           employeeId: data.employeeId,
           active: data.active
         }
@@ -66,8 +64,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         startTime: updated.startTime,
         endTime: updated.endTime,
         duration: updated.duration,
-        totalSlots: updated.totalSlots,
-        availableSlots: updated.availableSlots,
+        appointmentId: updated.appointmentId || undefined,
         employeeId: updated.employeeId,
         active: updated.active
       });
@@ -109,53 +106,23 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       startTime: schedule.startTime,
       endTime: schedule.endTime,
       duration: schedule.duration,
-      totalSlots: schedule.totalSlots,
-      availableSlots: schedule.availableSlots,
+      appointmentId: schedule.appointmentId || undefined,
       employeeId: schedule.employeeId,
       active: schedule.active
     });
   }
 
   async findAll(): Promise<Schedule[]> {
-    const schedules = await this.prisma.schedule.findMany();
-
-    return schedules.map(schedule => new Schedule({
-      id: schedule.id,
-      date: schedule.date,
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
-      duration: schedule.duration,
-      totalSlots: schedule.totalSlots,
-      availableSlots: schedule.availableSlots,
-      employeeId: schedule.employeeId,
-      active: schedule.active
-    }));
-  }
-
-  async findByEmployeeId(employeeId: string): Promise<Schedule[]> {
     const schedules = await this.prisma.schedule.findMany({
-      where: { employeeId }
-    });
-
-    return schedules.map(schedule => new Schedule({
-      id: schedule.id,
-      date: schedule.date,
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
-      duration: schedule.duration,
-      totalSlots: schedule.totalSlots,
-      availableSlots: schedule.availableSlots,
-      employeeId: schedule.employeeId,
-      active: schedule.active
-    }));
-  }
-
-  async findAvailableByEmployeeId(employeeId: string, active: true): Promise<Schedule[]> {
-    const schedules = await this.prisma.schedule.findMany({
-      where: { 
-        employeeId,
-        active,
-        availableSlots: { gt: 0 }
+      select: {
+        id: true,
+        date: true,
+        startTime: true,
+        endTime: true,
+        duration: true,
+        appointmentId: true,
+        employeeId: true,
+        active: true
       }
     });
 
@@ -165,9 +132,66 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       startTime: schedule.startTime,
       endTime: schedule.endTime,
       duration: schedule.duration,
-      totalSlots: schedule.totalSlots,
-      availableSlots: schedule.availableSlots,
+      appointmentId: schedule.appointmentId || undefined,
       employeeId: schedule.employeeId,
+      active: schedule.active
+    }));
+  }
+
+  async findByEmployeeId(employeeId: string): Promise<Schedule[]> {
+    const schedules = await this.prisma.schedule.findMany({
+      where: { employeeId },
+      select: {
+        id: true,
+        date: true,
+        startTime: true,
+        endTime: true,
+        duration: true,
+        appointmentId: true,
+        employeeId: true,
+        active: true
+      }
+    });
+
+    return schedules.map(schedule => new Schedule({
+      id: schedule.id,
+      date: schedule.date,
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      duration: schedule.duration,
+      employeeId: schedule.employeeId,
+      appointmentId: schedule.appointmentId || undefined,
+      active: schedule.active
+    }));
+  }
+
+  async findAvailableByEmployeeId(employeeId: string, active: true): Promise<Schedule[]> {
+    const schedules = await this.prisma.schedule.findMany({
+      where: { 
+        employeeId,
+        active,
+        appointmentId: null
+      },
+      select: {
+        id: true,
+        date: true,
+        startTime: true,
+        endTime: true,
+        duration: true,
+        appointmentId: true,
+        employeeId: true,
+        active: true
+      }
+    });
+
+    return schedules.map(schedule => new Schedule({
+      id: schedule.id,
+      date: schedule.date,
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      duration: schedule.duration,
+      employeeId: schedule.employeeId,
+      appointmentId: schedule.appointmentId || undefined,
       active: schedule.active
     }));
   }
@@ -186,6 +210,16 @@ export class PrismaScheduleRepository implements ScheduleRepository {
           gte: startOfDay,
           lte: endOfDay
         }
+      },
+      select: {
+        id: true,
+        date: true,
+        startTime: true,
+        endTime: true,
+        duration: true,
+        appointmentId: true,
+        employeeId: true,
+        active: true
       }
     });
 
@@ -195,9 +229,8 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       startTime: schedule.startTime,
       endTime: schedule.endTime,
       duration: schedule.duration,
-      totalSlots: schedule.totalSlots,
-      availableSlots: schedule.availableSlots,
       employeeId: schedule.employeeId,
+      appointmentId: schedule.appointmentId || undefined,
       active: schedule.active
     }));
   }
@@ -213,11 +246,21 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       where: {
         employeeId,
         active,
-        availableSlots: { gt: 0 },
+        appointmentId: null,
         date: {
           gte: startOfDay,
           lte: endOfDay
         }
+      },
+      select: {
+        id: true,
+        date: true,
+        startTime: true,
+        endTime: true,
+        duration: true,
+        appointmentId: true,
+        employeeId: true,
+        active: true
       }
     });
 
@@ -227,10 +270,9 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       startTime: schedule.startTime,
       endTime: schedule.endTime,
       duration: schedule.duration,
-      totalSlots: schedule.totalSlots,
-      availableSlots: schedule.availableSlots,
       employeeId: schedule.employeeId,
+      appointmentId: schedule.appointmentId || undefined,
       active: schedule.active
     }));
   }
-} 
+}

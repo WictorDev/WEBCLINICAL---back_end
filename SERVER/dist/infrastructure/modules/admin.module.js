@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const prisma_module_1 = require("./prisma.module");
 const admin_controller_1 = require("../controllers/admin.controller");
 const create_admin_usecase_1 = require("../../use-case/admin/create-admin.usecase");
+const delete_admin_usecase_1 = require("../../use-case/admin/delete-admin.usecase");
 const admin_repository_1 = require("../../domain/repositories/admin.repository");
 const type_module_1 = require("./type.module");
 const prisma_admin_repository_1 = require("../db/repositories/prisma-admin.repository");
@@ -28,11 +29,13 @@ exports.AdminModule = AdminModule = __decorate([
             },
             prisma_admin_repository_1.PrismaAdminRepository,
             create_admin_usecase_1.CreateAdminUseCase,
+            delete_admin_usecase_1.DeleteAdminUseCase,
         ],
         exports: [
             admin_repository_1.AdminRepository,
             prisma_admin_repository_1.PrismaAdminRepository,
             create_admin_usecase_1.CreateAdminUseCase,
+            delete_admin_usecase_1.DeleteAdminUseCase,
         ],
     })
 ], AdminModule);

@@ -30,53 +30,48 @@ let CreateUserUseCase = class CreateUserUseCase {
         this.createEmployeeUseCase = createEmployeeUseCase;
     }
     async execute(data) {
-        const type = await this.typeRepository.findByName(data.type);
-        if (!type) {
-            throw new common_1.BadRequestException(`Tipo ${data.type} não encontrado.`);
-        }
-        const existingUserByCpf = await this.userRepository.findByCpf(data.cpf);
-        const existingUserByEmail = await this.userRepository.findByEmail(data.email);
-        const existingUser = existingUserByCpf || existingUserByEmail;
+        const existingUser = await this.userRepository.findByCpf(data.cpf);
         if (existingUser) {
-            if (!existingUser.types.includes(type.id)) {
-                const updatedTypes = [...existingUser.types, type.id];
-                const updatedUser = await this.userRepository.update(existingUser.cpf.toString(), { types: updatedTypes });
-                await this.createInSpecificTable(data.type, {
-                    cpf: existingUser.cpf.toString(),
-                    name: existingUser.name,
-                    email: existingUser.email,
-                    password: existingUser.password,
-                    type: type.id,
-                    employeeTypeId: data.employeeTypeId || undefined,
-                    advice: data.advice
-                });
-                return updatedUser;
-            }
-            return existingUser;
+            throw new common_1.ConflictException('CPF já cadastrado.');
         }
+        const existingEmail = await this.userRepository.findByEmail(data.email);
+        if (existingEmail) {
+            throw new common_1.ConflictException('E-mail já cadastrado.');
+        }
+        const types = await Promise.all(data.types.map(async (typeName) => {
+            const type = await this.typeRepository.findByName(typeName);
+            if (!type) {
+                throw new common_1.BadRequestException(`Tipo ${typeName} não encontrado.`);
+            }
+            return type;
+        }));
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const user = new user_1.User({
-            name: data.name,
             cpf: new unique_entity_cpf_1.UniqueEntityCpf(data.cpf),
+            name: data.name,
             email: data.email,
             password: hashedPassword,
             companyId: data.companyId,
-            types: [type.id],
-            active: data.active
+            types: data.types,
+            active: data.active ?? true,
         });
         const createdUser = await this.userRepository.create(user);
-        await this.createInSpecificTable(data.type, {
-            cpf: data.cpf,
-            name: data.name,
-            email: data.email,
-            password: hashedPassword,
-            type: type.id,
-            employeeTypeId: data.employeeTypeId || undefined,
-            advice: data.advice
-        });
+        for (const type of types) {
+            await this.createInSpecificTable(type.name, {
+                cpf: data.cpf,
+                name: data.name,
+                email: data.email,
+                password: hashedPassword,
+                type: type.name,
+                employeeTypeId: data.employeeTypeId,
+                advice: data.advice
+            });
+        }
         return createdUser;
     }
     async createInSpecificTable(typeName, data) {
+        if (!typeName)
+            return;
         switch (typeName.toUpperCase()) {
             case 'ADMIN':
                 await this.createAdminUseCase.execute({
@@ -86,14 +81,14 @@ let CreateUserUseCase = class CreateUserUseCase {
                 });
                 break;
             case 'EMPLOYEE':
-                const result = await this.createEmployeeUseCase.execute({
+                await this.createEmployeeUseCase.execute({
                     cpf: data.cpf,
                     name: data.name,
                     type: typeName,
                     employeeTypeId: data.employeeTypeId,
                     advice: data.advice
                 });
-                return result;
+                break;
             default:
                 throw new common_1.BadRequestException(`Tipo ${typeName} não suportado`);
         }

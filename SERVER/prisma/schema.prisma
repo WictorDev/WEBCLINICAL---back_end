@@ -89,31 +89,30 @@ model Patient {
 }
 
 model Schedule {
-  id            String   @id @default(uuid())
-  date          DateTime // Data específica da agenda
-  startTime     String   // formato HH:mm
-  endTime       String   // formato HH:mm
-  duration      Int      // Duração da consulta em minutos
-  totalSlots    Int      // Quantidade total de vagas disponíveis
-  availableSlots Int     // Quantidade de vagas ainda disponíveis
-  employee      Employee @relation(fields: [employeeId], references: [cpf])
+  id            String        @id @default(uuid())
+  date          DateTime
+  startTime     String
+  endTime       String
+  duration      Int
+  employee      Employee      @relation(fields: [employeeId], references: [cpf])
   employeeId    String
-  appointments  Appointment[]
-  active        Boolean @default(true)
+  appointment   Appointment?  @relation("ScheduleToAppointment")
+  appointmentId String?       @unique
+  active        Boolean       @default(true)
 }
 
 model Appointment {
-  id          String    @id @default(uuid())
-  date        DateTime
-  startTime   String    // formato HH:mm
-  endTime     String    // formato HH:mm
-  status      String    // Ex: PENDENTE, CONFIRMADO, FINALIZADO, CANCELADO
-  schedule    Schedule  @relation(fields: [scheduleId], references: [id])
-  scheduleId  String
-  patient     Patient   @relation(fields: [patientId], references: [cpf])
-  patientId   String
-  employee    Employee  @relation("EmployeeAppointments", fields: [employeeId], references: [cpf])
-  employeeId  String
+  id            String        @id @default(uuid())
+  date          DateTime
+  startTime     String
+  endTime       String
+  status        String
+  schedule      Schedule?     @relation("ScheduleToAppointment", fields: [scheduleId], references: [id])
+  scheduleId    String?       @unique
+  patient       Patient       @relation(fields: [patientId], references: [cpf])
+  patientId     String
+  employee      Employee      @relation("EmployeeAppointments", fields: [employeeId], references: [cpf])
+  employeeId    String
   medicalRecord MedicalRecord?
 }
 

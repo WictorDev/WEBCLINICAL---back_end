@@ -43,12 +43,7 @@ export class ScheduleController {
         duration: { 
           type: 'number', 
           example: 30,
-          description: 'Duração de cada consulta em minutos'
-        },
-        totalSlots: { 
-          type: 'number', 
-          example: 4,
-          description: 'Número total de vagas disponíveis'
+          description: 'Duração da consulta em minutos'
         },
         employeeId: { 
           type: 'string', 
@@ -56,7 +51,7 @@ export class ScheduleController {
           description: 'CPF do funcionário'
         }
       },
-      required: ['date', 'startTime', 'duration', 'totalSlots', 'employeeId']
+      required: ['date', 'startTime', 'duration', 'employeeId']
     }
   })
   @ApiResponse({ 
@@ -68,10 +63,8 @@ export class ScheduleController {
         id: { type: 'string', example: '123e4567-e89b-12d3-a456-426614174000' },
         date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
         startTime: { type: 'string', example: '09:00' },
-        endTime: { type: 'string', example: '11:00' },
+        endTime: { type: 'string', example: '09:30' },
         duration: { type: 'number', example: 30 },
-        totalSlots: { type: 'number', example: 4 },
-        availableSlots: { type: 'number', example: 4 },
         employeeId: { type: 'string', example: '987.654.321-00' },
         active: { type: 'boolean', example: true }
       }
@@ -83,7 +76,6 @@ export class ScheduleController {
     date: Date;
     startTime: string;
     duration: number;
-    totalSlots: number;
     employeeId: string;
   }): Promise<Schedule> {
     return this.createScheduleUseCase.execute(data);
@@ -98,10 +90,8 @@ export class ScheduleController {
       properties: {
         date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
         startTime: { type: 'string', example: '09:00' },
-        endTime: { type: 'string', example: '17:00' },
+        endTime: { type: 'string', example: '09:30' },
         duration: { type: 'number', example: 30 },
-        totalSlots: { type: 'number', example: 16 },
-        availableSlots: { type: 'number', example: 16 },
         employeeId: { type: 'string', example: '123.456.789-00' },
         active: { type: 'boolean', example: true }
       }
@@ -116,8 +106,6 @@ export class ScheduleController {
       startTime?: string;
       endTime?: string;
       duration?: number;
-      totalSlots?: number;
-      availableSlots?: number;
       employeeId?: string;
       active?: boolean;
     },

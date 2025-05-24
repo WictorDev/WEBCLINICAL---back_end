@@ -20,16 +20,22 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
         this.prismaService = prismaService;
     }
     async create(employee) {
+        console.log('PrismaEmployeeRepository - Criando employee:', employee);
         try {
             const created = await this.prismaService.employee.create({
                 data: {
                     cpf: employee.cpf,
                     name: employee.name,
-                    advice: employee.advice,
+                    advice: employee.advice === '' ? null : employee.advice,
                     typeId: employee.typeId,
                     employeeTypeId: employee.employeeTypeId || undefined,
                 },
+                include: {
+                    employeeType: true,
+                    type: true
+                }
             });
+            console.log('PrismaEmployeeRepository - Employee criado:', created);
             return new employee_1.Employee({
                 cpf: created.cpf,
                 name: created.name,
@@ -39,6 +45,7 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
             });
         }
         catch (error) {
+            console.error('PrismaEmployeeRepository - Erro ao criar employee:', error);
             if (error instanceof library_1.PrismaClientKnownRequestError &&
                 error.code === 'P2002') {
                 const target = error.meta?.target;
@@ -58,17 +65,35 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
         }
     }
     async findAll() {
-        const employees = await this.prismaService.employee.findMany();
-        return employees.map((employee) => new employee_1.Employee({
+        console.log('PrismaEmployeeRepository - Buscando todos os employees');
+        const employees = await this.prismaService.employee.findMany({
+            include: {
+                employeeType: true,
+                type: true
+            }
+        });
+        console.log('PrismaEmployeeRepository - Employees encontrados:', employees);
+        return employees.map((employee) => ({
             cpf: employee.cpf,
             name: employee.name,
             advice: employee.advice ?? undefined,
             typeId: employee.typeId,
             employeeTypeId: employee.employeeTypeId || undefined,
+            employeeType: employee.employeeType
+                ? { id: employee.employeeType.id, name: employee.employeeType.name }
+                : undefined,
         }));
     }
     async findByCpf(cpf) {
-        const employee = await this.prismaService.employee.findUnique({ where: { cpf } });
+        console.log('PrismaEmployeeRepository - Buscando employee por CPF:', cpf);
+        const employee = await this.prismaService.employee.findUnique({
+            where: { cpf },
+            include: {
+                employeeType: true,
+                type: true
+            }
+        });
+        console.log('PrismaEmployeeRepository - Employee encontrado:', employee);
         if (!employee)
             return null;
         return new employee_1.Employee({
@@ -80,22 +105,44 @@ let PrismaEmployeeRepository = class PrismaEmployeeRepository {
         });
     }
     async update(cpf, data) {
-        const updated = await this.prismaService.employee.update({
-            where: { cpf },
-            data: {
-                name: data.name,
-                advice: data.advice,
-                typeId: data.typeId,
-                employeeTypeId: data.employeeTypeId || undefined,
-            },
+        console.log('PrismaEmployeeRepository - Atualizando employee:', { cpf, data });
+        try {
+            const updated = await this.prismaService.employee.update({
+                where: { cpf },
+                data: {
+                    name: data.name,
+                    advice: data.advice === '' ? null : data.advice,
+                    typeId: data.typeId,
+                    employeeTypeId: data.employeeTypeId,
+                },
+                include: {
+                    employeeType: true,
+                    type: true
+                }
+            });
+            console.log('PrismaEmployeeRepository - Employee atualizado:', updated);
+            return new employee_1.Employee({
+                cpf: updated.cpf,
+                name: updated.name,
+                advice: updated.advice ?? undefined,
+                typeId: updated.typeId,
+                employeeTypeId: updated.employeeTypeId || undefined,
+            });
+        }
+        catch (error) {
+            console.error('PrismaEmployeeRepository - Erro ao atualizar employee:', error);
+            if (error instanceof library_1.PrismaClientKnownRequestError && error.code === 'P2025') {
+                throw new common_1.ConflictException('Funcionário não encontrado.');
+            }
+            throw error;
+        }
+    }
+    async delete(cpf) {
+        console.log('PrismaEmployeeRepository - Deletando employee:', cpf);
+        await this.prismaService.employee.delete({
+            where: { cpf }
         });
-        return new employee_1.Employee({
-            cpf: updated.cpf,
-            name: updated.name,
-            advice: updated.advice ?? undefined,
-            typeId: updated.typeId,
-            employeeTypeId: updated.employeeTypeId || undefined,
-        });
+        console.log('PrismaEmployeeRepository - Employee deletado com sucesso');
     }
 };
 exports.PrismaEmployeeRepository = PrismaEmployeeRepository;

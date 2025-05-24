@@ -4,9 +4,8 @@ export interface ScheduleData {
   startTime: string;
   endTime: string;
   duration: number;
-  totalSlots: number;
-  availableSlots: number;
   employeeId: string;
+  appointmentId?: string;
   active: boolean;
 }
 
@@ -54,25 +53,6 @@ export class Schedule {
     this.data.duration = duration;
   }
 
-  get totalSlots(): number {
-    return this.data.totalSlots;
-  }
-
-  set totalSlots(totalSlots: number) {
-    if (totalSlots <= 0) throw new Error("Total de vagas deve ser maior que zero.");
-    this.data.totalSlots = totalSlots;
-  }
-
-  get availableSlots(): number {
-    return this.data.availableSlots;
-  }
-
-  set availableSlots(availableSlots: number) {
-    if (availableSlots < 0) throw new Error("Vagas disponíveis não podem ser negativas.");
-    if (availableSlots > this.totalSlots) throw new Error("Vagas disponíveis não podem ser maiores que o total de vagas.");
-    this.data.availableSlots = availableSlots;
-  }
-
   get employeeId(): string {
     return this.data.employeeId;
   }
@@ -80,6 +60,14 @@ export class Schedule {
   set employeeId(employeeId: string) {
     if (!employeeId) throw new Error("ID do funcionário é obrigatório.");
     this.data.employeeId = employeeId;
+  }
+
+  get appointmentId(): string | undefined {
+    return this.data.appointmentId;
+  }
+
+  set appointmentId(appointmentId: string | undefined) {
+    this.data.appointmentId = appointmentId;
   }
 
   get active(): boolean {
@@ -92,14 +80,14 @@ export class Schedule {
 
   toJSON() {
     return {
-      id: this.id,
-      date: this.date,
-      startTime: this.startTime,
-      endTime: this.endTime,
-      duration: this.duration,
-      totalSlots: this.totalSlots,
-      availableSlots: this.availableSlots,
-      employeeId: this.employeeId
+      id: this.data.id,
+      date: this.data.date,
+      startTime: this.data.startTime,
+      endTime: this.data.endTime,
+      duration: this.data.duration,
+      employeeId: this.data.employeeId,
+      appointmentId: this.data.appointmentId,
+      active: this.data.active
     };
   }
 
@@ -110,9 +98,9 @@ export class Schedule {
       startTime: data.startTime,
       endTime: data.endTime,
       duration: data.duration,
-      totalSlots: data.totalSlots,
-      availableSlots: data.availableSlots,
-      employeeId: data.employeeId
+      employeeId: data.employeeId,
+      appointmentId: data.appointmentId,
+      active: data.active
     };
   }
 } 

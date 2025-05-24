@@ -8,7 +8,6 @@ export declare class CreateScheduleUseCase {
         date: Date;
         startTime: string;
         duration: number;
-        totalSlots: number;
         employeeId: string;
     }): Promise<Schedule>;
 }

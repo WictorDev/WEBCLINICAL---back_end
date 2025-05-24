@@ -45,8 +45,6 @@ class Appointment {
         return this.data.scheduleId;
     }
     set scheduleId(scheduleId) {
-        if (!scheduleId)
-            throw new Error("ID do agendamento é obrigatório.");
         this.data.scheduleId = scheduleId;
     }
     get patientId() {

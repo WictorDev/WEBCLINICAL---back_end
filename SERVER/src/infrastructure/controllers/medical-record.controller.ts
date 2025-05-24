@@ -7,7 +7,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { randomUUID } from 'crypto';
 
 @ApiTags('medical-records')
-@Controller('medical-records')
+@Controller('/api/medical-records')
 @UseGuards(JwtAuthGuard)
 export class MedicalRecordController {
   constructor(
