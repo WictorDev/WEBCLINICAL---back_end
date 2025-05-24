@@ -5,4 +5,5 @@ export abstract class EmployeeRepository {
   abstract findByCpf(cpf: string): Promise<Employee | null>;
   abstract update(cpf: string, employee: Partial<Employee>): Promise<Employee>;
   abstract findAll(): Promise<Employee[]>;
+  abstract delete(cpf: string): Promise<void>;
 } 

@@ -79,12 +79,7 @@ __decorate([
                 duration: {
                     type: 'number',
                     example: 30,
-                    description: 'Duração de cada consulta em minutos'
-                },
-                totalSlots: {
-                    type: 'number',
-                    example: 4,
-                    description: 'Número total de vagas disponíveis'
+                    description: 'Duração da consulta em minutos'
                 },
                 employeeId: {
                     type: 'string',
@@ -92,7 +87,7 @@ __decorate([
                     description: 'CPF do funcionário'
                 }
             },
-            required: ['date', 'startTime', 'duration', 'totalSlots', 'employeeId']
+            required: ['date', 'startTime', 'duration', 'employeeId']
         }
     }),
     (0, swagger_1.ApiResponse)({
@@ -104,10 +99,8 @@ __decorate([
                 id: { type: 'string', example: '123e4567-e89b-12d3-a456-426614174000' },
                 date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
                 startTime: { type: 'string', example: '09:00' },
-                endTime: { type: 'string', example: '11:00' },
+                endTime: { type: 'string', example: '09:30' },
                 duration: { type: 'number', example: 30 },
-                totalSlots: { type: 'number', example: 4 },
-                availableSlots: { type: 'number', example: 4 },
                 employeeId: { type: 'string', example: '987.654.321-00' },
                 active: { type: 'boolean', example: true }
             }
@@ -130,10 +123,8 @@ __decorate([
             properties: {
                 date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
                 startTime: { type: 'string', example: '09:00' },
-                endTime: { type: 'string', example: '17:00' },
+                endTime: { type: 'string', example: '09:30' },
                 duration: { type: 'number', example: 30 },
-                totalSlots: { type: 'number', example: 16 },
-                availableSlots: { type: 'number', example: 16 },
                 employeeId: { type: 'string', example: '123.456.789-00' },
                 active: { type: 'boolean', example: true }
             }

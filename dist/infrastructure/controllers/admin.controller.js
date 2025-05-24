@@ -15,14 +15,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
 const create_admin_usecase_1 = require("../../use-case/admin/create-admin.usecase");
+const delete_admin_usecase_1 = require("../../use-case/admin/delete-admin.usecase");
 const jwt_guard_1 = require("../auth/jwt.guard");
 let AdminController = class AdminController {
     createAdminUseCase;
-    constructor(createAdminUseCase) {
+    deleteAdminUseCase;
+    constructor(createAdminUseCase, deleteAdminUseCase) {
         this.createAdminUseCase = createAdminUseCase;
+        this.deleteAdminUseCase = deleteAdminUseCase;
     }
     async create(data) {
         return await this.createAdminUseCase.execute(data);
+    }
+    async delete(cpf) {
+        await this.deleteAdminUseCase.execute(cpf);
+        return { message: 'Admin removido com sucesso' };
     }
 };
 exports.AdminController = AdminController;
@@ -33,9 +40,17 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "create", null);
+__decorate([
+    (0, common_1.Delete)(':cpf'),
+    __param(0, (0, common_1.Param)('cpf')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "delete", null);
 exports.AdminController = AdminController = __decorate([
-    (0, common_1.Controller)('admins'),
+    (0, common_1.Controller)('/api/admins'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
-    __metadata("design:paramtypes", [create_admin_usecase_1.CreateAdminUseCase])
+    __metadata("design:paramtypes", [create_admin_usecase_1.CreateAdminUseCase,
+        delete_admin_usecase_1.DeleteAdminUseCase])
 ], AdminController);
 //# sourceMappingURL=admin.controller.js.map

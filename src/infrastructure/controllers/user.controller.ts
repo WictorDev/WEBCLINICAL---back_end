@@ -49,34 +49,29 @@ export class UserController {
     return this.findUserByCpfUseCase.execute(new UniqueEntityCpf(cpf));
   }
 
-  @Post('/create_user')
-  async create(
-    @Body() body: { 
-      name: string; 
-      cpf: string; 
-      email: string; 
-      password: string; 
-      companyId: string;
-      type: string;
-      active: boolean; 
-    }
-  ) {
-    try {
-      const type = await this.typeRepository.findByName(body.type);
-      if (!type) {
-        throw new BadRequestException('Tipo de usuário não encontrado.');
-      }
-      return this.createUserUseCase.execute({
-        ...body,
-        cpf: new UniqueEntityCpf(body.cpf).toString(),
-        type: body.type
-      });
-    } catch (error) {
-      if (error.message && error.message.includes('CPF')) {
-        throw new BadRequestException(error.message);
-      }
-      throw error;
-    }
+  @Post('create_user')
+  async createUser(@Body() body: {
+    name: string;
+    cpf: string;
+    email: string;
+    password: string;
+    types: string[];
+    companyId: string;
+    active?: boolean;
+    employeeTypeId?: string;
+    advice?: string;
+  }) {
+    return this.createUserUseCase.execute({
+      name: body.name,
+      cpf: body.cpf,
+      email: body.email,
+      password: body.password,
+      types: body.types,
+      companyId: body.companyId,
+      active: body.active,
+      employeeTypeId: body.employeeTypeId,
+      advice: body.advice
+    });
   }
 
   @Post('/create_first_admin')
@@ -97,7 +92,15 @@ export class UserController {
 
   @Put('cpf/:cpf')
   async update(@Param('cpf') cpf: string, @Body() body: any) {
-    return this.updateUserUseCase.execute(new UniqueEntityCpf(cpf), body);
+    console.log('UserController - Atualizando usuário:', { cpf, body });
+    try {
+      const result = await this.updateUserUseCase.execute(new UniqueEntityCpf(cpf), body);
+      console.log('UserController - Usuário atualizado com sucesso:', result);
+      return result;
+    } catch (error) {
+      console.error('UserController - Erro ao atualizar usuário:', error);
+      throw error;
+    }
   }
 
   @Delete('cpf/:cpf')

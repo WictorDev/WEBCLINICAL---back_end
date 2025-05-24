@@ -88,7 +88,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AppointmentController.prototype, "updateStatus", null);
 exports.AppointmentController = AppointmentController = __decorate([
-    (0, common_1.Controller)('appointments'),
+    (0, common_1.Controller)('/api/appointments'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_appointment_usecase_1.CreateAppointmentUseCase,
         find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,

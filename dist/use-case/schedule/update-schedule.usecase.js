@@ -29,8 +29,6 @@ let UpdateScheduleUseCase = class UpdateScheduleUseCase {
             startTime: data.startTime ?? schedule.startTime,
             endTime: data.endTime ?? schedule.endTime,
             duration: data.duration ?? schedule.duration,
-            totalSlots: data.totalSlots ?? schedule.totalSlots,
-            availableSlots: data.availableSlots ?? schedule.availableSlots,
             employeeId: data.employeeId ?? schedule.employeeId,
             active: data.active ?? schedule.active
         });

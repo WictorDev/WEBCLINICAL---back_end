@@ -11,28 +11,37 @@ export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(user: User): Promise<User> {
-    // Hash da senha se ainda não estiver hasheada
-    let password = user.password;
-    if (!password.startsWith('$2b$')) {
-      password = await bcrypt.hash(user.password, 10);
-    }
-
     try {
+      // Primeiro, busca os tipos pelo nome
+      const types = await Promise.all(
+        user.types.map(async (typeName) => {
+          const type = await this.prismaService.type.findUnique({
+            where: { name: typeName }
+          });
+          if (!type) {
+            throw new NotFoundException(`Tipo ${typeName} não encontrado.`);
+          }
+          return type;
+        })
+      );
+
       const createdUser = await this.prismaService.user.create({
         data: {
+          cpf: user.cpf.toString(),
           name: user.name,
           email: user.email,
-          password: password,
-          cpf: user.cpf.toString(),
-          companyId: user.companyId,
+          password: user.password,
+          companyId: user.companyId ?? null,
+          active: user.active ?? true,
           types: {
-            create: user.types.map(typeId => ({
+            create: types.map(type => ({
               type: {
-                connect: { id: typeId }
+                connect: {
+                  id: type.id
+                }
               }
             }))
-          },
-          active: user.active ?? true,
+          }
         },
         include: {
           types: {
@@ -44,70 +53,66 @@ export class PrismaUserRepository implements UserRepository {
       });
 
       return new User({
-        ...createdUser,
         cpf: new UniqueEntityCpf(createdUser.cpf),
-        companyId: createdUser.companyId ?? '',
-        types: createdUser.types.map(ut => ut.type.id),
+        name: createdUser.name,
+        email: createdUser.email,
+        password: createdUser.password,
+        companyId: createdUser.companyId ?? undefined,
+        types: createdUser.types.map(t => t.type.name),
+        active: createdUser.active
       });
     } catch (error) {
-      if (
-        error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        const target = error.meta?.target;
-        if (Array.isArray(target)) {
-          if (target.includes('email')) {
-            throw new ConflictException('E-mail já cadastrado.');
-          }
-          if (target.includes('cpf')) {
-            throw new ConflictException('CPF já cadastrado.');
-          }
-        } else if (typeof target === 'string') {
-          if (target.includes('email')) {
-            throw new ConflictException('E-mail já cadastrado.');
-          }
-          if (target.includes('cpf')) {
-            throw new ConflictException('CPF já cadastrado.');
-          }
-        }
-        throw new ConflictException('E-mail ou CPF já cadastrado.');
-      }
+      console.error('Erro ao criar usuário:', error);
       throw error;
     }
   }
 
-  async update(
-    cpf: string,
-    user: Partial<Omit<User, 'cpf'>>,
-  ): Promise<User> {
-    let password = user.password;
-    if (password && !password.startsWith('$2b$')) {
-      password = await bcrypt.hash(password, 10);
-    }
-
-    const updateData: any = {
-        name: user.name,
-        email: user.email,
-        password: password,
-        companyId: user.companyId,
-        active: user.active ?? true
-    };
-
+  async update(cpf: string, user: Partial<User>): Promise<User> {
+    console.log('PrismaUserRepository - Atualizando usuário:', { cpf, user });
+    
     // Se houver tipos para atualizar
     if (user.types) {
-      updateData.types = {
-        deleteMany: {}, // Remove todos os tipos existentes
-        create: user.types.map(typeId => ({
-          type: {
-            connect: { id: typeId }
+      // Primeiro, busca os tipos pelo nome
+      const types = await Promise.all(
+        user.types.map(async (typeName) => {
+          const type = await this.prismaService.type.findUnique({
+            where: { name: typeName }
+          });
+          if (!type) {
+            throw new NotFoundException(`Tipo ${typeName} não encontrado.`);
           }
-        }))
-      };
+          return type;
+        })
+      );
+
+      // Remove todos os tipos existentes
+      await this.prismaService.userType.deleteMany({
+        where: { userId: cpf }
+      });
+
+      // Cria os novos tipos
+      await Promise.all(
+        types.map(type => 
+          this.prismaService.userType.create({
+            data: {
+              userId: cpf,
+              typeId: type.id
+            }
+          })
+        )
+      );
     }
 
+    // Atualiza os outros dados do usuário
     const updatedUser = await this.prismaService.user.update({
-      where: { cpf: cpf.toString() },
-      data: updateData,
+      where: { cpf },
+      data: {
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        companyId: user.companyId,
+        active: user.active
+      },
       include: {
         types: {
           include: {
@@ -118,35 +123,31 @@ export class PrismaUserRepository implements UserRepository {
     });
 
     return new User({
-      ...updatedUser,
-      cpf: new UniqueEntityCpf(updatedUser.cpf.toString()),
-      companyId: updatedUser.companyId ?? '',
-      types: updatedUser.types.map(ut => ut.type.id),
+      cpf: new UniqueEntityCpf(updatedUser.cpf),
+      name: updatedUser.name,
+      email: updatedUser.email,
+      password: updatedUser.password,
+      companyId: updatedUser.companyId || undefined,
+      types: updatedUser.types.map(ut => ut.type.name),
+      active: updatedUser.active
     });
   }
 
   async findAll(): Promise<User[]> {
     const users = await this.prismaService.user.findMany({
       include: {
-        types: {
-          include: {
-            type: true
-          }
-        }
-      }
+        types: true,
+      },
     });
-
-    return users.map((user) => {
-      return new User({
-        cpf: new UniqueEntityCpf(user.cpf),
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        companyId: user.companyId ?? '',
-        types: user.types.map(ut => ut.type.id),
-        active: user.active,
-      });
-    });
+    return users.map((user) => new User({
+      cpf: new UniqueEntityCpf(user.cpf),
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      companyId: user.companyId ?? '',
+      types: user.types.map(ut => ut.typeId),
+      active: user.active,
+    }));
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -166,7 +167,7 @@ export class PrismaUserRepository implements UserRepository {
     }
 
     return new User({
-      cpf: new UniqueEntityCpf(user.cpf.toString()),
+      cpf: new UniqueEntityCpf(user.cpf),
       name: user.name,
       email: user.email,
       password: user.password,
@@ -236,5 +237,44 @@ export class PrismaUserRepository implements UserRepository {
         }
       }
     });
+  }
+
+  async delete(cpf: string): Promise<void> {
+    await this.prismaService.user.delete({
+      where: { cpf }
+    });
+  }
+
+  async removeType(cpf: string, typeName: string): Promise<void> {
+    // Primeiro busca o tipo pelo nome
+    const type = await this.prismaService.type.findUnique({
+      where: { name: typeName }
+    });
+
+    if (!type) {
+      throw new NotFoundException(`Tipo ${typeName} não encontrado.`);
+    }
+
+    // Remove a relação UserType
+    await this.prismaService.userType.deleteMany({
+      where: {
+        userId: cpf,
+        typeId: type.id
+      }
+    });
+
+    // Remove o registro específico baseado no tipo
+    switch (typeName.toUpperCase()) {
+      case 'ADMIN':
+        await this.prismaService.admin.deleteMany({
+          where: { cpf }
+        });
+        break;
+      case 'EMPLOYEE':
+        await this.prismaService.employee.deleteMany({
+          where: { cpf }
+        });
+        break;
+    }
   }
 }

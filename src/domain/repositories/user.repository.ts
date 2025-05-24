@@ -6,5 +6,7 @@ export abstract class UserRepository {
   abstract update(cpf: string, userData: Partial<User>): Promise<User>;
   abstract findByEmail(email: string): Promise<User | null>;
   abstract findAll(): Promise<User[]>;
+  abstract delete(cpf: string): Promise<void>;
   abstract addType(cpf: string, typeId: string): Promise<void>;
+  abstract removeType(cpf: string, typeName: string): Promise<void>;
 }

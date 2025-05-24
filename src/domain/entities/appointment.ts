@@ -4,7 +4,7 @@ export interface AppointmentData {
   startTime: string;
   endTime: string;
   status: string;
-  scheduleId: string;
+  scheduleId?: string;
   patientId: string;
   employeeId: string;
 }
@@ -52,12 +52,11 @@ export class Appointment {
     this.data.status = status;
   }
 
-  get scheduleId(): string {
+  get scheduleId(): string | undefined {
     return this.data.scheduleId;
   }
 
-  set scheduleId(scheduleId: string) {
-    if (!scheduleId) throw new Error("ID do agendamento é obrigatório.");
+  set scheduleId(scheduleId: string | undefined) {
     this.data.scheduleId = scheduleId;
   }
 

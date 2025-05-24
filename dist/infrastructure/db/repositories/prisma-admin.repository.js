@@ -96,6 +96,11 @@ let PrismaAdminRepository = class PrismaAdminRepository {
             type: admin.type.name
         }));
     }
+    async delete(cpf) {
+        await this.prisma.admin.delete({
+            where: { cpf }
+        });
+    }
 };
 exports.PrismaAdminRepository = PrismaAdminRepository;
 exports.PrismaAdminRepository = PrismaAdminRepository = __decorate([

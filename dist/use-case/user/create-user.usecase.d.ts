@@ -14,9 +14,9 @@ export declare class CreateUserUseCase {
         cpf: string;
         email: string;
         password: string;
+        types: string[];
         companyId: string;
-        type: string;
-        active: boolean;
+        active?: boolean;
         employeeTypeId?: string;
         advice?: string;
     }): Promise<User>;

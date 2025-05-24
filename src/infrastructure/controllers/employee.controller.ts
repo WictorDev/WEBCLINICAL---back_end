@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post, Put, Param, BadRequestException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Delete, Param, BadRequestException, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateEmployeeUseCase } from 'src/use-case/employee/create-employee.usecase';
 import { UpdateEmployeeUseCase } from 'src/use-case/employee/update-employee.usecase';
+import { DeleteEmployeeUseCase } from 'src/use-case/employee/delete-employee.usecase';
 import { PrismaEmployeeRepository } from '../db/repositories/prisma-employee.repository';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
 import { EmployeeTypeRepository } from 'src/domain/repositories/employee-type.repository';
@@ -14,6 +15,7 @@ export class EmployeeController {
   constructor(
     private readonly createUseCase: CreateEmployeeUseCase,
     private readonly updateUseCase: UpdateEmployeeUseCase,
+    private readonly deleteUseCase: DeleteEmployeeUseCase,
     private readonly repo: PrismaEmployeeRepository,
     private readonly typeRepository: TypeRepository,
     private readonly employeeTypeRepository: EmployeeTypeRepository
@@ -89,5 +91,11 @@ export class EmployeeController {
     } catch (error) {
       throw error;
     }
+  }
+
+  @Delete(':cpf')
+  async delete(@Param('cpf') cpf: string) {
+    await this.deleteUseCase.execute(cpf);
+    return { message: 'Funcionário removido com sucesso' };
   }
 } 

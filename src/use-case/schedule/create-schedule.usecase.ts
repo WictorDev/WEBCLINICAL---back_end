@@ -33,21 +33,33 @@ export class CreateScheduleUseCase {
     date: Date;
     startTime: string;
     duration: number;
-    totalSlots: number;
     employeeId: string;
   }): Promise<Schedule> {
-    // Calcula o horário final baseado na duração e total de vagas
-    const [hours, minutes] = data.startTime.split(':').map(Number);
-    const startTimeInMinutes = hours * 60 + minutes;
-    const totalDurationInMinutes = data.duration * data.totalSlots;
-    const endTimeInMinutes = startTimeInMinutes + totalDurationInMinutes;
-    
-    const endHours = Math.floor(endTimeInMinutes / 60);
-    const endMinutes = endTimeInMinutes % 60;
-    const endTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+    // Validação do formato de startTime
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(data.startTime)) {
+      throw new ConflictException('Horário de início inválido. Use o formato HH:mm.');
+    }
 
-    // Busca agendas existentes para o mesmo funcionário na mesma data
-    const existingSchedules = await this.scheduleRepository.findByDate(data.employeeId, data.date);
+    // Cria um objeto Date com a data e o horário de início (UTC)
+    const [hours, minutes] = data.startTime.split(':').map(Number);
+    const startDate = new Date(data.date);
+    startDate.setUTCHours(hours, minutes, 0, 0);
+    console.log('[CREATE SCHEDULE] Recebido:', { data });
+
+    // Soma a duração em minutos
+    const endDate = new Date(startDate.getTime() + data.duration * 60000);
+
+    // Formata o horário final para HH:mm
+    const endHours = String(endDate.getUTCHours()).padStart(2, '0');
+    const endMinutes = String(endDate.getUTCMinutes()).padStart(2, '0');
+    const endTime = `${endHours}:${endMinutes}`;
+    console.log('[CREATE SCHEDULE] Calculado endTime:', endTime);
+
+    // Busca agendas existentes para o mesmo funcionário na mesma data E que estejam ativas
+    const existingSchedules = (await this.scheduleRepository.findByDate(data.employeeId, data.date))
+      .filter(s => s.active);
+    console.log('[CREATE SCHEDULE] Horários existentes ativos:', existingSchedules.map(s => ({ startTime: s.startTime, endTime: s.endTime })));
 
     // Verifica se há conflito de horário
     if (this.hasTimeConflict(existingSchedules, data.startTime, endTime)) {
@@ -60,10 +72,14 @@ export class CreateScheduleUseCase {
       startTime: data.startTime,
       endTime,
       duration: Number(data.duration),
-      totalSlots: data.totalSlots,
-      availableSlots: data.totalSlots, // Inicialmente todas as vagas estão disponíveis
       employeeId: data.employeeId,
       active: true
+    });
+    console.log('[CREATE SCHEDULE] Agenda criada:', {
+      startTime: data.startTime,
+      endTime,
+      duration: data.duration,
+      employeeId: data.employeeId
     });
 
     return this.scheduleRepository.create(schedule);

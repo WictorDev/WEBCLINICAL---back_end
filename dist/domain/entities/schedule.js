@@ -43,24 +43,6 @@ class Schedule {
             throw new Error("Duração deve ser maior que zero.");
         this.data.duration = duration;
     }
-    get totalSlots() {
-        return this.data.totalSlots;
-    }
-    set totalSlots(totalSlots) {
-        if (totalSlots <= 0)
-            throw new Error("Total de vagas deve ser maior que zero.");
-        this.data.totalSlots = totalSlots;
-    }
-    get availableSlots() {
-        return this.data.availableSlots;
-    }
-    set availableSlots(availableSlots) {
-        if (availableSlots < 0)
-            throw new Error("Vagas disponíveis não podem ser negativas.");
-        if (availableSlots > this.totalSlots)
-            throw new Error("Vagas disponíveis não podem ser maiores que o total de vagas.");
-        this.data.availableSlots = availableSlots;
-    }
     get employeeId() {
         return this.data.employeeId;
     }
@@ -68,6 +50,12 @@ class Schedule {
         if (!employeeId)
             throw new Error("ID do funcionário é obrigatório.");
         this.data.employeeId = employeeId;
+    }
+    get appointmentId() {
+        return this.data.appointmentId;
+    }
+    set appointmentId(appointmentId) {
+        this.data.appointmentId = appointmentId;
     }
     get active() {
         return this.data.active;
@@ -77,14 +65,14 @@ class Schedule {
     }
     toJSON() {
         return {
-            id: this.id,
-            date: this.date,
-            startTime: this.startTime,
-            endTime: this.endTime,
-            duration: this.duration,
-            totalSlots: this.totalSlots,
-            availableSlots: this.availableSlots,
-            employeeId: this.employeeId
+            id: this.data.id,
+            date: this.data.date,
+            startTime: this.data.startTime,
+            endTime: this.data.endTime,
+            duration: this.data.duration,
+            employeeId: this.data.employeeId,
+            appointmentId: this.data.appointmentId,
+            active: this.data.active
         };
     }
     static create(data) {
@@ -94,9 +82,9 @@ class Schedule {
             startTime: data.startTime,
             endTime: data.endTime,
             duration: data.duration,
-            totalSlots: data.totalSlots,
-            availableSlots: data.availableSlots,
-            employeeId: data.employeeId
+            employeeId: data.employeeId,
+            appointmentId: data.appointmentId,
+            active: data.active
         };
     }
 }

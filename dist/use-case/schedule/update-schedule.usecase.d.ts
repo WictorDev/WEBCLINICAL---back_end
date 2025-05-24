@@ -6,8 +6,6 @@ interface UpdateScheduleUseCaseRequest {
     startTime?: string;
     endTime?: string;
     duration?: number;
-    totalSlots?: number;
-    availableSlots?: number;
     employeeId?: string;
     active?: boolean;
 }

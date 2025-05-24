@@ -91,4 +91,10 @@ export class PrismaAdminRepository implements AdminRepository {
       type: admin.type.name
     }));
   }
+
+  async delete(cpf: string): Promise<void> {
+    await this.prisma.admin.delete({
+      where: { cpf }
+    });
+  }
 } 

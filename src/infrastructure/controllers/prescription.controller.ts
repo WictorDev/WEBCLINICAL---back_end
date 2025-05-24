@@ -6,7 +6,7 @@ import { JwtAuthGuard } from '../auth/jwt.guard';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('prescriptions')
-@Controller('prescriptions')
+@Controller('/api/prescriptions')
 @UseGuards(JwtAuthGuard)
 export class PrescriptionController {
   constructor(

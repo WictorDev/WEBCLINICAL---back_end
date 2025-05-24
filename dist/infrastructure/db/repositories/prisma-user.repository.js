@@ -12,36 +12,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaUserRepository = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../../core/services/prisma.service");
-const bcrypt = require("bcrypt");
 const user_1 = require("../../../domain/entities/user");
 const unique_entity_cpf_1 = require("../../../core/entities/unique-entity-cpf");
-const library_1 = require("@prisma/client/runtime/library");
 let PrismaUserRepository = class PrismaUserRepository {
     prismaService;
     constructor(prismaService) {
         this.prismaService = prismaService;
     }
     async create(user) {
-        let password = user.password;
-        if (!password.startsWith('$2b$')) {
-            password = await bcrypt.hash(user.password, 10);
-        }
         try {
+            const types = await Promise.all(user.types.map(async (typeName) => {
+                const type = await this.prismaService.type.findUnique({
+                    where: { name: typeName }
+                });
+                if (!type) {
+                    throw new common_1.NotFoundException(`Tipo ${typeName} não encontrado.`);
+                }
+                return type;
+            }));
             const createdUser = await this.prismaService.user.create({
                 data: {
+                    cpf: user.cpf.toString(),
                     name: user.name,
                     email: user.email,
-                    password: password,
-                    cpf: user.cpf.toString(),
-                    companyId: user.companyId,
+                    password: user.password,
+                    companyId: user.companyId ?? null,
+                    active: user.active ?? true,
                     types: {
-                        create: user.types.map(typeId => ({
+                        create: types.map(type => ({
                             type: {
-                                connect: { id: typeId }
+                                connect: {
+                                    id: type.id
+                                }
                             }
                         }))
-                    },
-                    active: user.active ?? true,
+                    }
                 },
                 include: {
                     types: {
@@ -52,62 +57,51 @@ let PrismaUserRepository = class PrismaUserRepository {
                 }
             });
             return new user_1.User({
-                ...createdUser,
                 cpf: new unique_entity_cpf_1.default(createdUser.cpf),
-                companyId: createdUser.companyId ?? '',
-                types: createdUser.types.map(ut => ut.type.id),
+                name: createdUser.name,
+                email: createdUser.email,
+                password: createdUser.password,
+                companyId: createdUser.companyId ?? undefined,
+                types: createdUser.types.map(t => t.type.name),
+                active: createdUser.active
             });
         }
         catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError &&
-                error.code === 'P2002') {
-                const target = error.meta?.target;
-                if (Array.isArray(target)) {
-                    if (target.includes('email')) {
-                        throw new common_1.ConflictException('E-mail já cadastrado.');
-                    }
-                    if (target.includes('cpf')) {
-                        throw new common_1.ConflictException('CPF já cadastrado.');
-                    }
-                }
-                else if (typeof target === 'string') {
-                    if (target.includes('email')) {
-                        throw new common_1.ConflictException('E-mail já cadastrado.');
-                    }
-                    if (target.includes('cpf')) {
-                        throw new common_1.ConflictException('CPF já cadastrado.');
-                    }
-                }
-                throw new common_1.ConflictException('E-mail ou CPF já cadastrado.');
-            }
+            console.error('Erro ao criar usuário:', error);
             throw error;
         }
     }
     async update(cpf, user) {
-        let password = user.password;
-        if (password && !password.startsWith('$2b$')) {
-            password = await bcrypt.hash(password, 10);
-        }
-        const updateData = {
-            name: user.name,
-            email: user.email,
-            password: password,
-            companyId: user.companyId,
-            active: user.active ?? true
-        };
+        console.log('PrismaUserRepository - Atualizando usuário:', { cpf, user });
         if (user.types) {
-            updateData.types = {
-                deleteMany: {},
-                create: user.types.map(typeId => ({
-                    type: {
-                        connect: { id: typeId }
-                    }
-                }))
-            };
+            const types = await Promise.all(user.types.map(async (typeName) => {
+                const type = await this.prismaService.type.findUnique({
+                    where: { name: typeName }
+                });
+                if (!type) {
+                    throw new common_1.NotFoundException(`Tipo ${typeName} não encontrado.`);
+                }
+                return type;
+            }));
+            await this.prismaService.userType.deleteMany({
+                where: { userId: cpf }
+            });
+            await Promise.all(types.map(type => this.prismaService.userType.create({
+                data: {
+                    userId: cpf,
+                    typeId: type.id
+                }
+            })));
         }
         const updatedUser = await this.prismaService.user.update({
-            where: { cpf: cpf.toString() },
-            data: updateData,
+            where: { cpf },
+            data: {
+                name: user.name,
+                email: user.email,
+                password: user.password,
+                companyId: user.companyId,
+                active: user.active
+            },
             include: {
                 types: {
                     include: {
@@ -117,33 +111,30 @@ let PrismaUserRepository = class PrismaUserRepository {
             }
         });
         return new user_1.User({
-            ...updatedUser,
-            cpf: new unique_entity_cpf_1.default(updatedUser.cpf.toString()),
-            companyId: updatedUser.companyId ?? '',
-            types: updatedUser.types.map(ut => ut.type.id),
+            cpf: new unique_entity_cpf_1.default(updatedUser.cpf),
+            name: updatedUser.name,
+            email: updatedUser.email,
+            password: updatedUser.password,
+            companyId: updatedUser.companyId || undefined,
+            types: updatedUser.types.map(ut => ut.type.name),
+            active: updatedUser.active
         });
     }
     async findAll() {
         const users = await this.prismaService.user.findMany({
             include: {
-                types: {
-                    include: {
-                        type: true
-                    }
-                }
-            }
+                types: true,
+            },
         });
-        return users.map((user) => {
-            return new user_1.User({
-                cpf: new unique_entity_cpf_1.default(user.cpf),
-                name: user.name,
-                email: user.email,
-                password: user.password,
-                companyId: user.companyId ?? '',
-                types: user.types.map(ut => ut.type.id),
-                active: user.active,
-            });
-        });
+        return users.map((user) => new user_1.User({
+            cpf: new unique_entity_cpf_1.default(user.cpf),
+            name: user.name,
+            email: user.email,
+            password: user.password,
+            companyId: user.companyId ?? '',
+            types: user.types.map(ut => ut.typeId),
+            active: user.active,
+        }));
     }
     async findByEmail(email) {
         const user = await this.prismaService.user.findUnique({
@@ -160,7 +151,7 @@ let PrismaUserRepository = class PrismaUserRepository {
             return null;
         }
         return new user_1.User({
-            cpf: new unique_entity_cpf_1.default(user.cpf.toString()),
+            cpf: new unique_entity_cpf_1.default(user.cpf),
             name: user.name,
             email: user.email,
             password: user.password,
@@ -220,6 +211,37 @@ let PrismaUserRepository = class PrismaUserRepository {
                 }
             }
         });
+    }
+    async delete(cpf) {
+        await this.prismaService.user.delete({
+            where: { cpf }
+        });
+    }
+    async removeType(cpf, typeName) {
+        const type = await this.prismaService.type.findUnique({
+            where: { name: typeName }
+        });
+        if (!type) {
+            throw new common_1.NotFoundException(`Tipo ${typeName} não encontrado.`);
+        }
+        await this.prismaService.userType.deleteMany({
+            where: {
+                userId: cpf,
+                typeId: type.id
+            }
+        });
+        switch (typeName.toUpperCase()) {
+            case 'ADMIN':
+                await this.prismaService.admin.deleteMany({
+                    where: { cpf }
+                });
+                break;
+            case 'EMPLOYEE':
+                await this.prismaService.employee.deleteMany({
+                    where: { cpf }
+                });
+                break;
+        }
     }
 };
 exports.PrismaUserRepository = PrismaUserRepository;

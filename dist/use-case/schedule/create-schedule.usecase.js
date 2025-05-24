@@ -35,14 +35,22 @@ let CreateScheduleUseCase = class CreateScheduleUseCase {
         });
     }
     async execute(data) {
+        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+        if (!timeRegex.test(data.startTime)) {
+            throw new common_1.ConflictException('Horário de início inválido. Use o formato HH:mm.');
+        }
         const [hours, minutes] = data.startTime.split(':').map(Number);
-        const startTimeInMinutes = hours * 60 + minutes;
-        const totalDurationInMinutes = data.duration * data.totalSlots;
-        const endTimeInMinutes = startTimeInMinutes + totalDurationInMinutes;
-        const endHours = Math.floor(endTimeInMinutes / 60);
-        const endMinutes = endTimeInMinutes % 60;
-        const endTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
-        const existingSchedules = await this.scheduleRepository.findByDate(data.employeeId, data.date);
+        const startDate = new Date(data.date);
+        startDate.setUTCHours(hours, minutes, 0, 0);
+        console.log('[CREATE SCHEDULE] Recebido:', { data });
+        const endDate = new Date(startDate.getTime() + data.duration * 60000);
+        const endHours = String(endDate.getUTCHours()).padStart(2, '0');
+        const endMinutes = String(endDate.getUTCMinutes()).padStart(2, '0');
+        const endTime = `${endHours}:${endMinutes}`;
+        console.log('[CREATE SCHEDULE] Calculado endTime:', endTime);
+        const existingSchedules = (await this.scheduleRepository.findByDate(data.employeeId, data.date))
+            .filter(s => s.active);
+        console.log('[CREATE SCHEDULE] Horários existentes ativos:', existingSchedules.map(s => ({ startTime: s.startTime, endTime: s.endTime })));
         if (this.hasTimeConflict(existingSchedules, data.startTime, endTime)) {
             throw new common_1.ConflictException('Já existe uma agenda para este funcionário no mesmo horário');
         }
@@ -52,10 +60,14 @@ let CreateScheduleUseCase = class CreateScheduleUseCase {
             startTime: data.startTime,
             endTime,
             duration: Number(data.duration),
-            totalSlots: data.totalSlots,
-            availableSlots: data.totalSlots,
             employeeId: data.employeeId,
             active: true
+        });
+        console.log('[CREATE SCHEDULE] Agenda criada:', {
+            startTime: data.startTime,
+            endTime,
+            duration: data.duration,
+            employeeId: data.employeeId
         });
         return this.scheduleRepository.create(schedule);
     }

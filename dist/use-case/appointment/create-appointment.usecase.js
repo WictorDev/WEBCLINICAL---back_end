@@ -25,12 +25,12 @@ let CreateAppointmentUseCase = class CreateAppointmentUseCase {
         if (!timeRegex.test(appointment.startTime) || !timeRegex.test(appointment.endTime)) {
             throw new common_1.BadRequestException('Formato de hora inválido. Use o formato HH:mm.');
         }
+        if (!appointment.scheduleId) {
+            throw new common_1.BadRequestException('ID da agenda é obrigatório.');
+        }
         const schedule = await this.scheduleRepository.findById(appointment.scheduleId);
         if (!schedule) {
             throw new common_1.BadRequestException('Agenda não encontrada.');
-        }
-        if (schedule.availableSlots <= 0) {
-            throw new common_1.BadRequestException('Não há vagas disponíveis nesta agenda.');
         }
         if (appointment.startTime < schedule.startTime || appointment.endTime > schedule.endTime) {
             throw new common_1.BadRequestException('Horário fora do período da agenda.');
@@ -42,7 +42,7 @@ let CreateAppointmentUseCase = class CreateAppointmentUseCase {
         }
         const newAppointment = await this.appointmentRepository.create(appointment);
         await this.scheduleRepository.update(schedule.id, {
-            availableSlots: schedule.availableSlots - 1
+            appointmentId: newAppointment.id
         });
         return newAppointment;
     }

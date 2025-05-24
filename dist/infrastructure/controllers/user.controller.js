@@ -50,24 +50,18 @@ let UserController = class UserController {
     async findByCpf(cpf) {
         return this.findUserByCpfUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf));
     }
-    async create(body) {
-        try {
-            const type = await this.typeRepository.findByName(body.type);
-            if (!type) {
-                throw new common_1.BadRequestException('Tipo de usuário não encontrado.');
-            }
-            return this.createUserUseCase.execute({
-                ...body,
-                cpf: new unique_entity_cpf_1.UniqueEntityCpf(body.cpf).toString(),
-                type: body.type
-            });
-        }
-        catch (error) {
-            if (error.message && error.message.includes('CPF')) {
-                throw new common_1.BadRequestException(error.message);
-            }
-            throw error;
-        }
+    async createUser(body) {
+        return this.createUserUseCase.execute({
+            name: body.name,
+            cpf: body.cpf,
+            email: body.email,
+            password: body.password,
+            types: body.types,
+            companyId: body.companyId,
+            active: body.active,
+            employeeTypeId: body.employeeTypeId,
+            advice: body.advice
+        });
     }
     async createFirstUser(body) {
         const users = await this.findUserUseCase.execute();
@@ -85,7 +79,16 @@ let UserController = class UserController {
         }
     }
     async update(cpf, body) {
-        return this.updateUserUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf), body);
+        console.log('UserController - Atualizando usuário:', { cpf, body });
+        try {
+            const result = await this.updateUserUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf), body);
+            console.log('UserController - Usuário atualizado com sucesso:', result);
+            return result;
+        }
+        catch (error) {
+            console.error('UserController - Erro ao atualizar usuário:', error);
+            throw error;
+        }
     }
     async delete(cpf) {
         return this.updateUserUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf), { active: false });
@@ -113,12 +116,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findByCpf", null);
 __decorate([
-    (0, common_1.Post)('/create_user'),
+    (0, common_1.Post)('create_user'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], UserController.prototype, "create", null);
+], UserController.prototype, "createUser", null);
 __decorate([
     (0, common_1.Post)('/create_first_admin'),
     __param(0, (0, common_1.Body)()),

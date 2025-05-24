@@ -49,7 +49,7 @@ __decorate([
 ], PrescriptionController.prototype, "getByMedicalRecord", null);
 exports.PrescriptionController = PrescriptionController = __decorate([
     (0, swagger_1.ApiTags)('prescriptions'),
-    (0, common_1.Controller)('prescriptions'),
+    (0, common_1.Controller)('/api/prescriptions'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [add_prescription_usecase_1.AddPrescriptionUseCase,
         prescription_repository_1.PrescriptionRepository])

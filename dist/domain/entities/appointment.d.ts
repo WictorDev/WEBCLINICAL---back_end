@@ -4,7 +4,7 @@ export interface AppointmentData {
     startTime: string;
     endTime: string;
     status: string;
-    scheduleId: string;
+    scheduleId?: string;
     patientId: string;
     employeeId: string;
 }
@@ -20,8 +20,8 @@ export declare class Appointment {
     set endTime(endTime: string);
     get status(): string;
     set status(status: string);
-    get scheduleId(): string;
-    set scheduleId(scheduleId: string);
+    get scheduleId(): string | undefined;
+    set scheduleId(scheduleId: string | undefined);
     get patientId(): string;
     set patientId(patientId: string);
     get employeeId(): string;
@@ -32,7 +32,7 @@ export declare class Appointment {
         startTime: string;
         endTime: string;
         status: string;
-        scheduleId: string;
+        scheduleId: string | undefined;
         patientId: string;
         employeeId: string;
     };
@@ -42,7 +42,7 @@ export declare class Appointment {
         startTime: string;
         endTime: string;
         status: string;
-        scheduleId: string;
+        scheduleId: string | undefined;
         patientId: string;
         employeeId: string;
     };
