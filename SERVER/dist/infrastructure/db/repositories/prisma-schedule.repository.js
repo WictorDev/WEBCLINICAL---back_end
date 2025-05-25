@@ -269,6 +269,40 @@ let PrismaScheduleRepository = class PrismaScheduleRepository {
             active: schedule.active
         }));
     }
+    async findAllAvailable() {
+        try {
+            const schedules = await this.prisma.schedule.findMany({
+                where: {
+                    active: true,
+                    appointmentId: null
+                },
+                include: {
+                    employee: {
+                        select: {
+                            name: true,
+                        }
+                    }
+                },
+                orderBy: {
+                    date: 'asc'
+                }
+            });
+            return schedules.map(schedule => ({
+                id: schedule.id,
+                date: schedule.date,
+                startTime: schedule.startTime,
+                endTime: schedule.endTime,
+                duration: schedule.duration,
+                employeeId: schedule.employeeId,
+                appointmentId: schedule.appointmentId || undefined,
+                active: schedule.active,
+                employee: schedule.employee ? { name: schedule.employee.name } : undefined
+            }));
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 };
 exports.PrismaScheduleRepository = PrismaScheduleRepository;
 exports.PrismaScheduleRepository = PrismaScheduleRepository = __decorate([

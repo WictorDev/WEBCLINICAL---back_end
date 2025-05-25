@@ -4,6 +4,7 @@ import { DeleteScheduleUseCase } from '../../use-case/schedule/delete-schedule.u
 import { FindScheduleByIdUseCase } from '../../use-case/schedule/find-schedule-by-id.usecase';
 import { FindSchedulesByEmployeeUseCase } from '../../use-case/schedule/find-schedules-by-employee.usecase';
 import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-available-schedules.usecase';
+import { FindAllAvailableSchedulesUseCase } from '../../use-case/schedule/find-all-avaiable-schedules.usecase';
 import { Schedule } from '../../domain/entities/schedule';
 export declare class ScheduleController {
     private readonly createScheduleUseCase;
@@ -12,7 +13,8 @@ export declare class ScheduleController {
     private readonly findScheduleByIdUseCase;
     private readonly findSchedulesByEmployeeUseCase;
     private readonly findAvailableSchedulesUseCase;
-    constructor(createScheduleUseCase: CreateScheduleUseCase, updateScheduleUseCase: UpdateScheduleUseCase, deleteScheduleUseCase: DeleteScheduleUseCase, findScheduleByIdUseCase: FindScheduleByIdUseCase, findSchedulesByEmployeeUseCase: FindSchedulesByEmployeeUseCase, findAvailableSchedulesUseCase: FindAvailableSchedulesUseCase);
+    private readonly findAllAvailableSchedulesUseCase;
+    constructor(createScheduleUseCase: CreateScheduleUseCase, updateScheduleUseCase: UpdateScheduleUseCase, deleteScheduleUseCase: DeleteScheduleUseCase, findScheduleByIdUseCase: FindScheduleByIdUseCase, findSchedulesByEmployeeUseCase: FindSchedulesByEmployeeUseCase, findAvailableSchedulesUseCase: FindAvailableSchedulesUseCase, findAllAvailableSchedulesUseCase: FindAllAvailableSchedulesUseCase);
     create(data: {
         date: Date;
         startTime: string;
@@ -28,6 +30,7 @@ export declare class ScheduleController {
         active?: boolean;
     }): Promise<Schedule>;
     delete(id: string): Promise<void>;
+    findAllAvailable(): Promise<Schedule[]>;
     findById(id: string): Promise<Schedule>;
     findByEmployee(employeeId: string, date?: Date): Promise<Schedule[]>;
     findAvailable(employeeId: string, date?: Date): Promise<Schedule[]>;

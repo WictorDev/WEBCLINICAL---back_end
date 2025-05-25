@@ -5,6 +5,7 @@ import { DeleteScheduleUseCase } from '../../use-case/schedule/delete-schedule.u
 import { FindScheduleByIdUseCase } from '../../use-case/schedule/find-schedule-by-id.usecase';
 import { FindSchedulesByEmployeeUseCase } from '../../use-case/schedule/find-schedules-by-employee.usecase';
 import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-available-schedules.usecase';
+import { FindAllAvailableSchedulesUseCase } from '../../use-case/schedule/find-all-avaiable-schedules.usecase';
 import { Schedule } from '../../domain/entities/schedule';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt.guard';
@@ -20,6 +21,7 @@ export class ScheduleController {
     private readonly findScheduleByIdUseCase: FindScheduleByIdUseCase,
     private readonly findSchedulesByEmployeeUseCase: FindSchedulesByEmployeeUseCase,
     private readonly findAvailableSchedulesUseCase: FindAvailableSchedulesUseCase,
+    private readonly findAllAvailableSchedulesUseCase: FindAllAvailableSchedulesUseCase,
   ) {}
 
   @Post()
@@ -120,6 +122,14 @@ export class ScheduleController {
   @ApiResponse({ status: 404, description: 'Agenda não encontrada' })
   async delete(@Param('id') id: string): Promise<void> {
     return this.deleteScheduleUseCase.execute(id);
+  }
+
+  @Get('available')
+  @ApiOperation({ summary: 'Listar agendas disponíveis' })
+  @ApiResponse({ status: 200, description: 'Lista de agendas disponíveis encontrada' })
+  async findAllAvailable(
+  ): Promise<Schedule[]> {
+    return this.findAllAvailableSchedulesUseCase.execute(true);
   }
 
   @Get(':id')

@@ -9,6 +9,8 @@ import { DeleteScheduleUseCase } from '../../use-case/schedule/delete-schedule.u
 import { FindScheduleByIdUseCase } from '../../use-case/schedule/find-schedule-by-id.usecase';
 import { FindSchedulesByEmployeeUseCase } from '../../use-case/schedule/find-schedules-by-employee.usecase';
 import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-available-schedules.usecase';
+import { FindAllAvailableSchedulesUseCase } from '../../use-case/schedule/find-all-avaiable-schedules.usecase';
+import { FindAllSchedulesUseCase } from '../../use-case/schedule/find-all-schedules.usecase';
 
 @Module({
   imports: [PrismaModule],
@@ -25,6 +27,8 @@ import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-avai
     FindScheduleByIdUseCase,
     FindSchedulesByEmployeeUseCase,
     FindAvailableSchedulesUseCase,
+    FindAllAvailableSchedulesUseCase,
+    FindAllSchedulesUseCase,
   ],
   exports: [
     ScheduleRepository,
@@ -35,6 +39,8 @@ import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-avai
     FindScheduleByIdUseCase,
     FindSchedulesByEmployeeUseCase,
     FindAvailableSchedulesUseCase,
+    FindAllAvailableSchedulesUseCase,
+    FindAllSchedulesUseCase,
   ],
 })
 export class ScheduleModule {} 
