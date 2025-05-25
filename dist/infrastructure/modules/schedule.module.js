@@ -18,6 +18,8 @@ const delete_schedule_usecase_1 = require("../../use-case/schedule/delete-schedu
 const find_schedule_by_id_usecase_1 = require("../../use-case/schedule/find-schedule-by-id.usecase");
 const find_schedules_by_employee_usecase_1 = require("../../use-case/schedule/find-schedules-by-employee.usecase");
 const find_available_schedules_usecase_1 = require("../../use-case/schedule/find-available-schedules.usecase");
+const find_all_avaiable_schedules_usecase_1 = require("../../use-case/schedule/find-all-avaiable-schedules.usecase");
+const find_all_schedules_usecase_1 = require("../../use-case/schedule/find-all-schedules.usecase");
 let ScheduleModule = class ScheduleModule {
 };
 exports.ScheduleModule = ScheduleModule;
@@ -37,6 +39,8 @@ exports.ScheduleModule = ScheduleModule = __decorate([
             find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
             find_schedules_by_employee_usecase_1.FindSchedulesByEmployeeUseCase,
             find_available_schedules_usecase_1.FindAvailableSchedulesUseCase,
+            find_all_avaiable_schedules_usecase_1.FindAllAvailableSchedulesUseCase,
+            find_all_schedules_usecase_1.FindAllSchedulesUseCase,
         ],
         exports: [
             schedule_repository_1.ScheduleRepository,
@@ -47,6 +51,8 @@ exports.ScheduleModule = ScheduleModule = __decorate([
             find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
             find_schedules_by_employee_usecase_1.FindSchedulesByEmployeeUseCase,
             find_available_schedules_usecase_1.FindAvailableSchedulesUseCase,
+            find_all_avaiable_schedules_usecase_1.FindAllAvailableSchedulesUseCase,
+            find_all_schedules_usecase_1.FindAllSchedulesUseCase,
         ],
     })
 ], ScheduleModule);

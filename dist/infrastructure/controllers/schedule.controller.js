@@ -20,8 +20,10 @@ const delete_schedule_usecase_1 = require("../../use-case/schedule/delete-schedu
 const find_schedule_by_id_usecase_1 = require("../../use-case/schedule/find-schedule-by-id.usecase");
 const find_schedules_by_employee_usecase_1 = require("../../use-case/schedule/find-schedules-by-employee.usecase");
 const find_available_schedules_usecase_1 = require("../../use-case/schedule/find-available-schedules.usecase");
+const find_all_avaiable_schedules_usecase_1 = require("../../use-case/schedule/find-all-avaiable-schedules.usecase");
 const swagger_1 = require("@nestjs/swagger");
 const jwt_guard_1 = require("../auth/jwt.guard");
+const public_decorator_1 = require("../auth/public.decorator");
 let ScheduleController = class ScheduleController {
     createScheduleUseCase;
     updateScheduleUseCase;
@@ -29,13 +31,15 @@ let ScheduleController = class ScheduleController {
     findScheduleByIdUseCase;
     findSchedulesByEmployeeUseCase;
     findAvailableSchedulesUseCase;
-    constructor(createScheduleUseCase, updateScheduleUseCase, deleteScheduleUseCase, findScheduleByIdUseCase, findSchedulesByEmployeeUseCase, findAvailableSchedulesUseCase) {
+    findAllAvailableSchedulesUseCase;
+    constructor(createScheduleUseCase, updateScheduleUseCase, deleteScheduleUseCase, findScheduleByIdUseCase, findSchedulesByEmployeeUseCase, findAvailableSchedulesUseCase, findAllAvailableSchedulesUseCase) {
         this.createScheduleUseCase = createScheduleUseCase;
         this.updateScheduleUseCase = updateScheduleUseCase;
         this.deleteScheduleUseCase = deleteScheduleUseCase;
         this.findScheduleByIdUseCase = findScheduleByIdUseCase;
         this.findSchedulesByEmployeeUseCase = findSchedulesByEmployeeUseCase;
         this.findAvailableSchedulesUseCase = findAvailableSchedulesUseCase;
+        this.findAllAvailableSchedulesUseCase = findAllAvailableSchedulesUseCase;
     }
     async create(data) {
         return this.createScheduleUseCase.execute(data);
@@ -45,6 +49,9 @@ let ScheduleController = class ScheduleController {
     }
     async delete(id) {
         return this.deleteScheduleUseCase.execute(id);
+    }
+    async findAllAvailable() {
+        return this.findAllAvailableSchedulesUseCase.execute(true);
     }
     async findById(id) {
         return this.findScheduleByIdUseCase.execute(id);
@@ -150,6 +157,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ScheduleController.prototype, "delete", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('available'),
+    (0, swagger_1.ApiOperation)({ summary: 'Listar agendas disponíveis' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de agendas disponíveis encontrada' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ScheduleController.prototype, "findAllAvailable", null);
+__decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Buscar uma agenda por ID' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'ID da agenda' }),
@@ -193,6 +209,7 @@ exports.ScheduleController = ScheduleController = __decorate([
         delete_schedule_usecase_1.DeleteScheduleUseCase,
         find_schedule_by_id_usecase_1.FindScheduleByIdUseCase,
         find_schedules_by_employee_usecase_1.FindSchedulesByEmployeeUseCase,
-        find_available_schedules_usecase_1.FindAvailableSchedulesUseCase])
+        find_available_schedules_usecase_1.FindAvailableSchedulesUseCase,
+        find_all_avaiable_schedules_usecase_1.FindAllAvailableSchedulesUseCase])
 ], ScheduleController);
 //# sourceMappingURL=schedule.controller.js.map
