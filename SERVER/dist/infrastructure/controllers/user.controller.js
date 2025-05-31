@@ -24,6 +24,7 @@ const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const swagger_1 = require("@nestjs/swagger");
 const type_repository_1 = require("../../domain/repositories/type.repository");
 const create_first_admin_usecase_1 = require("../../use-case/user/create-first-admin.usecase");
+const public_decorator_1 = require("../auth/public.decorator");
 let UserController = class UserController {
     createUserUseCase;
     updateUserUseCase;
@@ -123,6 +124,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "createUser", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/create_first_admin'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
