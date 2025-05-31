@@ -16,7 +16,6 @@ const user_1 = require("../../domain/entities/user");
 const create_admin_usecase_1 = require("../admin/create-admin.usecase");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const type_repository_1 = require("../../domain/repositories/type.repository");
-const type_1 = require("../../domain/entities/type");
 let CreateFirstAdminUseCase = class CreateFirstAdminUseCase {
     userRepository;
     createAdminUseCase;
@@ -27,29 +26,34 @@ let CreateFirstAdminUseCase = class CreateFirstAdminUseCase {
         this.typeRepository = typeRepository;
     }
     async execute(data) {
-        let type = await this.typeRepository.findByName('ADMIN');
-        if (!type) {
-            type = await this.typeRepository.create(new type_1.Type({
-                id: crypto.randomUUID(),
-                name: 'ADMIN'
-            }));
+        try {
+            const type = await this.typeRepository.findByName('ADMIN');
+            if (!type) {
+                throw new common_1.BadRequestException('Tipo ADMIN não encontrado no banco de dados');
+            }
+            const user = new user_1.User({
+                name: data.name,
+                cpf: new unique_entity_cpf_1.default(data.cpf),
+                email: data.email,
+                password: data.password,
+                companyId: data.companyId,
+                types: [type.name],
+                active: data.active
+            });
+            const createdUser = await this.userRepository.create(user);
+            await this.createAdminUseCase.execute({
+                cpf: data.cpf,
+                name: data.name,
+                type: type.name
+            });
+            return createdUser;
         }
-        const user = new user_1.User({
-            name: data.name,
-            cpf: new unique_entity_cpf_1.default(data.cpf),
-            email: data.email,
-            password: data.password,
-            companyId: data.companyId,
-            types: [type.id],
-            active: data.active
-        });
-        const createdUser = await this.userRepository.create(user);
-        await this.createAdminUseCase.execute({
-            cpf: data.cpf,
-            name: data.name,
-            type: "ADMIN"
-        });
-        return createdUser;
+        catch (error) {
+            if (error instanceof common_1.BadRequestException) {
+                throw error;
+            }
+            throw new common_1.BadRequestException(`Erro ao criar usuário administrador: ${error.message}`);
+        }
     }
 };
 exports.CreateFirstAdminUseCase = CreateFirstAdminUseCase;

@@ -19,7 +19,7 @@ import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
 import { ApiTags } from '@nestjs/swagger';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
 import { CreateFirstAdminUseCase } from 'src/use-case/user/create-first-admin.usecase';
-
+import { Public } from 'src/infrastructure/auth/public.decorator';
 @ApiTags('users')
 @Controller('/api/users')
 @UseGuards(JwtAuthGuard)
@@ -74,6 +74,7 @@ export class UserController {
     });
   }
 
+  @Public()
   @Post('/create_first_admin')
   async createFirstUser(@Body() body: { name: string; cpf: string; email: string; password: string; companyId: string; active: boolean }) {
     const users = await this.findUserUseCase.execute();
