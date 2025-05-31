@@ -21,16 +21,19 @@ const update_appointment_status_usecase_1 = require("../../use-case/appointment/
 const appointment_1 = require("../../domain/entities/appointment");
 const jwt_guard_1 = require("../auth/jwt.guard");
 const crypto_1 = require("crypto");
+const find_patient_appointments_usecase_1 = require("../../use-case/appointment/find-patient-appointments.usecase");
 let AppointmentController = class AppointmentController {
     createAppointment;
     findEmployeeAppointments;
     finalizeAppointment;
     updateAppointmentStatus;
-    constructor(createAppointment, findEmployeeAppointments, finalizeAppointment, updateAppointmentStatus) {
+    findPatientAppointments;
+    constructor(createAppointment, findEmployeeAppointments, finalizeAppointment, updateAppointmentStatus, findPatientAppointments) {
         this.createAppointment = createAppointment;
         this.findEmployeeAppointments = findEmployeeAppointments;
         this.finalizeAppointment = finalizeAppointment;
         this.updateAppointmentStatus = updateAppointmentStatus;
+        this.findPatientAppointments = findPatientAppointments;
     }
     async create(body) {
         const appointment = new appointment_1.Appointment({
@@ -53,6 +56,9 @@ let AppointmentController = class AppointmentController {
     }
     async updateStatus(id, body) {
         return this.updateAppointmentStatus.execute(id, body.status);
+    }
+    async getByPatient(patientId) {
+        return this.findPatientAppointments.execute(patientId);
     }
 };
 exports.AppointmentController = AppointmentController;
@@ -87,12 +93,20 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], AppointmentController.prototype, "updateStatus", null);
+__decorate([
+    (0, common_1.Get)('patient/:patientId'),
+    __param(0, (0, common_1.Param)('patientId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AppointmentController.prototype, "getByPatient", null);
 exports.AppointmentController = AppointmentController = __decorate([
     (0, common_1.Controller)('/api/appointments'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_appointment_usecase_1.CreateAppointmentUseCase,
         find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,
         finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
-        update_appointment_status_usecase_1.UpdateAppointmentStatusUseCase])
+        update_appointment_status_usecase_1.UpdateAppointmentStatusUseCase,
+        find_patient_appointments_usecase_1.FindPatientAppointmentsUseCase])
 ], AppointmentController);
 //# sourceMappingURL=appointment.controller.js.map

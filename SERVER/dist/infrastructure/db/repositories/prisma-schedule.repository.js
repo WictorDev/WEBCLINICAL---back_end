@@ -271,10 +271,13 @@ let PrismaScheduleRepository = class PrismaScheduleRepository {
     }
     async findAllAvailable() {
         try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const schedules = await this.prisma.schedule.findMany({
                 where: {
                     active: true,
-                    appointmentId: null
+                    appointmentId: null,
+                    date: { gte: today }
                 },
                 include: {
                     employee: {
