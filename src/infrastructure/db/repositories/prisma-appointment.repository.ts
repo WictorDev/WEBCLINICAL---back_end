@@ -61,12 +61,17 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     }
   }
 
-  async findByPatient(patientId: string): Promise<Appointment[]> {
+  async findByPatient(patientId: string): Promise<any[]> {
     const appointments = await this.prisma.appointment.findMany({
-      where: { patientId }
+      where: { patientId },
+      include: {
+        employee: {
+          select: { name: true }
+        }
+      }
     });
 
-    return appointments.map(appointment => new Appointment({
+    return appointments.map(appointment => ({
       id: appointment.id,
       date: appointment.date,
       startTime: appointment.startTime,
@@ -74,7 +79,8 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       status: appointment.status,
       scheduleId: appointment.scheduleId || undefined,
       patientId: appointment.patientId,
-      employeeId: appointment.employeeId
+      employeeId: appointment.employeeId,
+      employee: appointment.employee ? { name: appointment.employee.name } : undefined
     }));
   }
 

@@ -278,10 +278,13 @@ export class PrismaScheduleRepository implements ScheduleRepository {
 
   async findAllAvailable(): Promise<any[]> {    
     try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       const schedules = await this.prisma.schedule.findMany({
         where: { 
           active: true,
-          appointmentId: null
+          appointmentId: null,
+          date: { gte: today }
         },
         include: {
           employee: {

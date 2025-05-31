@@ -23,7 +23,6 @@ const find_available_schedules_usecase_1 = require("../../use-case/schedule/find
 const find_all_avaiable_schedules_usecase_1 = require("../../use-case/schedule/find-all-avaiable-schedules.usecase");
 const swagger_1 = require("@nestjs/swagger");
 const jwt_guard_1 = require("../auth/jwt.guard");
-const public_decorator_1 = require("../auth/public.decorator");
 let ScheduleController = class ScheduleController {
     createScheduleUseCase;
     updateScheduleUseCase;
@@ -157,7 +156,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ScheduleController.prototype, "delete", null);
 __decorate([
-    (0, public_decorator_1.Public)(),
     (0, common_1.Get)('available'),
     (0, swagger_1.ApiOperation)({ summary: 'Listar agendas disponíveis' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de agendas disponíveis encontrada' }),

@@ -70,9 +70,14 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
     }
     async findByPatient(patientId) {
         const appointments = await this.prisma.appointment.findMany({
-            where: { patientId }
+            where: { patientId },
+            include: {
+                employee: {
+                    select: { name: true }
+                }
+            }
         });
-        return appointments.map(appointment => new appointment_1.Appointment({
+        return appointments.map(appointment => ({
             id: appointment.id,
             date: appointment.date,
             startTime: appointment.startTime,
@@ -80,7 +85,8 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
             status: appointment.status,
             scheduleId: appointment.scheduleId || undefined,
             patientId: appointment.patientId,
-            employeeId: appointment.employeeId
+            employeeId: appointment.employeeId,
+            employee: appointment.employee ? { name: appointment.employee.name } : undefined
         }));
     }
     async findByEmployee(employeeId, date) {
