@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  Cnpj  String @unique
+  name  String
+  phone String
+  email String @unique
+  users User[]
+}
+
+model User {
+  cpf       String  @unique
+  email     String  @unique
+  password  String
+  name      String
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [Cnpj])
+  types     UserType[]
+  active    Boolean
+  // Relacionamentos com as tabelas específicas
+  admin     Admin?
+  employee  Employee?
+}
+
+model UserType {
+  user      User   @relation(fields: [userId], references: [cpf])
+  userId    String
+  type      Type   @relation(fields: [typeId], references: [id])
+  typeId    String
+
+  @@id([userId, typeId])
+}
+
+model Admin {
+  cpf    String @unique
+  name   String
+  user   User   @relation(fields: [cpf], references: [cpf])
+  typeId String
+  type   Type   @relation(fields: [typeId], references: [id])
+}
+
+model Type {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  users     UserType[]
+  employees Employee[]
+  admins    Admin[]
+  patients  Patient[]
+}
+
+// Funcionario
+model Employee {
+  cpf            String        @unique
+  advice         String? //CRM ou CRO ou etc...
+  name           String
+  typeId         String
+  type           Type          @relation(fields: [typeId], references: [id])
+  employeeType   EmployeeType? @relation(fields: [employeeTypeId], references: [id])
+  employeeTypeId String?
+  schedules      Schedule[]
+  appointments   Appointment[] @relation("EmployeeAppointments")
+  user           User         @relation(fields: [cpf], references: [cpf])
+}
+
+//tipo do funcionario 
+model EmployeeType {
+  id        String     @id @default(uuid())
+  name      String
+  employees Employee[]
+}
+
+//paciente
+model Patient {
+  cpf      String @unique
+  name     String
+  email    String @unique
+  password String
+  type     Type?  @relation(fields: [typeId], references: [id])
+  typeId   String
+  appointments Appointment[]
+}
+
+model Schedule {
+  id            String        @id @default(uuid())
+  date          DateTime
+  startTime     String
+  endTime       String
+  employee      Employee      @relation(fields: [employeeId], references: [cpf])
+  employeeId    String
+  appointments  Appointment[] @relation("ScheduleToAppointment")
+  active        Boolean       @default(true)
+}
+
+model Appointment {
+  id            String        @id @default(uuid())
+  date          DateTime
+  startTime     String
+  endTime       String
+  status        String
+  schedule      Schedule?     @relation("ScheduleToAppointment", fields: [scheduleId], references: [id])
+  scheduleId    String?       
+  patient       Patient?       @relation(fields: [patientId], references: [cpf])
+  patientId     String?
+  employee      Employee      @relation("EmployeeAppointments", fields: [employeeId], references: [cpf])
+  employeeId    String
+  medicalRecord MedicalRecord?
+}
+
+model MedicalRecord {
+  id            String      @id @default(uuid())
+  symptoms      String
+  diagnosis     String
+  conduct       String
+  createdAt     DateTime    @default(now())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String      @unique
+  prescriptions Prescription[]
+}
+
+model Prescription {
+  id            String        @id @default(uuid())
+  medication    String
+  dosage        String
+  instructions  String
+  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId String
+}
