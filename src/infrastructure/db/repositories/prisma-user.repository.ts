@@ -1,10 +1,8 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { UserRepository } from 'src/domain/repositories/user.repository';
 import { PrismaService } from 'src/core/services/prisma.service';
-import * as bcrypt from 'bcrypt';
 import { User } from 'src/domain/entities/user';
 import UniqueEntityCpf from 'src/core/entities/unique-entity-cpf';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
