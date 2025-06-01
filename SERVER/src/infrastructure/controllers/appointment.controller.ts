@@ -57,4 +57,15 @@ export class AppointmentController {
   async getByPatient(@Param('patientId') patientId: string) {
     return this.findPatientAppointments.execute(patientId);
   }
+
+  @Get('available')
+  async getAvailableBySchedule(@Query('scheduleId') scheduleId: string) {
+    return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'disponivel');
+  }
+
+  @Get('employee/me')
+  async getMyAppointments(@Req() req) {
+    const employeeId = req.user.cpf || req.user.id;
+    return this.findEmployeeAppointments.execute(employeeId);
+  }
 } 

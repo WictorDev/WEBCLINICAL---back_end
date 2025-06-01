@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PrismaModule } from './prisma.module';
 import { AppointmentController } from '../controllers/appointment.controller';
 import { PrismaAppointmentRepository } from '../db/repositories/prisma-appointment.repository';
@@ -15,7 +15,7 @@ import { MedicalRecordModule } from './medical-record.module';
 @Module({
   imports: [
     PrismaModule,
-    ScheduleModule,
+    forwardRef(() => ScheduleModule),
     MedicalRecordModule,
   ],
   controllers: [AppointmentController],

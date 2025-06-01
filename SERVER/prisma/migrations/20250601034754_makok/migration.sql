@@ -44,6 +44,7 @@ CREATE TABLE `Type` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `Type_name_key`(`name`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -53,7 +54,7 @@ CREATE TABLE `Employee` (
     `advice` VARCHAR(191) NULL,
     `name` VARCHAR(191) NOT NULL,
     `typeId` VARCHAR(191) NOT NULL,
-    `employeeTypeId` VARCHAR(191) NOT NULL,
+    `employeeTypeId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `Employee_cpf_key`(`cpf`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -84,9 +85,6 @@ CREATE TABLE `Schedule` (
     `date` DATETIME(3) NOT NULL,
     `startTime` VARCHAR(191) NOT NULL,
     `endTime` VARCHAR(191) NOT NULL,
-    `duration` INTEGER NOT NULL,
-    `totalSlots` INTEGER NOT NULL,
-    `availableSlots` INTEGER NOT NULL,
     `employeeId` VARCHAR(191) NOT NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
 
@@ -100,8 +98,8 @@ CREATE TABLE `Appointment` (
     `startTime` VARCHAR(191) NOT NULL,
     `endTime` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
-    `scheduleId` VARCHAR(191) NOT NULL,
-    `patientId` VARCHAR(191) NOT NULL,
+    `scheduleId` VARCHAR(191) NULL,
+    `patientId` VARCHAR(191) NULL,
     `employeeId` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -150,7 +148,7 @@ ALTER TABLE `Admin` ADD CONSTRAINT `Admin_typeId_fkey` FOREIGN KEY (`typeId`) RE
 ALTER TABLE `Employee` ADD CONSTRAINT `Employee_typeId_fkey` FOREIGN KEY (`typeId`) REFERENCES `Type`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Employee` ADD CONSTRAINT `Employee_employeeTypeId_fkey` FOREIGN KEY (`employeeTypeId`) REFERENCES `EmployeeType`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Employee` ADD CONSTRAINT `Employee_employeeTypeId_fkey` FOREIGN KEY (`employeeTypeId`) REFERENCES `EmployeeType`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Employee` ADD CONSTRAINT `Employee_cpf_fkey` FOREIGN KEY (`cpf`) REFERENCES `User`(`cpf`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -159,16 +157,13 @@ ALTER TABLE `Employee` ADD CONSTRAINT `Employee_cpf_fkey` FOREIGN KEY (`cpf`) RE
 ALTER TABLE `Patient` ADD CONSTRAINT `Patient_typeId_fkey` FOREIGN KEY (`typeId`) REFERENCES `Type`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Patient` ADD CONSTRAINT `Patient_cpf_fkey` FOREIGN KEY (`cpf`) REFERENCES `User`(`cpf`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_employeeId_fkey` FOREIGN KEY (`employeeId`) REFERENCES `Employee`(`cpf`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_scheduleId_fkey` FOREIGN KEY (`scheduleId`) REFERENCES `Schedule`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_scheduleId_fkey` FOREIGN KEY (`scheduleId`) REFERENCES `Schedule`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_patientId_fkey` FOREIGN KEY (`patientId`) REFERENCES `Patient`(`cpf`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_patientId_fkey` FOREIGN KEY (`patientId`) REFERENCES `Patient`(`cpf`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_employeeId_fkey` FOREIGN KEY (`employeeId`) REFERENCES `Employee`(`cpf`) ON DELETE RESTRICT ON UPDATE CASCADE;

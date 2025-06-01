@@ -16,6 +16,7 @@ const user_1 = require("../../domain/entities/user");
 const create_admin_usecase_1 = require("../admin/create-admin.usecase");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const type_repository_1 = require("../../domain/repositories/type.repository");
+const bcrypt = require("bcrypt");
 let CreateFirstAdminUseCase = class CreateFirstAdminUseCase {
     userRepository;
     createAdminUseCase;
@@ -31,11 +32,12 @@ let CreateFirstAdminUseCase = class CreateFirstAdminUseCase {
             if (!type) {
                 throw new common_1.BadRequestException('Tipo ADMIN não encontrado no banco de dados');
             }
+            const hashedPassword = await bcrypt.hash(data.password, 10);
             const user = new user_1.User({
                 name: data.name,
                 cpf: new unique_entity_cpf_1.default(data.cpf),
                 email: data.email,
-                password: data.password,
+                password: hashedPassword,
                 companyId: data.companyId,
                 types: [type.name],
                 active: data.active

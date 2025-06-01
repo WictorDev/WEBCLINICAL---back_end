@@ -4,8 +4,8 @@ export interface AppointmentData {
   startTime: string;
   endTime: string;
   status: string;
-  scheduleId?: string;
-  patientId: string;
+  scheduleId: string;
+  patientId?: string | null;
   employeeId: string;
 }
 
@@ -52,20 +52,20 @@ export class Appointment {
     this.data.status = status;
   }
 
-  get scheduleId(): string | undefined {
+  get scheduleId(): string {
     return this.data.scheduleId;
   }
 
-  set scheduleId(scheduleId: string | undefined) {
+  set scheduleId(scheduleId: string) {
+    if (!scheduleId) throw new Error("ID da agenda é obrigatório.");
     this.data.scheduleId = scheduleId;
   }
 
-  get patientId(): string {
+  get patientId(): string | undefined | null {
     return this.data.patientId;
   }
 
-  set patientId(patientId: string) {
-    if (!patientId) throw new Error("ID do paciente é obrigatório.");
+  set patientId(patientId: string | undefined | null) {
     this.data.patientId = patientId;
   }
 

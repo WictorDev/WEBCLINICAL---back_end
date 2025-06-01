@@ -48,10 +48,10 @@ export class CreateAppointmentUseCase {
     // Criar o agendamento
     const newAppointment = await this.appointmentRepository.create(appointment);
 
-    // Atualizar a agenda para indicar que está ocupada
-    await this.scheduleRepository.update(schedule.id, {
-      appointmentId: newAppointment.id
-    });
+    // Atualizar a agenda para indicar que está ocupada (não é mais necessário atualizar appointmentId)
+    // await this.scheduleRepository.update(schedule.id, {
+    //   appointmentId: newAppointment.id
+    // });
 
     return newAppointment;
   }

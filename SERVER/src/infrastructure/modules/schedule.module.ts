@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PrismaModule } from './prisma.module';
 import { ScheduleController } from '../controllers/schedule.controller';
 import { PrismaScheduleRepository } from '../db/repositories/prisma-schedule.repository';
@@ -11,9 +11,13 @@ import { FindSchedulesByEmployeeUseCase } from '../../use-case/schedule/find-sch
 import { FindAvailableSchedulesUseCase } from '../../use-case/schedule/find-available-schedules.usecase';
 import { FindAllAvailableSchedulesUseCase } from '../../use-case/schedule/find-all-avaiable-schedules.usecase';
 import { FindAllSchedulesUseCase } from '../../use-case/schedule/find-all-schedules.usecase';
+import { AppointmentModule } from './appointment.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [
+    PrismaModule,
+    forwardRef(() => AppointmentModule),
+  ],
   controllers: [ScheduleController],
   providers: [
     {

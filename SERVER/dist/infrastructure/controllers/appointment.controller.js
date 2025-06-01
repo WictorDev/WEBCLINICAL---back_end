@@ -60,6 +60,9 @@ let AppointmentController = class AppointmentController {
     async getByPatient(patientId) {
         return this.findPatientAppointments.execute(patientId);
     }
+    async getAvailableBySchedule(scheduleId) {
+        return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'disponivel');
+    }
 };
 exports.AppointmentController = AppointmentController;
 __decorate([
@@ -100,6 +103,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AppointmentController.prototype, "getByPatient", null);
+__decorate([
+    (0, common_1.Get)('available'),
+    __param(0, (0, common_1.Query)('scheduleId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AppointmentController.prototype, "getAvailableBySchedule", null);
 exports.AppointmentController = AppointmentController = __decorate([
     (0, common_1.Controller)('/api/appointments'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),

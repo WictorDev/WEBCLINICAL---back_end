@@ -16,9 +16,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
           date: schedule.date,
           startTime: schedule.startTime,
           endTime: schedule.endTime,
-          duration: schedule.duration,
           employeeId: schedule.employeeId,
-          appointmentId: schedule.appointmentId,
           active: schedule.active
         }
       });
@@ -28,9 +26,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         date: created.date,
         startTime: created.startTime,
         endTime: created.endTime,
-        duration: created.duration,
         employeeId: created.employeeId,
-        appointmentId: created.appointmentId || undefined,
         active: created.active
       });
     } catch (error) {
@@ -51,8 +47,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
           date: data.date,
           startTime: data.startTime,
           endTime: data.endTime,
-          duration: data.duration,
-          appointmentId: data.appointmentId,
           employeeId: data.employeeId,
           active: data.active
         }
@@ -63,8 +57,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         date: updated.date,
         startTime: updated.startTime,
         endTime: updated.endTime,
-        duration: updated.duration,
-        appointmentId: updated.appointmentId || undefined,
         employeeId: updated.employeeId,
         active: updated.active
       });
@@ -105,8 +97,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       date: schedule.date,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      duration: schedule.duration,
-      appointmentId: schedule.appointmentId || undefined,
       employeeId: schedule.employeeId,
       active: schedule.active
     });
@@ -119,8 +109,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         date: true,
         startTime: true,
         endTime: true,
-        duration: true,
-        appointmentId: true,
         employeeId: true,
         active: true
       }
@@ -131,8 +119,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       date: schedule.date,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      duration: schedule.duration,
-      appointmentId: schedule.appointmentId || undefined,
       employeeId: schedule.employeeId,
       active: schedule.active
     }));
@@ -146,8 +132,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         date: true,
         startTime: true,
         endTime: true,
-        duration: true,
-        appointmentId: true,
         employeeId: true,
         active: true
       }
@@ -158,9 +142,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       date: schedule.date,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      duration: schedule.duration,
       employeeId: schedule.employeeId,
-      appointmentId: schedule.appointmentId || undefined,
       active: schedule.active
     }));
   }
@@ -169,16 +151,13 @@ export class PrismaScheduleRepository implements ScheduleRepository {
     const schedules = await this.prisma.schedule.findMany({
       where: { 
         employeeId,
-        active,
-        appointmentId: null
+        active
       },
       select: {
         id: true,
         date: true,
         startTime: true,
         endTime: true,
-        duration: true,
-        appointmentId: true,
         employeeId: true,
         active: true
       }
@@ -189,9 +168,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       date: schedule.date,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      duration: schedule.duration,
       employeeId: schedule.employeeId,
-      appointmentId: schedule.appointmentId || undefined,
       active: schedule.active
     }));
   }
@@ -216,8 +193,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         date: true,
         startTime: true,
         endTime: true,
-        duration: true,
-        appointmentId: true,
         employeeId: true,
         active: true
       }
@@ -228,9 +203,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       date: schedule.date,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      duration: schedule.duration,
       employeeId: schedule.employeeId,
-      appointmentId: schedule.appointmentId || undefined,
       active: schedule.active
     }));
   }
@@ -246,7 +219,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       where: {
         employeeId,
         active,
-        appointmentId: null,
         date: {
           gte: startOfDay,
           lte: endOfDay
@@ -257,8 +229,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         date: true,
         startTime: true,
         endTime: true,
-        duration: true,
-        appointmentId: true,
         employeeId: true,
         active: true
       }
@@ -269,9 +239,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       date: schedule.date,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      duration: schedule.duration,
       employeeId: schedule.employeeId,
-      appointmentId: schedule.appointmentId || undefined,
       active: schedule.active
     }));
   }
@@ -283,7 +251,6 @@ export class PrismaScheduleRepository implements ScheduleRepository {
       const schedules = await this.prisma.schedule.findMany({
         where: { 
           active: true,
-          appointmentId: null,
           date: { gte: today }
         },
         include: {
@@ -303,9 +270,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         date: schedule.date,
         startTime: schedule.startTime,
         endTime: schedule.endTime,
-        duration: schedule.duration,
         employeeId: schedule.employeeId,
-        appointmentId: schedule.appointmentId || undefined,
         active: schedule.active,
         employee: schedule.employee ? { name: schedule.employee.name } : undefined
       }));

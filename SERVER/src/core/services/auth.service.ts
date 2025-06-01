@@ -15,12 +15,22 @@ export class AuthService {
 
     // Busca nas duas tabelas
     const [userData, patient] = await Promise.all([
-      this.prismaService.user.findUnique({
-        where: { cpf: loginData.identifier },
+      this.prismaService.user.findFirst({
+        where: {
+          OR: [
+            { cpf: loginData.identifier },
+            { email: loginData.identifier }
+          ]
+        },
         include: { types: { include: { type: true } } }
       }),
-      this.prismaService.patient.findUnique({
-        where: { cpf: loginData.identifier },
+      this.prismaService.patient.findFirst({
+        where: {
+          OR: [
+            { cpf: loginData.identifier },
+            { email: loginData.identifier }
+          ]
+        },
         include: { type: true }
       })
     ]);

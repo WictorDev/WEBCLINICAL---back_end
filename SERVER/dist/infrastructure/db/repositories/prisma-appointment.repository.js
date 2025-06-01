@@ -25,14 +25,17 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
         });
         if (!appointment)
             return null;
+        if (!appointment.scheduleId) {
+            throw new Error('Appointment sem scheduleId não é permitido!');
+        }
         return new appointment_1.Appointment({
             id: appointment.id,
             date: appointment.date,
             startTime: appointment.startTime,
             endTime: appointment.endTime,
             status: appointment.status,
-            scheduleId: appointment.scheduleId || undefined,
-            patientId: appointment.patientId,
+            scheduleId: appointment.scheduleId,
+            patientId: appointment.patientId === null ? undefined : appointment.patientId,
             employeeId: appointment.employeeId
         });
     }
@@ -46,18 +49,21 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
                     endTime: data.endTime,
                     status: data.status,
                     scheduleId: data.scheduleId,
-                    patientId: data.patientId,
+                    patientId: data.patientId === null ? undefined : data.patientId,
                     employeeId: data.employeeId
                 }
             });
+            if (!updated.scheduleId) {
+                throw new Error('Appointment sem scheduleId não é permitido!');
+            }
             return new appointment_1.Appointment({
                 id: updated.id,
                 date: updated.date,
                 startTime: updated.startTime,
                 endTime: updated.endTime,
                 status: updated.status,
-                scheduleId: updated.scheduleId || undefined,
-                patientId: updated.patientId,
+                scheduleId: updated.scheduleId,
+                patientId: data.patientId === null ? undefined : data.patientId,
                 employeeId: updated.employeeId
             });
         }
@@ -84,7 +90,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
             endTime: appointment.endTime,
             status: appointment.status,
             scheduleId: appointment.scheduleId || undefined,
-            patientId: appointment.patientId,
+            patientId: appointment.patientId === null ? undefined : appointment.patientId,
             employeeId: appointment.employeeId,
             employee: appointment.employee ? { name: appointment.employee.name } : undefined
         }));
@@ -98,16 +104,21 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
             }
         } : { employeeId };
         const appointments = await this.prisma.appointment.findMany({ where });
-        return appointments.map(appointment => new appointment_1.Appointment({
-            id: appointment.id,
-            date: appointment.date,
-            startTime: appointment.startTime,
-            endTime: appointment.endTime,
-            status: appointment.status,
-            scheduleId: appointment.scheduleId || undefined,
-            patientId: appointment.patientId,
-            employeeId: appointment.employeeId
-        }));
+        return appointments.map(appointment => {
+            if (!appointment.scheduleId) {
+                throw new Error('Appointment sem scheduleId não é permitido!');
+            }
+            return new appointment_1.Appointment({
+                id: appointment.id,
+                date: appointment.date,
+                startTime: appointment.startTime,
+                endTime: appointment.endTime,
+                status: appointment.status,
+                scheduleId: appointment.scheduleId,
+                patientId: appointment.patientId === null ? undefined : appointment.patientId,
+                employeeId: appointment.employeeId
+            });
+        });
     }
     async create(appointment) {
         try {
@@ -118,18 +129,21 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
                     endTime: appointment.endTime,
                     status: appointment.status,
                     scheduleId: appointment.scheduleId,
-                    patientId: appointment.patientId,
+                    patientId: appointment.patientId === null ? undefined : appointment.patientId,
                     employeeId: appointment.employeeId
                 }
             });
+            if (!created.scheduleId) {
+                throw new Error('Appointment sem scheduleId não é permitido!');
+            }
             return new appointment_1.Appointment({
                 id: created.id,
                 date: created.date,
                 startTime: created.startTime,
                 endTime: created.endTime,
                 status: created.status,
-                scheduleId: created.scheduleId || undefined,
-                patientId: created.patientId,
+                scheduleId: created.scheduleId,
+                patientId: appointment.patientId === null ? undefined : appointment.patientId,
                 employeeId: created.employeeId
             });
         }
@@ -151,14 +165,17 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
                 where: { id: id.toString() },
                 data: { status }
             });
+            if (!updated.scheduleId) {
+                throw new Error('Appointment sem scheduleId não é permitido!');
+            }
             return new appointment_1.Appointment({
                 id: updated.id,
                 date: updated.date,
                 startTime: updated.startTime,
                 endTime: updated.endTime,
                 status: updated.status,
-                scheduleId: updated.scheduleId || undefined,
-                patientId: updated.patientId,
+                scheduleId: updated.scheduleId,
+                patientId: updated.patientId === null ? undefined : updated.patientId,
                 employeeId: updated.employeeId
             });
         }
@@ -168,6 +185,29 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
             }
             throw error;
         }
+    }
+    async findByScheduleIdAndStatus(scheduleId, status) {
+        const appointments = await this.prisma.appointment.findMany({
+            where: {
+                scheduleId,
+                status
+            }
+        });
+        return appointments.map(appointment => {
+            if (!appointment.scheduleId) {
+                throw new Error('Appointment sem scheduleId não é permitido!');
+            }
+            return new appointment_1.Appointment({
+                id: appointment.id,
+                date: appointment.date,
+                startTime: appointment.startTime,
+                endTime: appointment.endTime,
+                status: appointment.status,
+                scheduleId: appointment.scheduleId,
+                patientId: appointment.patientId === null ? undefined : appointment.patientId,
+                employeeId: appointment.employeeId
+            });
+        });
     }
 };
 exports.PrismaAppointmentRepository = PrismaAppointmentRepository;

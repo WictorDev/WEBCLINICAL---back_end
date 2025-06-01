@@ -41,9 +41,6 @@ let CreateAppointmentUseCase = class CreateAppointmentUseCase {
             throw new common_1.BadRequestException('Conflito de horário para este funcionário.');
         }
         const newAppointment = await this.appointmentRepository.create(appointment);
-        await this.scheduleRepository.update(schedule.id, {
-            appointmentId: newAppointment.id
-        });
         return newAppointment;
     }
 };

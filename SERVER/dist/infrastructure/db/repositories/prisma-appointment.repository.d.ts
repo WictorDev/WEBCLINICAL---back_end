@@ -11,4 +11,5 @@ export declare class PrismaAppointmentRepository implements AppointmentRepositor
     findByEmployee(employeeId: string, date?: Date): Promise<Appointment[]>;
     create(appointment: Appointment): Promise<Appointment>;
     updateStatus(id: UniqueEntityID, status: string): Promise<Appointment>;
+    findByScheduleIdAndStatus(scheduleId: string, status: string): Promise<Appointment[]>;
 }

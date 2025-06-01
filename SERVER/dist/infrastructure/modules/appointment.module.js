@@ -27,7 +27,7 @@ exports.AppointmentModule = AppointmentModule = __decorate([
     (0, common_1.Module)({
         imports: [
             prisma_module_1.PrismaModule,
-            schedule_module_1.ScheduleModule,
+            (0, common_1.forwardRef)(() => schedule_module_1.ScheduleModule),
             medical_record_module_1.MedicalRecordModule,
         ],
         controllers: [appointment_controller_1.AppointmentController],
