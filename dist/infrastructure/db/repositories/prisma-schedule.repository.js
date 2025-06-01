@@ -237,7 +237,7 @@ let PrismaScheduleRepository = class PrismaScheduleRepository {
             active: schedule.active
         }));
     }
-    async findAllAvailable() {
+    async findAllAvailable(includeAppointments = false) {
         try {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -251,7 +251,22 @@ let PrismaScheduleRepository = class PrismaScheduleRepository {
                         select: {
                             name: true,
                         }
-                    }
+                    },
+                    appointments: includeAppointments ? {
+                        select: {
+                            id: true,
+                            date: true,
+                            startTime: true,
+                            endTime: true,
+                            status: true,
+                            patient: {
+                                select: {
+                                    name: true,
+                                    cpf: true
+                                }
+                            }
+                        }
+                    } : false
                 },
                 orderBy: {
                     date: 'asc'
@@ -264,7 +279,8 @@ let PrismaScheduleRepository = class PrismaScheduleRepository {
                 endTime: schedule.endTime,
                 employeeId: schedule.employeeId,
                 active: schedule.active,
-                employee: schedule.employee ? { name: schedule.employee.name } : undefined
+                employee: schedule.employee ? { name: schedule.employee.name } : undefined,
+                appointments: schedule.appointments || []
             }));
         }
         catch (error) {

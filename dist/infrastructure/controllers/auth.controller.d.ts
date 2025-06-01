@@ -9,7 +9,7 @@ export declare class AuthController {
     }, res: Response): Promise<Response<any, Record<string, any>>>;
     logout(res: Response): Response<any, Record<string, any>>;
     getProfile(req: any): {
-        id: any;
+        cpf: any;
         tipos: any;
         name: any;
         iat: any;

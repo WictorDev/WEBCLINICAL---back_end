@@ -49,8 +49,8 @@ let ScheduleController = class ScheduleController {
     async delete(id) {
         return this.deleteScheduleUseCase.execute(id);
     }
-    async findAllAvailable() {
-        return this.findAllAvailableSchedulesUseCase.execute(true);
+    async findAllAvailable(includeAppointments) {
+        return this.findAllAvailableSchedulesUseCase.execute(true, includeAppointments);
     }
     async findById(id) {
         return this.findScheduleByIdUseCase.execute(id);
@@ -161,10 +161,12 @@ __decorate([
 ], ScheduleController.prototype, "delete", null);
 __decorate([
     (0, common_1.Get)('available'),
-    (0, swagger_1.ApiOperation)({ summary: 'Listar agendas disponíveis' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de agendas disponíveis encontrada' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Lista todas as agendas disponíveis' }),
+    (0, swagger_1.ApiQuery)({ name: 'includeAppointments', required: false, type: Boolean }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de agendas disponíveis' }),
+    __param(0, (0, common_1.Query)('includeAppointments')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Boolean]),
     __metadata("design:returntype", Promise)
 ], ScheduleController.prototype, "findAllAvailable", null);
 __decorate([

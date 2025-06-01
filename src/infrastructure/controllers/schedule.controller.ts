@@ -130,11 +130,11 @@ export class ScheduleController {
   }
 
   @Get('available')
-  @ApiOperation({ summary: 'Listar agendas disponíveis' })
-  @ApiResponse({ status: 200, description: 'Lista de agendas disponíveis encontrada' })
-  async findAllAvailable(
-  ): Promise<Schedule[]> {
-    return this.findAllAvailableSchedulesUseCase.execute(true);
+  @ApiOperation({ summary: 'Lista todas as agendas disponíveis' })
+  @ApiQuery({ name: 'includeAppointments', required: false, type: Boolean })
+  @ApiResponse({ status: 200, description: 'Lista de agendas disponíveis' })
+  async findAllAvailable(@Query('includeAppointments') includeAppointments?: boolean) {
+    return this.findAllAvailableSchedulesUseCase.execute(true, includeAppointments);
   }
 
   @Get(':id')

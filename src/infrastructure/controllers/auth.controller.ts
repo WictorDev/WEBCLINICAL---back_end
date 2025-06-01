@@ -56,7 +56,7 @@ export class AuthController {
     }
     // req.user já é o payload do JWT
     return {
-      id: req.user.id,
+      cpf: req.user.cpf,
       tipos: req.user.tipos,
       name: req.user.name,
       iat: req.user.iat,

@@ -18,6 +18,7 @@ const create_appointment_usecase_1 = require("../../use-case/appointment/create-
 const find_employee_appointments_usecase_1 = require("../../use-case/appointment/find-employee-appointments.usecase");
 const finalize_appointment_usecase_1 = require("../../use-case/appointment/finalize-appointment.usecase");
 const update_appointment_status_usecase_1 = require("../../use-case/appointment/update-appointment-status.usecase");
+const update_appointment_patient_usecase_1 = require("../../use-case/appointment/update-appointment-patient.usecase");
 const appointment_1 = require("../../domain/entities/appointment");
 const jwt_guard_1 = require("../auth/jwt.guard");
 const crypto_1 = require("crypto");
@@ -27,12 +28,14 @@ let AppointmentController = class AppointmentController {
     findEmployeeAppointments;
     finalizeAppointment;
     updateAppointmentStatus;
+    updateAppointmentPatient;
     findPatientAppointments;
-    constructor(createAppointment, findEmployeeAppointments, finalizeAppointment, updateAppointmentStatus, findPatientAppointments) {
+    constructor(createAppointment, findEmployeeAppointments, finalizeAppointment, updateAppointmentStatus, updateAppointmentPatient, findPatientAppointments) {
         this.createAppointment = createAppointment;
         this.findEmployeeAppointments = findEmployeeAppointments;
         this.finalizeAppointment = finalizeAppointment;
         this.updateAppointmentStatus = updateAppointmentStatus;
+        this.updateAppointmentPatient = updateAppointmentPatient;
         this.findPatientAppointments = findPatientAppointments;
     }
     async create(body) {
@@ -57,11 +60,16 @@ let AppointmentController = class AppointmentController {
     async updateStatus(id, body) {
         return this.updateAppointmentStatus.execute(id, body.status);
     }
+    async updatePatient(id, body) {
+        console.log('CPF do agendamento:', id);
+        console.log('CPF do paciente recebido:', body.patientId);
+        return this.updateAppointmentPatient.execute(id, body.patientId);
+    }
     async getByPatient(patientId) {
         return this.findPatientAppointments.execute(patientId);
     }
     async getAvailableBySchedule(scheduleId) {
-        return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'disponivel');
+        return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'DISPONIVEL');
     }
     async getMyAppointments(req) {
         const employeeId = req.user.cpf || req.user.id;
@@ -101,6 +109,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AppointmentController.prototype, "updateStatus", null);
 __decorate([
+    (0, common_1.Patch)(':id/patient'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AppointmentController.prototype, "updatePatient", null);
+__decorate([
     (0, common_1.Get)('patient/:patientId'),
     __param(0, (0, common_1.Param)('patientId')),
     __metadata("design:type", Function),
@@ -128,6 +144,7 @@ exports.AppointmentController = AppointmentController = __decorate([
         find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,
         finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
         update_appointment_status_usecase_1.UpdateAppointmentStatusUseCase,
+        update_appointment_patient_usecase_1.UpdateAppointmentPatientUseCase,
         find_patient_appointments_usecase_1.FindPatientAppointmentsUseCase])
 ], AppointmentController);
 //# sourceMappingURL=appointment.controller.js.map

@@ -86,7 +86,7 @@ export class CreateScheduleUseCase {
         endTime: slotEnd.toTimeString().slice(0,5),
         scheduleId: createdSchedule.id,
         employeeId: data.employeeId,
-        status: 'disponivel',
+        status: 'DISPONIVEL',
         patientId: undefined
       }));
       slotStart = slotEnd;

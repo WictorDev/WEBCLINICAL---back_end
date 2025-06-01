@@ -89,7 +89,7 @@ let AuthService = class AuthService {
         }
         const tipos = user.types.map((t) => t.type.name);
         const payload = {
-            id: user.cpf,
+            cpf: user.cpf,
             tipos: tipos,
             name: user.name,
             companyId: user.companyId
@@ -100,6 +100,7 @@ let AuthService = class AuthService {
             token: accessToken,
             tipos: tipos,
             nome: user.name,
+            cpf: user.cpf,
             iat: now,
             exp: now + 3600,
             companyId: user.companyId

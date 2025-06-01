@@ -2,16 +2,15 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../../core/services/prisma.service';
 import { AppointmentRepository } from '../../../domain/repositories/appointment.repository';
 import { Appointment } from '../../../domain/entities/appointment';
-import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PrismaAppointmentRepository implements AppointmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: UniqueEntityID): Promise<Appointment | null> {
+  async findById(id: string): Promise<Appointment | null> {
     const appointment = await this.prisma.appointment.findUnique({
-      where: { id: id.toString() }
+      where: { id }
     });
 
     if (!appointment) return null;
@@ -31,10 +30,10 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     });
   }
 
-  async update(id: UniqueEntityID, data: Partial<Appointment>): Promise<Appointment> {
+  async update(id: string, data: Partial<Appointment>): Promise<Appointment> {
     try {
       const updated = await this.prisma.appointment.update({
-        where: { id: id.toString() },
+        where: { id },
         data: {
           date: data.date,
           startTime: data.startTime,
@@ -158,10 +157,10 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     }
   }
 
-  async updateStatus(id: UniqueEntityID, status: string): Promise<Appointment> {
+  async updateStatus(id: string, status: string): Promise<Appointment> {
     try {
       const updated = await this.prisma.appointment.update({
-        where: { id: id.toString() },
+        where: { id },
         data: { status }
       });
 

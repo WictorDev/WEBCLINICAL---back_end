@@ -60,7 +60,7 @@ let AuthController = class AuthController {
             throw new common_1.UnauthorizedException('Usuário não autenticado');
         }
         return {
-            id: req.user.id,
+            cpf: req.user.cpf,
             tipos: req.user.tipos,
             name: req.user.name,
             iat: req.user.iat,

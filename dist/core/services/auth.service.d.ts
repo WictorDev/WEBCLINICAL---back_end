@@ -11,6 +11,7 @@ export declare class AuthService {
         token: string;
         tipos: any;
         nome: any;
+        cpf: any;
         iat: number;
         exp: number;
         companyId: any;

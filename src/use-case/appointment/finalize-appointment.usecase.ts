@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { MedicalRecordRepository } from '../../domain/repositories/medical-record.repository';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 import { MedicalRecord } from '../../domain/entities/medical-record';
-import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 
 @Injectable()
 export class FinalizeAppointmentUseCase {
@@ -13,7 +12,7 @@ export class FinalizeAppointmentUseCase {
 
   async execute(appointmentId: string, data: Omit<MedicalRecord, 'id' | 'createdAt'>): Promise<MedicalRecord> {
     // Verificar se o agendamento pode ser finalizado
-    const appointment = await this.appointmentRepository.findById(new UniqueEntityID(appointmentId));
+    const appointment = await this.appointmentRepository.findById(appointmentId);
     
     if (!appointment) {
       throw new Error('Agendamento não encontrado.');
@@ -24,7 +23,7 @@ export class FinalizeAppointmentUseCase {
     }
 
     // Finalizar o agendamento
-    await this.appointmentRepository.updateStatus(new UniqueEntityID(appointmentId), 'FINALIZADO');
+    await this.appointmentRepository.updateStatus(appointmentId, 'FINALIZADO');
     // Cria o prontuário
     const record = await this.medicalRecordRepository.create({
       ...data,

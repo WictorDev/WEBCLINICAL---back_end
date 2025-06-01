@@ -90,7 +90,7 @@ export class AuthService {
     const tipos = user.types.map((t: any) => t.type.name);
 
     const payload = {
-      id: user.cpf,
+      cpf: user.cpf,
       tipos: tipos,
       name: user.name,
       companyId: user.companyId
@@ -102,6 +102,7 @@ export class AuthService {
       token: accessToken, 
       tipos: tipos, 
       nome: user.name,
+      cpf: user.cpf,
       iat: now,
       exp: now + 3600,
       companyId: user.companyId

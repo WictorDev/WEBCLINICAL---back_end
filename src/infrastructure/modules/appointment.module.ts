@@ -9,6 +9,7 @@ import { UpdateAppointmentStatusUseCase } from '../../use-case/appointment/updat
 import { FinalizeAppointmentUseCase } from '../../use-case/appointment/finalize-appointment.usecase';
 import { FindEmployeeAppointmentsUseCase } from '../../use-case/appointment/find-employee-appointments.usecase';
 import { FindPatientAppointmentsUseCase } from '../../use-case/appointment/find-patient-appointments.usecase';
+import { UpdateAppointmentPatientUseCase } from '../../use-case/appointment/update-appointment-patient.usecase';
 import { ScheduleModule } from './schedule.module';
 import { MedicalRecordModule } from './medical-record.module';
 
@@ -31,6 +32,7 @@ import { MedicalRecordModule } from './medical-record.module';
     FinalizeAppointmentUseCase,
     FindEmployeeAppointmentsUseCase,
     FindPatientAppointmentsUseCase,
+    UpdateAppointmentPatientUseCase,
   ],
   exports: [
     AppointmentRepository,
@@ -41,6 +43,7 @@ import { MedicalRecordModule } from './medical-record.module';
     FinalizeAppointmentUseCase,
     FindEmployeeAppointmentsUseCase,
     FindPatientAppointmentsUseCase,
+    UpdateAppointmentPatientUseCase,
   ],
 })
 export class AppointmentModule {} 

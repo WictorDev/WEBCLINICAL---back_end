@@ -10,8 +10,8 @@ export declare class PrismaScheduleRepository implements ScheduleRepository {
     findById(id: string): Promise<Schedule | null>;
     findAll(): Promise<Schedule[]>;
     findByEmployeeId(employeeId: string): Promise<Schedule[]>;
-    findAvailableByEmployeeId(employeeId: string, active: true): Promise<Schedule[]>;
+    findAvailableByEmployeeId(employeeId: string, active: boolean): Promise<Schedule[]>;
     findByDate(employeeId: string, date: Date): Promise<Schedule[]>;
-    findAvailableByDate(employeeId: string, date: Date, active: true): Promise<Schedule[]>;
-    findAllAvailable(): Promise<any[]>;
+    findAvailableByDate(employeeId: string, date: Date, active: boolean): Promise<Schedule[]>;
+    findAllAvailable(includeAppointments?: boolean): Promise<any[]>;
 }

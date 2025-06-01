@@ -147,7 +147,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
     }));
   }
 
-  async findAvailableByEmployeeId(employeeId: string, active: true): Promise<Schedule[]> {
+  async findAvailableByEmployeeId(employeeId: string, active: boolean): Promise<Schedule[]> {
     const schedules = await this.prisma.schedule.findMany({
       where: { 
         employeeId,
@@ -208,7 +208,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
     }));
   }
 
-  async findAvailableByDate(employeeId: string, date: Date, active: true): Promise<Schedule[]> {
+  async findAvailableByDate(employeeId: string, date: Date, active: boolean): Promise<Schedule[]> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     
@@ -244,7 +244,7 @@ export class PrismaScheduleRepository implements ScheduleRepository {
     }));
   }
 
-  async findAllAvailable(): Promise<any[]> {    
+  async findAllAvailable(includeAppointments = false): Promise<any[]> {    
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -258,7 +258,22 @@ export class PrismaScheduleRepository implements ScheduleRepository {
             select: {
               name: true,
             }
-          }
+          },
+          appointments: includeAppointments ? {
+            select: {
+              id: true,
+              date: true,
+              startTime: true,
+              endTime: true,
+              status: true,
+              patient: {
+                select: {
+                  name: true,
+                  cpf: true
+                }
+              }
+            }
+          } : false
         },
         orderBy: {
           date: 'asc'
@@ -272,7 +287,8 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         endTime: schedule.endTime,
         employeeId: schedule.employeeId,
         active: schedule.active,
-        employee: schedule.employee ? { name: schedule.employee.name } : undefined
+        employee: schedule.employee ? { name: schedule.employee.name } : undefined,
+        appointments: schedule.appointments || []
       }));
     } catch (error) {
       throw error;

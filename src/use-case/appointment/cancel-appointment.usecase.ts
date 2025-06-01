@@ -1,7 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 import { ScheduleRepository } from '../../domain/repositories/schedule.repository';
-import { UniqueEntityID } from '../../core/entities/unique-entity-id';
 
 @Injectable()
 export class CancelAppointmentUseCase {
@@ -11,7 +10,7 @@ export class CancelAppointmentUseCase {
   ) {}
 
   async execute(id: string): Promise<void> {
-    const appointment = await this.appointmentRepository.findById(new UniqueEntityID(id));
+    const appointment = await this.appointmentRepository.findById(id);
     if (!appointment) {
       throw new BadRequestException('Agendamento não encontrado.');
     }
@@ -32,7 +31,7 @@ export class CancelAppointmentUseCase {
     }
 
     // Atualizar o status do agendamento
-    await this.appointmentRepository.updateStatus(new UniqueEntityID(id), 'CANCELADO');
+    await this.appointmentRepository.updateStatus(id, 'CANCELADO');
 
     // Liberar a agenda (não é mais necessário atualizar appointmentId)
     // await this.scheduleRepository.update(schedule.id, {

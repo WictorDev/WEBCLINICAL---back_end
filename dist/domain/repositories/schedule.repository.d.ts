@@ -6,8 +6,8 @@ export declare abstract class ScheduleRepository {
     abstract findById(id: string): Promise<Schedule | null>;
     abstract findAll(): Promise<Schedule[]>;
     abstract findByEmployeeId(employeeId: string): Promise<Schedule[]>;
-    abstract findAvailableByEmployeeId(employeeId: string, active: true): Promise<Schedule[]>;
+    abstract findAvailableByEmployeeId(employeeId: string, active: boolean): Promise<Schedule[]>;
     abstract findByDate(employeeId: string, date: Date): Promise<Schedule[]>;
-    abstract findAvailableByDate(employeeId: string, date: Date, active: true): Promise<Schedule[]>;
-    abstract findAllAvailable(active: true): Promise<Schedule[]>;
+    abstract findAvailableByDate(employeeId: string, date: Date, active: boolean): Promise<Schedule[]>;
+    abstract findAllAvailable(includeAppointments?: boolean): Promise<any[]>;
 }

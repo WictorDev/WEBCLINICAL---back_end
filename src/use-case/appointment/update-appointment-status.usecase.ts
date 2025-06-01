@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 import { Appointment } from '../../domain/entities/appointment';
-import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 
 @Injectable()
 export class UpdateAppointmentStatusUseCase {
@@ -17,7 +16,7 @@ export class UpdateAppointmentStatusUseCase {
     }
     
     // Verificar se o agendamento existe
-    const appointment = await this.appointmentRepository.findById(new UniqueEntityID(appointmentId));
+    const appointment = await this.appointmentRepository.findById(appointmentId);
     
     if (!appointment) {
       throw new Error('Agendamento não encontrado.');
@@ -29,6 +28,6 @@ export class UpdateAppointmentStatusUseCase {
     }
     
     // Atualizar o status
-    return this.appointmentRepository.updateStatus(new UniqueEntityID(appointmentId), status);
+    return this.appointmentRepository.updateStatus(appointmentId, status);
   }
 } 

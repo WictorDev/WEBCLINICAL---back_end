@@ -21,7 +21,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
     }
     async findById(id) {
         const appointment = await this.prisma.appointment.findUnique({
-            where: { id: id.toString() }
+            where: { id }
         });
         if (!appointment)
             return null;
@@ -42,7 +42,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
     async update(id, data) {
         try {
             const updated = await this.prisma.appointment.update({
-                where: { id: id.toString() },
+                where: { id },
                 data: {
                     date: data.date,
                     startTime: data.startTime,
@@ -162,7 +162,7 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
     async updateStatus(id, status) {
         try {
             const updated = await this.prisma.appointment.update({
-                where: { id: id.toString() },
+                where: { id },
                 data: { status }
             });
             if (!updated.scheduleId) {

@@ -17,8 +17,8 @@ let FindAllAvailableSchedulesUseCase = class FindAllAvailableSchedulesUseCase {
     constructor(scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
-    async execute(active) {
-        const result = await this.scheduleRepository.findAllAvailable(active);
+    async execute(active = true, includeAppointments = false) {
+        const result = await this.scheduleRepository.findAllAvailable(includeAppointments);
         return result;
     }
 };

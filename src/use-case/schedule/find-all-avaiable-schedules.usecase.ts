@@ -6,8 +6,8 @@ import { Schedule } from '../../domain/entities/schedule';
 export class FindAllAvailableSchedulesUseCase {
   constructor(private readonly scheduleRepository: ScheduleRepository) {}
 
-  async execute(active: true): Promise<any[]> {
-    const result = await this.scheduleRepository.findAllAvailable(active);
+  async execute(active: boolean = true, includeAppointments = false): Promise<any[]> {
+    const result = await this.scheduleRepository.findAllAvailable(includeAppointments);
     return result;
   }
 } 

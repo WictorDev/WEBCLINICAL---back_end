@@ -3,6 +3,7 @@ import { CreateAppointmentUseCase } from '../../use-case/appointment/create-appo
 import { FindEmployeeAppointmentsUseCase } from '../../use-case/appointment/find-employee-appointments.usecase';
 import { FinalizeAppointmentUseCase } from '../../use-case/appointment/finalize-appointment.usecase';
 import { UpdateAppointmentStatusUseCase } from '../../use-case/appointment/update-appointment-status.usecase';
+import { UpdateAppointmentPatientUseCase } from '../../use-case/appointment/update-appointment-patient.usecase';
 import { Appointment } from '../../domain/entities/appointment';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { randomUUID } from 'crypto';
@@ -17,6 +18,7 @@ export class AppointmentController {
     private readonly findEmployeeAppointments: FindEmployeeAppointmentsUseCase,
     private readonly finalizeAppointment: FinalizeAppointmentUseCase,
     private readonly updateAppointmentStatus: UpdateAppointmentStatusUseCase,
+    private readonly updateAppointmentPatient: UpdateAppointmentPatientUseCase,
     private readonly findPatientAppointments: FindPatientAppointmentsUseCase,
   ) {}
 
@@ -53,6 +55,13 @@ export class AppointmentController {
     return this.updateAppointmentStatus.execute(id, body.status);
   }
 
+  @Patch(':id/patient')
+  async updatePatient(@Param('id') id: string, @Body() body: { patientId: string }) {
+    console.log('CPF do agendamento:', id);
+    console.log('CPF do paciente recebido:', body.patientId);
+    return this.updateAppointmentPatient.execute(id, body.patientId);
+  }
+
   @Get('patient/:patientId')
   async getByPatient(@Param('patientId') patientId: string) {
     return this.findPatientAppointments.execute(patientId);
@@ -60,7 +69,7 @@ export class AppointmentController {
 
   @Get('available')
   async getAvailableBySchedule(@Query('scheduleId') scheduleId: string) {
-    return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'disponivel');
+    return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'DISPONIVEL');
   }
 
   @Get('employee/me')

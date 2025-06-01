@@ -18,6 +18,7 @@ const update_appointment_status_usecase_1 = require("../../use-case/appointment/
 const finalize_appointment_usecase_1 = require("../../use-case/appointment/finalize-appointment.usecase");
 const find_employee_appointments_usecase_1 = require("../../use-case/appointment/find-employee-appointments.usecase");
 const find_patient_appointments_usecase_1 = require("../../use-case/appointment/find-patient-appointments.usecase");
+const update_appointment_patient_usecase_1 = require("../../use-case/appointment/update-appointment-patient.usecase");
 const schedule_module_1 = require("./schedule.module");
 const medical_record_module_1 = require("./medical-record.module");
 let AppointmentModule = class AppointmentModule {
@@ -43,6 +44,7 @@ exports.AppointmentModule = AppointmentModule = __decorate([
             finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
             find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,
             find_patient_appointments_usecase_1.FindPatientAppointmentsUseCase,
+            update_appointment_patient_usecase_1.UpdateAppointmentPatientUseCase,
         ],
         exports: [
             appointment_repository_1.AppointmentRepository,
@@ -53,6 +55,7 @@ exports.AppointmentModule = AppointmentModule = __decorate([
             finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
             find_employee_appointments_usecase_1.FindEmployeeAppointmentsUseCase,
             find_patient_appointments_usecase_1.FindPatientAppointmentsUseCase,
+            update_appointment_patient_usecase_1.UpdateAppointmentPatientUseCase,
         ],
     })
 ], AppointmentModule);

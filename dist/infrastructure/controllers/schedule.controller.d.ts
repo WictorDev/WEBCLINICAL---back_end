@@ -31,7 +31,7 @@ export declare class ScheduleController {
         active?: boolean;
     }): Promise<Schedule>;
     delete(id: string): Promise<void>;
-    findAllAvailable(): Promise<Schedule[]>;
+    findAllAvailable(includeAppointments?: boolean): Promise<any[]>;
     findById(id: string): Promise<Schedule>;
     findByEmployee(employeeId: string, date?: Date): Promise<Schedule[]>;
     findAvailable(employeeId: string, date?: Date): Promise<Schedule[]>;
