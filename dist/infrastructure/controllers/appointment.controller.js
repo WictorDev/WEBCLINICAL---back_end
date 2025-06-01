@@ -63,6 +63,10 @@ let AppointmentController = class AppointmentController {
     async getAvailableBySchedule(scheduleId) {
         return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'disponivel');
     }
+    async getMyAppointments(req) {
+        const employeeId = req.user.cpf || req.user.id;
+        return this.findEmployeeAppointments.execute(employeeId);
+    }
 };
 exports.AppointmentController = AppointmentController;
 __decorate([
@@ -110,6 +114,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AppointmentController.prototype, "getAvailableBySchedule", null);
+__decorate([
+    (0, common_1.Get)('employee/me'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AppointmentController.prototype, "getMyAppointments", null);
 exports.AppointmentController = AppointmentController = __decorate([
     (0, common_1.Controller)('/api/appointments'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),

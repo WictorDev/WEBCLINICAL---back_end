@@ -20,4 +20,5 @@ export declare class AppointmentController {
     }): Promise<Appointment>;
     getByPatient(patientId: string): Promise<Appointment[]>;
     getAvailableBySchedule(scheduleId: string): Promise<Appointment[]>;
+    getMyAppointments(req: any): Promise<Appointment[]>;
 }
