@@ -6,6 +6,7 @@ import UniqueEntityCpf from "src/core/entities/unique-entity-cpf";
 import { TypeRepository } from "src/domain/repositories/type.repository";
 import { Type } from "src/domain/entities/type";
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class CreateFirstAdminUseCase {
@@ -30,11 +31,14 @@ export class CreateFirstAdminUseCase {
                 throw new BadRequestException('Tipo ADMIN não encontrado no banco de dados');
             }
 
+            // Hash da senha antes de criar o usuário
+            const hashedPassword = await bcrypt.hash(data.password, 10);
+
             const user = new User({
                 name: data.name,
                 cpf: new UniqueEntityCpf(data.cpf),
                 email: data.email,
-                password: data.password,
+                password: hashedPassword,
                 companyId: data.companyId,
                 types: [type.name],
                 active: data.active

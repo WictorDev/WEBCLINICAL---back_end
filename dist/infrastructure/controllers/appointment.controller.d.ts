@@ -19,4 +19,5 @@ export declare class AppointmentController {
         status: string;
     }): Promise<Appointment>;
     getByPatient(patientId: string): Promise<Appointment[]>;
+    getAvailableBySchedule(scheduleId: string): Promise<Appointment[]>;
 }

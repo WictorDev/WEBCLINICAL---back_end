@@ -4,8 +4,8 @@ export interface AppointmentData {
     startTime: string;
     endTime: string;
     status: string;
-    scheduleId?: string;
-    patientId: string;
+    scheduleId: string;
+    patientId?: string | null;
     employeeId: string;
 }
 export declare class Appointment {
@@ -20,10 +20,10 @@ export declare class Appointment {
     set endTime(endTime: string);
     get status(): string;
     set status(status: string);
-    get scheduleId(): string | undefined;
-    set scheduleId(scheduleId: string | undefined);
-    get patientId(): string;
-    set patientId(patientId: string);
+    get scheduleId(): string;
+    set scheduleId(scheduleId: string);
+    get patientId(): string | undefined | null;
+    set patientId(patientId: string | undefined | null);
     get employeeId(): string;
     set employeeId(employeeId: string);
     toJSON(): {
@@ -32,8 +32,8 @@ export declare class Appointment {
         startTime: string;
         endTime: string;
         status: string;
-        scheduleId: string | undefined;
-        patientId: string;
+        scheduleId: string;
+        patientId: string | null | undefined;
         employeeId: string;
     };
     static create(data: AppointmentData): {
@@ -42,8 +42,8 @@ export declare class Appointment {
         startTime: string;
         endTime: string;
         status: string;
-        scheduleId: string | undefined;
-        patientId: string;
+        scheduleId: string;
+        patientId: string | null | undefined;
         employeeId: string;
     };
 }

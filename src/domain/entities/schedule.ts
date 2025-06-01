@@ -3,9 +3,8 @@ export interface ScheduleData {
   date: Date;
   startTime: string;
   endTime: string;
-  duration: number;
+  duration?: number;
   employeeId: string;
-  appointmentId?: string;
   active: boolean;
 }
 
@@ -44,12 +43,12 @@ export class Schedule {
     this.data.endTime = endTime;
   }
 
-  get duration(): number {
+  get duration(): number | undefined {
     return this.data.duration;
   }
 
-  set duration(duration: number) {
-    if (duration <= 0) throw new Error("Duração deve ser maior que zero.");
+  set duration(duration: number | undefined) {
+    if (duration !== undefined && duration <= 0) throw new Error("Duração deve ser maior que zero.");
     this.data.duration = duration;
   }
 
@@ -60,14 +59,6 @@ export class Schedule {
   set employeeId(employeeId: string) {
     if (!employeeId) throw new Error("ID do funcionário é obrigatório.");
     this.data.employeeId = employeeId;
-  }
-
-  get appointmentId(): string | undefined {
-    return this.data.appointmentId;
-  }
-
-  set appointmentId(appointmentId: string | undefined) {
-    this.data.appointmentId = appointmentId;
   }
 
   get active(): boolean {
@@ -86,7 +77,6 @@ export class Schedule {
       endTime: this.data.endTime,
       duration: this.data.duration,
       employeeId: this.data.employeeId,
-      appointmentId: this.data.appointmentId,
       active: this.data.active
     };
   }
@@ -99,7 +89,6 @@ export class Schedule {
       endTime: data.endTime,
       duration: data.duration,
       employeeId: data.employeeId,
-      appointmentId: data.appointmentId,
       active: data.active
     };
   }

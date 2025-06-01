@@ -39,7 +39,7 @@ class Schedule {
         return this.data.duration;
     }
     set duration(duration) {
-        if (duration <= 0)
+        if (duration !== undefined && duration <= 0)
             throw new Error("Duração deve ser maior que zero.");
         this.data.duration = duration;
     }
@@ -50,12 +50,6 @@ class Schedule {
         if (!employeeId)
             throw new Error("ID do funcionário é obrigatório.");
         this.data.employeeId = employeeId;
-    }
-    get appointmentId() {
-        return this.data.appointmentId;
-    }
-    set appointmentId(appointmentId) {
-        this.data.appointmentId = appointmentId;
     }
     get active() {
         return this.data.active;
@@ -71,7 +65,6 @@ class Schedule {
             endTime: this.data.endTime,
             duration: this.data.duration,
             employeeId: this.data.employeeId,
-            appointmentId: this.data.appointmentId,
             active: this.data.active
         };
     }
@@ -83,7 +76,6 @@ class Schedule {
             endTime: data.endTime,
             duration: data.duration,
             employeeId: data.employeeId,
-            appointmentId: data.appointmentId,
             active: data.active
         };
     }

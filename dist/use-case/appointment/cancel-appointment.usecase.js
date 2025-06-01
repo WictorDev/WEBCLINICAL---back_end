@@ -37,9 +37,6 @@ let CancelAppointmentUseCase = class CancelAppointmentUseCase {
             throw new common_1.BadRequestException('Agenda não encontrada.');
         }
         await this.appointmentRepository.updateStatus(new unique_entity_id_1.UniqueEntityID(id), 'CANCELADO');
-        await this.scheduleRepository.update(schedule.id, {
-            appointmentId: undefined
-        });
     }
 };
 exports.CancelAppointmentUseCase = CancelAppointmentUseCase;

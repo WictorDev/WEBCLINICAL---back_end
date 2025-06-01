@@ -93,11 +93,9 @@ model Schedule {
   date          DateTime
   startTime     String
   endTime       String
-  duration      Int
   employee      Employee      @relation(fields: [employeeId], references: [cpf])
   employeeId    String
-  appointment   Appointment?  @relation("ScheduleToAppointment")
-  appointmentId String?       @unique
+  appointments  Appointment[] @relation("ScheduleToAppointment")
   active        Boolean       @default(true)
 }
 
@@ -108,9 +106,9 @@ model Appointment {
   endTime       String
   status        String
   schedule      Schedule?     @relation("ScheduleToAppointment", fields: [scheduleId], references: [id])
-  scheduleId    String?       @unique
-  patient       Patient       @relation(fields: [patientId], references: [cpf])
-  patientId     String
+  scheduleId    String?       
+  patient       Patient?       @relation(fields: [patientId], references: [cpf])
+  patientId     String?
   employee      Employee      @relation("EmployeeAppointments", fields: [employeeId], references: [cpf])
   employeeId    String
   medicalRecord MedicalRecord?

@@ -34,9 +34,9 @@ export class CancelAppointmentUseCase {
     // Atualizar o status do agendamento
     await this.appointmentRepository.updateStatus(new UniqueEntityID(id), 'CANCELADO');
 
-    // Liberar a agenda
-    await this.scheduleRepository.update(schedule.id, {
-      appointmentId: undefined
-    });
+    // Liberar a agenda (não é mais necessário atualizar appointmentId)
+    // await this.scheduleRepository.update(schedule.id, {
+    //   appointmentId: undefined
+    // });
   }
 } 

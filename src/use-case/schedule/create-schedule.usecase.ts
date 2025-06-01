@@ -2,10 +2,15 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { ScheduleRepository } from '../../domain/repositories/schedule.repository';
 import { Schedule } from '../../domain/entities/schedule';
 import { randomUUID } from 'crypto';
+import { Appointment } from '../../domain/entities/appointment';
+import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 
 @Injectable()
 export class CreateScheduleUseCase {
-  constructor(private readonly scheduleRepository: ScheduleRepository) {}
+  constructor(
+    private readonly scheduleRepository: ScheduleRepository,
+    private readonly appointmentRepository: AppointmentRepository
+  ) {}
 
   private hasTimeConflict(existingSchedules: Schedule[], newStartTime: string, newEndTime: string): boolean {
     return existingSchedules.some(schedule => {
@@ -32,29 +37,15 @@ export class CreateScheduleUseCase {
   async execute(data: {
     date: Date;
     startTime: string;
-    duration: number;
+    endTime: string;
     employeeId: string;
+    slotDuration: number;
   }): Promise<Schedule> {
-    // Validação do formato de startTime
+    // Validação do formato de startTime e endTime
     const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-    if (!timeRegex.test(data.startTime)) {
-      throw new ConflictException('Horário de início inválido. Use o formato HH:mm.');
+    if (!timeRegex.test(data.startTime) || !timeRegex.test(data.endTime)) {
+      throw new ConflictException('Horário inválido. Use o formato HH:mm.');
     }
-
-    // Cria um objeto Date com a data e o horário de início (UTC)
-    const [hours, minutes] = data.startTime.split(':').map(Number);
-    const startDate = new Date(data.date);
-    startDate.setUTCHours(hours, minutes, 0, 0);
-    console.log('[CREATE SCHEDULE] Recebido:', { data });
-
-    // Soma a duração em minutos
-    const endDate = new Date(startDate.getTime() + data.duration * 60000);
-
-    // Formata o horário final para HH:mm
-    const endHours = String(endDate.getUTCHours()).padStart(2, '0');
-    const endMinutes = String(endDate.getUTCMinutes()).padStart(2, '0');
-    const endTime = `${endHours}:${endMinutes}`;
-    console.log('[CREATE SCHEDULE] Calculado endTime:', endTime);
 
     // Busca agendas existentes para o mesmo funcionário na mesma data E que estejam ativas
     const existingSchedules = (await this.scheduleRepository.findByDate(data.employeeId, data.date))
@@ -62,26 +53,45 @@ export class CreateScheduleUseCase {
     console.log('[CREATE SCHEDULE] Horários existentes ativos:', existingSchedules.map(s => ({ startTime: s.startTime, endTime: s.endTime })));
 
     // Verifica se há conflito de horário
-    if (this.hasTimeConflict(existingSchedules, data.startTime, endTime)) {
+    if (this.hasTimeConflict(existingSchedules, data.startTime, data.endTime)) {
       throw new ConflictException('Já existe uma agenda para este funcionário no mesmo horário');
     }
 
+    // Criação da agenda
     const schedule = new Schedule({
       id: randomUUID(),
       date: data.date,
       startTime: data.startTime,
-      endTime,
-      duration: Number(data.duration),
+      endTime: data.endTime,
       employeeId: data.employeeId,
       active: true
     });
-    console.log('[CREATE SCHEDULE] Agenda criada:', {
-      startTime: data.startTime,
-      endTime,
-      duration: data.duration,
-      employeeId: data.employeeId
-    });
+    const createdSchedule = await this.scheduleRepository.create(schedule);
 
-    return this.scheduleRepository.create(schedule);
+    // Gerar slots (appointments) automaticamente
+    const [startHour, startMinute] = data.startTime.split(':').map(Number);
+    const [endHour, endMinute] = data.endTime.split(':').map(Number);
+    const start = new Date(data.date);
+    start.setHours(startHour, startMinute, 0, 0);
+    const end = new Date(data.date);
+    end.setHours(endHour, endMinute, 0, 0);
+    let slotStart = new Date(start);
+    while (slotStart < end) {
+      const slotEnd = new Date(slotStart.getTime() + data.slotDuration * 60000);
+      if (slotEnd > end) break;
+      await this.appointmentRepository.create(new Appointment({
+        id: randomUUID(),
+        date: schedule.date,
+        startTime: slotStart.toTimeString().slice(0,5),
+        endTime: slotEnd.toTimeString().slice(0,5),
+        scheduleId: createdSchedule.id,
+        employeeId: data.employeeId,
+        status: 'disponivel',
+        patientId: undefined
+      }));
+      slotStart = slotEnd;
+    }
+
+    return createdSchedule;
   }
 } 

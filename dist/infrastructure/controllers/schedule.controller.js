@@ -82,18 +82,23 @@ __decorate([
                     example: '09:00',
                     description: 'Horário de início no formato HH:mm'
                 },
-                duration: {
-                    type: 'number',
-                    example: 30,
-                    description: 'Duração da consulta em minutos'
+                endTime: {
+                    type: 'string',
+                    example: '12:00',
+                    description: 'Horário de fim no formato HH:mm'
                 },
                 employeeId: {
                     type: 'string',
                     example: '98765432100',
                     description: 'CPF do funcionário'
+                },
+                slotDuration: {
+                    type: 'number',
+                    example: 30,
+                    description: 'Duração de cada slot em minutos'
                 }
             },
-            required: ['date', 'startTime', 'duration', 'employeeId']
+            required: ['date', 'startTime', 'endTime', 'employeeId']
         }
     }),
     (0, swagger_1.ApiResponse)({
@@ -105,8 +110,7 @@ __decorate([
                 id: { type: 'string', example: '123e4567-e89b-12d3-a456-426614174000' },
                 date: { type: 'string', format: 'date-time', example: '2024-03-20T10:00:00Z' },
                 startTime: { type: 'string', example: '09:00' },
-                endTime: { type: 'string', example: '09:30' },
-                duration: { type: 'number', example: 30 },
+                endTime: { type: 'string', example: '12:00' },
                 employeeId: { type: 'string', example: '987.654.321-00' },
                 active: { type: 'boolean', example: true }
             }

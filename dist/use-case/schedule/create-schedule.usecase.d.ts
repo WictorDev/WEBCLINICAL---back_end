@@ -1,13 +1,16 @@
 import { ScheduleRepository } from '../../domain/repositories/schedule.repository';
 import { Schedule } from '../../domain/entities/schedule';
+import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 export declare class CreateScheduleUseCase {
     private readonly scheduleRepository;
-    constructor(scheduleRepository: ScheduleRepository);
+    private readonly appointmentRepository;
+    constructor(scheduleRepository: ScheduleRepository, appointmentRepository: AppointmentRepository);
     private hasTimeConflict;
     execute(data: {
         date: Date;
         startTime: string;
-        duration: number;
+        endTime: string;
         employeeId: string;
+        slotDuration: number;
     }): Promise<Schedule>;
 }

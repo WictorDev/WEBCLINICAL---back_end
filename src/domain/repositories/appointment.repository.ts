@@ -8,5 +8,6 @@ export abstract class AppointmentRepository {
   abstract findById(id: UniqueEntityID): Promise<Appointment | null>;
   abstract update(id: UniqueEntityID, data: Partial<Appointment>): Promise<Appointment>;
   abstract updateStatus(id: UniqueEntityID, status: string): Promise<Appointment>;
+  abstract findByScheduleIdAndStatus(scheduleId: string, status: string): Promise<Appointment[]>;
   // outros métodos necessários...
 } 

@@ -3,9 +3,8 @@ export interface ScheduleData {
     date: Date;
     startTime: string;
     endTime: string;
-    duration: number;
+    duration?: number;
     employeeId: string;
-    appointmentId?: string;
     active: boolean;
 }
 export declare class Schedule {
@@ -18,12 +17,10 @@ export declare class Schedule {
     set startTime(startTime: string);
     get endTime(): string;
     set endTime(endTime: string);
-    get duration(): number;
-    set duration(duration: number);
+    get duration(): number | undefined;
+    set duration(duration: number | undefined);
     get employeeId(): string;
     set employeeId(employeeId: string);
-    get appointmentId(): string | undefined;
-    set appointmentId(appointmentId: string | undefined);
     get active(): boolean;
     set active(active: boolean);
     toJSON(): {
@@ -31,9 +28,8 @@ export declare class Schedule {
         date: Date;
         startTime: string;
         endTime: string;
-        duration: number;
+        duration: number | undefined;
         employeeId: string;
-        appointmentId: string | undefined;
         active: boolean;
     };
     static create(data: ScheduleData): {
@@ -41,9 +37,8 @@ export declare class Schedule {
         date: Date;
         startTime: string;
         endTime: string;
-        duration: number;
+        duration: number | undefined;
         employeeId: string;
-        appointmentId: string | undefined;
         active: boolean;
     };
 }

@@ -45,14 +45,14 @@ class Appointment {
         return this.data.scheduleId;
     }
     set scheduleId(scheduleId) {
+        if (!scheduleId)
+            throw new Error("ID da agenda é obrigatório.");
         this.data.scheduleId = scheduleId;
     }
     get patientId() {
         return this.data.patientId;
     }
     set patientId(patientId) {
-        if (!patientId)
-            throw new Error("ID do paciente é obrigatório.");
         this.data.patientId = patientId;
     }
     get employeeId() {

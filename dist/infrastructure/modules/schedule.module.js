@@ -20,12 +20,16 @@ const find_schedules_by_employee_usecase_1 = require("../../use-case/schedule/fi
 const find_available_schedules_usecase_1 = require("../../use-case/schedule/find-available-schedules.usecase");
 const find_all_avaiable_schedules_usecase_1 = require("../../use-case/schedule/find-all-avaiable-schedules.usecase");
 const find_all_schedules_usecase_1 = require("../../use-case/schedule/find-all-schedules.usecase");
+const appointment_module_1 = require("./appointment.module");
 let ScheduleModule = class ScheduleModule {
 };
 exports.ScheduleModule = ScheduleModule;
 exports.ScheduleModule = ScheduleModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        imports: [
+            prisma_module_1.PrismaModule,
+            (0, common_1.forwardRef)(() => appointment_module_1.AppointmentModule),
+        ],
         controllers: [schedule_controller_1.ScheduleController],
         providers: [
             {
