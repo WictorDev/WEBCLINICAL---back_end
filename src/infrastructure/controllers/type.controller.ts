@@ -56,7 +56,8 @@ export class TypeController {
     const initialTypes = [
       { name: 'ADMIN' },
       { name: 'EMPLOYEE' },
-      { name: 'PATIENT' }
+      { name: 'PATIENT' },
+      { name: 'RECEPTIONIST' }
     ];
     const createdTypes: Type[] = [];
     for (const type of initialTypes) {

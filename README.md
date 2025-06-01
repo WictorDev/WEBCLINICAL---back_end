@@ -154,25 +154,6 @@ Antes de criar um usuário, é necessário que existam:
 
 **Endpoint:** `POST /api/types/create_initial_types`
 
-**Corpo da requisição:**
-```json
-{
-  "name": "ADMIN"
-}
-```
-
-```json
-{
-  "name": "EMPLOYEE"
-}
-```
-
-```json
-{
-  "name": "PATIENT"
-}
-```
-
 **Observações:**
 - Esta rota só pode ser executada uma vez, na primeira criação do banco
 - Cria automaticamente os tipos ADMIN, EMPLOYEE e PATIENT
@@ -184,7 +165,7 @@ Antes de criar um usuário, é necessário que existam:
 **Corpo da requisição:**
 ```json
 {
-  "name": "Dr. João Silva",
+  "name": "João Silva",
   "cpf": "64883645029",
   "email": "joao.silva@clinicasaolucas.com.br",
   "password": "senha123",
@@ -261,9 +242,13 @@ ou
 **Resposta:**
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "userType": "PATIENT",
-  "nome": "Ana Paula Silva" 
+	"tipos": [
+		"PATIENT"
+	],
+	"nome": "Ana Paula Silva",
+	"iat": 1748779928,
+	"exp": 1748783528,
+	"companyId": null
 }
 ```
 
@@ -274,7 +259,7 @@ ou
 **Endpoint:** `POST /api/employee-types`
 ```json
 {
-  "name": "Médico"
+  "name": "MÉDICO"
 }
 ```
 
@@ -286,7 +271,7 @@ ou
   "cpf": "12345678900",
   "name": "Maria da Silva",
   "advice": "CRM 12345",
-  "type": "medico",
+  "type": "MÉDICO",
   "employeeType": "Urologista"
 }
 ```
@@ -304,7 +289,7 @@ ou
 {
   "name": "Maria da Silva Souza",
   "advice": "CRM 54321",
-  "type": "Employee",
+  "type": "EMPLOYEE",
   "employeeType": "Enfermeiro"
 }
 ```
