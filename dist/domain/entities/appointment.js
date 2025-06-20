@@ -1,6 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Appointment = void 0;
+exports.Appointment = exports.AppointmentStatus = void 0;
+var AppointmentStatus;
+(function (AppointmentStatus) {
+    AppointmentStatus["AVAILABLE"] = "AVAILABLE";
+    AppointmentStatus["SCHEDULED"] = "SCHEDULED";
+    AppointmentStatus["FINISHED"] = "FINISHED";
+})(AppointmentStatus || (exports.AppointmentStatus = AppointmentStatus = {}));
 class Appointment {
     data;
     constructor(data) {
@@ -39,6 +45,9 @@ class Appointment {
     set status(status) {
         if (!status)
             throw new Error("Status é obrigatório.");
+        if (!Object.values(AppointmentStatus).includes(status)) {
+            throw new Error(`Status inválido. Use um dos seguintes: ${Object.values(AppointmentStatus).join(', ')}`);
+        }
         this.data.status = status;
     }
     get scheduleId() {

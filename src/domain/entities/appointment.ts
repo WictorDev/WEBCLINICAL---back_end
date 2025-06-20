@@ -1,9 +1,15 @@
+export enum AppointmentStatus {
+  AVAILABLE = 'AVAILABLE',
+  SCHEDULED = 'SCHEDULED',
+  FINISHED = 'FINISHED'
+}
+
 export interface AppointmentData {
   id: string;
   date: Date;
   startTime: string;
   endTime: string;
-  status: string;
+  status: AppointmentStatus;
   scheduleId: string;
   patientId?: string | null;
   employeeId: string;
@@ -43,12 +49,15 @@ export class Appointment {
     this.data.endTime = endTime;
   }
 
-  get status(): string {
+  get status(): AppointmentStatus {
     return this.data.status;
   }
 
-  set status(status: string) {
+  set status(status: AppointmentStatus) {
     if (!status) throw new Error("Status é obrigatório.");
+    if (!Object.values(AppointmentStatus).includes(status)) {
+      throw new Error(`Status inválido. Use um dos seguintes: ${Object.values(AppointmentStatus).join(', ')}`);
+    }
     this.data.status = status;
   }
 
@@ -103,4 +112,16 @@ export class Appointment {
       employeeId: data.employeeId
     };
   }
+}
+
+export interface AppointmentWithPatient {
+  id: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  status: AppointmentStatus;
+  scheduleId: string;
+  patientId?: string | null;
+  employeeId: string;
+  patient?: { name: string };
 } 

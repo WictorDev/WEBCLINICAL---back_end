@@ -7,16 +7,22 @@ import { FindPatientUseCase } from 'src/use-case/patient/find-patient.usecase';
 import { FindPatientByCpfUseCase } from 'src/use-case/patient/find-patient-by-cpf.usecase';
 import { FindPatientByEmailUseCase } from 'src/use-case/patient/find-patient-by-email.usecase';
 import { UpdatePatientUseCase } from 'src/use-case/patient/update-patient.usecase';
+import { RecoveryPasswordUseCase } from 'src/use-case/patient/recovery-password.usecase';
+import { ConfirmPatientRegistrationUseCase } from 'src/use-case/patient/confirm-patient-registration.usecase';
 import { PatientRepository } from 'src/domain/repositories/patient.repository';
 import { TypeModule } from './type.module';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from './user.module';
+import { EmailService } from 'src/core/services/email.service';
 
 @Module({
   imports: [
     PrismaModule,
     TypeModule,
-    JwtModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'your-secret-key',
+      signOptions: { expiresIn: '24h' },
+    }),
     forwardRef(() => UserModule)
   ],
   controllers: [PatientController],
@@ -31,6 +37,9 @@ import { UserModule } from './user.module';
     FindPatientByCpfUseCase,
     FindPatientByEmailUseCase,
     UpdatePatientUseCase,
+    RecoveryPasswordUseCase,
+    ConfirmPatientRegistrationUseCase,
+    EmailService,
   ],
   exports: [
     PatientRepository,
@@ -40,6 +49,8 @@ import { UserModule } from './user.module';
     FindPatientByCpfUseCase,
     FindPatientByEmailUseCase,
     UpdatePatientUseCase,
+    RecoveryPasswordUseCase,
+    ConfirmPatientRegistrationUseCase,
   ],
 })
 export class PatientModule {} 

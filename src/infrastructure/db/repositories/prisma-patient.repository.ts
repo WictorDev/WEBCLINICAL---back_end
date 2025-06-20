@@ -4,6 +4,7 @@ import { Patient } from 'src/domain/entities/patient';
 import { PatientRepository } from 'src/domain/repositories/patient.repository';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PrismaPatientRepository implements PatientRepository {
@@ -18,6 +19,7 @@ export class PrismaPatientRepository implements PatientRepository {
           email: patient.email,
           password: patient.password,
           typeId: patient.typeId,
+          phoneNumber: patient.phoneNumber,
         },
       });
       return new Patient({
@@ -26,6 +28,7 @@ export class PrismaPatientRepository implements PatientRepository {
         email: created.email,
         password: created.password,
         typeId: created.typeId,
+        phoneNumber: created.phoneNumber,
       });
     } catch (error) {
       if (
@@ -62,6 +65,7 @@ export class PrismaPatientRepository implements PatientRepository {
           email: patient.email,
           password: patient.password,
           typeId: patient.typeId,
+          phoneNumber: patient.phoneNumber,
         }),
     );
   }
@@ -77,6 +81,7 @@ export class PrismaPatientRepository implements PatientRepository {
       email: patient.email,
       password: patient.password,
       typeId: patient.typeId,
+      phoneNumber: patient.phoneNumber,
     });
   }
 
@@ -91,6 +96,7 @@ export class PrismaPatientRepository implements PatientRepository {
       email: patient.email,
       password: patient.password,
       typeId: patient.typeId,
+      phoneNumber: patient.phoneNumber,
     });
   }
 
@@ -102,6 +108,7 @@ export class PrismaPatientRepository implements PatientRepository {
         email: data.email,
         password: data.password,
         typeId: data.typeId,
+        phoneNumber: data.phoneNumber,
       },
     });
     return new Patient({
@@ -110,6 +117,17 @@ export class PrismaPatientRepository implements PatientRepository {
       email: updated.email,
       password: updated.password,
       typeId: updated.typeId,
+      phoneNumber: updated.phoneNumber,
+    });
+  }
+
+  async recoveryPassword(email: string, password: string): Promise<void> {
+    // Hash da nova senha
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    await this.prismaService.patient.update({
+      where: { email },
+      data: { password: hashedPassword },
     });
   }
 } 

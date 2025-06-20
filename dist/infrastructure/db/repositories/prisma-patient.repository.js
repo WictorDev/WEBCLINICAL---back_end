@@ -15,6 +15,7 @@ const prisma_service_1 = require("../../../core/services/prisma.service");
 const patient_1 = require("../../../domain/entities/patient");
 const library_1 = require("@prisma/client/runtime/library");
 const unique_entity_cpf_1 = require("../../../core/entities/unique-entity-cpf");
+const bcrypt = require("bcrypt");
 let PrismaPatientRepository = class PrismaPatientRepository {
     prismaService;
     constructor(prismaService) {
@@ -29,6 +30,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
                     email: patient.email,
                     password: patient.password,
                     typeId: patient.typeId,
+                    phoneNumber: patient.phoneNumber,
                 },
             });
             return new patient_1.Patient({
@@ -37,6 +39,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
                 email: created.email,
                 password: created.password,
                 typeId: created.typeId,
+                phoneNumber: created.phoneNumber,
             });
         }
         catch (error) {
@@ -72,6 +75,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
             email: patient.email,
             password: patient.password,
             typeId: patient.typeId,
+            phoneNumber: patient.phoneNumber,
         }));
     }
     async findByCpf(cpf) {
@@ -86,6 +90,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
             email: patient.email,
             password: patient.password,
             typeId: patient.typeId,
+            phoneNumber: patient.phoneNumber,
         });
     }
     async findByEmail(email) {
@@ -100,6 +105,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
             email: patient.email,
             password: patient.password,
             typeId: patient.typeId,
+            phoneNumber: patient.phoneNumber,
         });
     }
     async update(cpf, data) {
@@ -110,6 +116,7 @@ let PrismaPatientRepository = class PrismaPatientRepository {
                 email: data.email,
                 password: data.password,
                 typeId: data.typeId,
+                phoneNumber: data.phoneNumber,
             },
         });
         return new patient_1.Patient({
@@ -118,6 +125,14 @@ let PrismaPatientRepository = class PrismaPatientRepository {
             email: updated.email,
             password: updated.password,
             typeId: updated.typeId,
+            phoneNumber: updated.phoneNumber,
+        });
+    }
+    async recoveryPassword(email, password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await this.prismaService.patient.update({
+            where: { email },
+            data: { password: hashedPassword },
         });
     }
 };

@@ -12,22 +12,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateAppointmentStatusUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const appointment_repository_1 = require("../../domain/repositories/appointment.repository");
+const appointment_1 = require("../../domain/entities/appointment");
 let UpdateAppointmentStatusUseCase = class UpdateAppointmentStatusUseCase {
     appointmentRepository;
     constructor(appointmentRepository) {
         this.appointmentRepository = appointmentRepository;
     }
     async execute(appointmentId, status) {
-        const validStatuses = ['PENDENTE', 'CONFIRMADO', 'FINALIZADO', 'CANCELADO'];
-        if (!validStatuses.includes(status)) {
-            throw new Error(`Status inválido. Use um dos seguintes: ${validStatuses.join(', ')}`);
-        }
         const appointment = await this.appointmentRepository.findById(appointmentId);
         if (!appointment) {
             throw new Error('Agendamento não encontrado.');
         }
-        if (status === 'FINALIZADO' && appointment.status !== 'CONFIRMADO') {
-            throw new Error('Apenas agendamentos confirmados podem ser finalizados.');
+        if (status === appointment_1.AppointmentStatus.FINISHED && appointment.status !== appointment_1.AppointmentStatus.SCHEDULED) {
+            throw new Error('Apenas agendamentos agendados podem ser finalizados.');
         }
         return this.appointmentRepository.updateStatus(appointmentId, status);
     }

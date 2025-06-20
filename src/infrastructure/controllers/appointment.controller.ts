@@ -1,10 +1,11 @@
-import { Controller, Post, Body, Get, Query, UseGuards, Req, Param, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, UseGuards, Req, Param, Patch, Delete } from '@nestjs/common';
 import { CreateAppointmentUseCase } from '../../use-case/appointment/create-appointment.usecase';
 import { FindEmployeeAppointmentsUseCase } from '../../use-case/appointment/find-employee-appointments.usecase';
 import { FinalizeAppointmentUseCase } from '../../use-case/appointment/finalize-appointment.usecase';
 import { UpdateAppointmentStatusUseCase } from '../../use-case/appointment/update-appointment-status.usecase';
 import { UpdateAppointmentPatientUseCase } from '../../use-case/appointment/update-appointment-patient.usecase';
-import { Appointment } from '../../domain/entities/appointment';
+import { CancelAppointmentUseCase } from '../../use-case/appointment/cancel-appointment.usecase';
+import { Appointment, AppointmentStatus } from '../../domain/entities/appointment';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { randomUUID } from 'crypto';
 import { MedicalRecord } from '../../domain/entities/medical-record';
@@ -19,6 +20,7 @@ export class AppointmentController {
     private readonly finalizeAppointment: FinalizeAppointmentUseCase,
     private readonly updateAppointmentStatus: UpdateAppointmentStatusUseCase,
     private readonly updateAppointmentPatient: UpdateAppointmentPatientUseCase,
+    private readonly cancelAppointment: CancelAppointmentUseCase,
     private readonly findPatientAppointments: FindPatientAppointmentsUseCase,
   ) {}
 
@@ -29,12 +31,25 @@ export class AppointmentController {
       date: new Date(body.date),
       startTime: body.startTime,
       endTime: body.endTime,
-      status: body.status || 'PENDENTE',
+      status: body.status || AppointmentStatus.AVAILABLE,
       scheduleId: body.scheduleId,
       patientId: body.patientId,
       employeeId: body.employeeId
     });
     return this.createAppointment.execute(appointment);
+  }
+
+  @Get('employee/:employeeId/all')
+  async getAllByEmployee(@Param('employeeId') employeeId: string) {
+    return this.findEmployeeAppointments.execute(employeeId);
+  }
+
+  @Get('employee/schedule')
+  async getAllByEmployeeAndSchedule(
+    @Query('employeeId') employeeId: string,
+    @Query('scheduleId') scheduleId: string
+  ) {
+    return this.findEmployeeAppointments.executeByEmployeeAndSchedule(employeeId, scheduleId);
   }
 
   @Get('employee')
@@ -51,7 +66,7 @@ export class AppointmentController {
   }
   
   @Patch(':id/status')
-  async updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
+  async updateStatus(@Param('id') id: string, @Body() body: { status: AppointmentStatus }) {
     return this.updateAppointmentStatus.execute(id, body.status);
   }
 
@@ -69,12 +84,17 @@ export class AppointmentController {
 
   @Get('available')
   async getAvailableBySchedule(@Query('scheduleId') scheduleId: string) {
-    return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'DISPONIVEL');
+    return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, AppointmentStatus.AVAILABLE);
   }
 
   @Get('employee/me')
   async getMyAppointments(@Req() req) {
     const employeeId = req.user.cpf || req.user.id;
     return this.findEmployeeAppointments.execute(employeeId);
+  }
+
+  @Delete(':id')
+  async cancel(@Param('id') id: string) {
+    return this.cancelAppointment.execute(id);
   }
 } 

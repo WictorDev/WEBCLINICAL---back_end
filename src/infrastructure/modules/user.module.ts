@@ -25,12 +25,16 @@ import { EmployeeTypeModule } from './employee-type.module';
 import { PrismaEmployeeTypeRepository } from 'src/infrastructure/db/repositories/prisma-employee-type.repository';
 import { PrismaEmployeeRepository } from 'src/infrastructure/db/repositories/prisma-employee.repository';
 import { DeleteUserUseCase } from 'src/use-case/user/delete-user.usecase';
+import { EmailService } from 'src/core/services/email.service';
 
 @Module({
   imports: [
     PrismaModule, // fornece PrismaService
     ConfigModule, // necessário para que ConfigService funcione aqui
-    JwtModule, // Apenas importa, não registra
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'your-secret-key',
+      signOptions: { expiresIn: '24h' },
+    }),
     AdminModule,
     EmployeeModule,
     forwardRef(() => PatientModule),
@@ -69,6 +73,8 @@ import { DeleteUserUseCase } from 'src/use-case/user/delete-user.usecase';
     CreatePatientUseCase,
     CreateFirstAdminUseCase,
     DeleteUserUseCase,
+    // Services
+    EmailService,
   ],
   exports: [
     // Exporta tudo que pode ser útil em outros módulos
@@ -87,6 +93,7 @@ import { DeleteUserUseCase } from 'src/use-case/user/delete-user.usecase';
     CreatePatientUseCase,
     CreateFirstAdminUseCase,
     DeleteUserUseCase,
+    EmailService,
   ],
 })
 export class UserModule {}

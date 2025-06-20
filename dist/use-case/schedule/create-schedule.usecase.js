@@ -38,12 +38,24 @@ let CreateScheduleUseCase = class CreateScheduleUseCase {
                 (newStartInMinutes <= existingStartInMinutes && newEndInMinutes >= existingEndInMinutes));
         });
     }
+    isPastDateTime(dateStr, time) {
+        const now = new Date();
+        const [hours, minutes] = time.split(':').map(Number);
+        const inputDate = new Date(dateStr);
+        const scheduleDate = new Date(Date.UTC(inputDate.getUTCFullYear(), inputDate.getUTCMonth(), inputDate.getUTCDate(), hours, minutes, 0, 0));
+        const currentDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), 0, 0));
+        return scheduleDate < currentDate;
+    }
     async execute(data) {
         const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
         if (!timeRegex.test(data.startTime) || !timeRegex.test(data.endTime)) {
             throw new common_1.ConflictException('Horário inválido. Use o formato HH:mm.');
         }
-        const existingSchedules = (await this.scheduleRepository.findByDate(data.employeeId, data.date))
+        if (this.isPastDateTime(data.date, data.startTime)) {
+            throw new common_1.ConflictException('Não é possível criar agendas para datas e horários passados.');
+        }
+        const scheduleDate = typeof data.date === 'string' ? new Date(data.date) : data.date;
+        const existingSchedules = (await this.scheduleRepository.findByDate(data.employeeId, scheduleDate))
             .filter(s => s.active);
         console.log('[CREATE SCHEDULE] Horários existentes ativos:', existingSchedules.map(s => ({ startTime: s.startTime, endTime: s.endTime })));
         if (this.hasTimeConflict(existingSchedules, data.startTime, data.endTime)) {
@@ -51,7 +63,7 @@ let CreateScheduleUseCase = class CreateScheduleUseCase {
         }
         const schedule = new schedule_1.Schedule({
             id: (0, crypto_1.randomUUID)(),
-            date: data.date,
+            date: scheduleDate,
             startTime: data.startTime,
             endTime: data.endTime,
             employeeId: data.employeeId,
@@ -60,10 +72,10 @@ let CreateScheduleUseCase = class CreateScheduleUseCase {
         const createdSchedule = await this.scheduleRepository.create(schedule);
         const [startHour, startMinute] = data.startTime.split(':').map(Number);
         const [endHour, endMinute] = data.endTime.split(':').map(Number);
-        const start = new Date(data.date);
-        start.setHours(startHour, startMinute, 0, 0);
-        const end = new Date(data.date);
-        end.setHours(endHour, endMinute, 0, 0);
+        const start = new Date(scheduleDate);
+        start.setUTCHours(startHour, startMinute, 0, 0);
+        const end = new Date(scheduleDate);
+        end.setUTCHours(endHour, endMinute, 0, 0);
         let slotStart = new Date(start);
         while (slotStart < end) {
             const slotEnd = new Date(slotStart.getTime() + data.slotDuration * 60000);
@@ -76,7 +88,7 @@ let CreateScheduleUseCase = class CreateScheduleUseCase {
                 endTime: slotEnd.toTimeString().slice(0, 5),
                 scheduleId: createdSchedule.id,
                 employeeId: data.employeeId,
-                status: 'DISPONIVEL',
+                status: appointment_1.AppointmentStatus.AVAILABLE,
                 patientId: undefined
             }));
             slotStart = slotEnd;

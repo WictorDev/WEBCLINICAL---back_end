@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateAppointmentPatientUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const appointment_repository_1 = require("../../domain/repositories/appointment.repository");
+const appointment_1 = require("../../domain/entities/appointment");
 let UpdateAppointmentPatientUseCase = class UpdateAppointmentPatientUseCase {
     appointmentRepository;
     constructor(appointmentRepository) {
@@ -22,8 +23,17 @@ let UpdateAppointmentPatientUseCase = class UpdateAppointmentPatientUseCase {
         if (!appointment) {
             throw new common_1.NotFoundException('Agendamento não encontrado');
         }
+        const patientAppointments = await this.appointmentRepository.findByPatientAndDate(patientId, appointment.date);
+        const otherAppointments = patientAppointments.filter(a => a.id !== id);
+        if (otherAppointments.length > 0) {
+            throw new common_1.BadRequestException('Você já possui um agendamento nesta data.');
+        }
         appointment.patientId = patientId;
-        return this.appointmentRepository.update(id, { patientId });
+        appointment.status = appointment_1.AppointmentStatus.SCHEDULED;
+        return this.appointmentRepository.update(id, {
+            patientId,
+            status: appointment_1.AppointmentStatus.SCHEDULED
+        });
     }
 };
 exports.UpdateAppointmentPatientUseCase = UpdateAppointmentPatientUseCase;

@@ -95,6 +95,32 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
             employee: appointment.employee ? { name: appointment.employee.name } : undefined
         }));
     }
+    async findByPatientAndDate(patientId, date) {
+        const appointments = await this.prisma.appointment.findMany({
+            where: {
+                patientId,
+                date: {
+                    gte: new Date(date.setHours(0, 0, 0, 0)),
+                    lt: new Date(date.setHours(23, 59, 59, 999))
+                }
+            }
+        });
+        return appointments.map(appointment => {
+            if (!appointment.scheduleId) {
+                throw new Error('Appointment sem scheduleId não é permitido!');
+            }
+            return new appointment_1.Appointment({
+                id: appointment.id,
+                date: appointment.date,
+                startTime: appointment.startTime,
+                endTime: appointment.endTime,
+                status: appointment.status,
+                scheduleId: appointment.scheduleId,
+                patientId: appointment.patientId === null ? undefined : appointment.patientId,
+                employeeId: appointment.employeeId
+            });
+        });
+    }
     async findByEmployee(employeeId, date) {
         const where = date ? {
             employeeId,
@@ -207,6 +233,35 @@ let PrismaAppointmentRepository = class PrismaAppointmentRepository {
                 patientId: appointment.patientId === null ? undefined : appointment.patientId,
                 employeeId: appointment.employeeId
             });
+        });
+    }
+    async findByEmployeeAndSchedule(employeeId, scheduleId) {
+        const appointments = await this.prisma.appointment.findMany({
+            where: {
+                employeeId,
+                scheduleId
+            },
+            include: {
+                patient: {
+                    select: { name: true }
+                }
+            }
+        });
+        return appointments.map(appointment => {
+            if (!appointment.scheduleId) {
+                throw new Error('Appointment sem scheduleId não é permitido!');
+            }
+            return {
+                id: appointment.id,
+                date: appointment.date,
+                startTime: appointment.startTime,
+                endTime: appointment.endTime,
+                status: appointment.status,
+                scheduleId: appointment.scheduleId,
+                patientId: appointment.patientId === null ? undefined : appointment.patientId,
+                employeeId: appointment.employeeId,
+                patient: appointment.patient ? { name: appointment.patient.name } : undefined
+            };
         });
     }
 };

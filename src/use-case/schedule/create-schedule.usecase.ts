@@ -2,7 +2,7 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { ScheduleRepository } from '../../domain/repositories/schedule.repository';
 import { Schedule } from '../../domain/entities/schedule';
 import { randomUUID } from 'crypto';
-import { Appointment } from '../../domain/entities/appointment';
+import { Appointment, AppointmentStatus } from '../../domain/entities/appointment';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 
 @Injectable()
@@ -34,21 +34,62 @@ export class CreateScheduleUseCase {
     });
   }
 
+  private isPastDateTime(dateStr: string | Date, time: string): boolean {
+    const now = new Date();
+    const [hours, minutes] = time.split(':').map(Number);
+    
+    // Converter a string ISO para Date
+    const inputDate = new Date(dateStr);
+    
+    // Criar data do agendamento usando UTC
+    const scheduleDate = new Date(Date.UTC(
+      inputDate.getUTCFullYear(),
+      inputDate.getUTCMonth(),
+      inputDate.getUTCDate(),
+      hours,
+      minutes,
+      0,
+      0
+    ));
+
+    // Criar data atual usando UTC
+    const currentDate = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      0,
+      0
+    ));
+    
+    return scheduleDate < currentDate;
+  }
+
   async execute(data: {
-    date: Date;
+    date: string | Date;
     startTime: string;
     endTime: string;
     employeeId: string;
     slotDuration: number;
   }): Promise<Schedule> {
+
     // Validação do formato de startTime e endTime
     const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
     if (!timeRegex.test(data.startTime) || !timeRegex.test(data.endTime)) {
       throw new ConflictException('Horário inválido. Use o formato HH:mm.');
     }
 
+    // Validação de data e hora no passado
+    if (this.isPastDateTime(data.date, data.startTime)) {
+      throw new ConflictException('Não é possível criar agendas para datas e horários passados.');
+    }
+
+    // Converter a string ISO para Date se necessário
+    const scheduleDate = typeof data.date === 'string' ? new Date(data.date) : data.date;
+
     // Busca agendas existentes para o mesmo funcionário na mesma data E que estejam ativas
-    const existingSchedules = (await this.scheduleRepository.findByDate(data.employeeId, data.date))
+    const existingSchedules = (await this.scheduleRepository.findByDate(data.employeeId, scheduleDate))
       .filter(s => s.active);
     console.log('[CREATE SCHEDULE] Horários existentes ativos:', existingSchedules.map(s => ({ startTime: s.startTime, endTime: s.endTime })));
 
@@ -60,7 +101,7 @@ export class CreateScheduleUseCase {
     // Criação da agenda
     const schedule = new Schedule({
       id: randomUUID(),
-      date: data.date,
+      date: scheduleDate,
       startTime: data.startTime,
       endTime: data.endTime,
       employeeId: data.employeeId,
@@ -71,10 +112,10 @@ export class CreateScheduleUseCase {
     // Gerar slots (appointments) automaticamente
     const [startHour, startMinute] = data.startTime.split(':').map(Number);
     const [endHour, endMinute] = data.endTime.split(':').map(Number);
-    const start = new Date(data.date);
-    start.setHours(startHour, startMinute, 0, 0);
-    const end = new Date(data.date);
-    end.setHours(endHour, endMinute, 0, 0);
+    const start = new Date(scheduleDate);
+    start.setUTCHours(startHour, startMinute, 0, 0);
+    const end = new Date(scheduleDate);
+    end.setUTCHours(endHour, endMinute, 0, 0);
     let slotStart = new Date(start);
     while (slotStart < end) {
       const slotEnd = new Date(slotStart.getTime() + data.slotDuration * 60000);
@@ -86,7 +127,7 @@ export class CreateScheduleUseCase {
         endTime: slotEnd.toTimeString().slice(0,5),
         scheduleId: createdSchedule.id,
         employeeId: data.employeeId,
-        status: 'DISPONIVEL',
+        status: AppointmentStatus.AVAILABLE,
         patientId: undefined
       }));
       slotStart = slotEnd;

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MedicalRecordRepository } from '../../domain/repositories/medical-record.repository';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 import { MedicalRecord } from '../../domain/entities/medical-record';
+import { AppointmentStatus } from '../../domain/entities/appointment';
 
 @Injectable()
 export class FinalizeAppointmentUseCase {
@@ -18,12 +19,12 @@ export class FinalizeAppointmentUseCase {
       throw new Error('Agendamento não encontrado.');
     }
     
-    if (appointment.status !== 'CONFIRMADO') {
-      throw new Error('Apenas agendamentos confirmados podem ser finalizados.');
+    if (appointment.status !== AppointmentStatus.SCHEDULED) {
+      throw new Error('Apenas agendamentos agendados podem ser finalizados.');
     }
 
     // Finalizar o agendamento
-    await this.appointmentRepository.updateStatus(appointmentId, 'FINALIZADO');
+    await this.appointmentRepository.updateStatus(appointmentId, AppointmentStatus.FINISHED);
     // Cria o prontuário
     const record = await this.medicalRecordRepository.create({
       ...data,

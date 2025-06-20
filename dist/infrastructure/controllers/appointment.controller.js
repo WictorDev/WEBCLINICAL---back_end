@@ -19,6 +19,7 @@ const find_employee_appointments_usecase_1 = require("../../use-case/appointment
 const finalize_appointment_usecase_1 = require("../../use-case/appointment/finalize-appointment.usecase");
 const update_appointment_status_usecase_1 = require("../../use-case/appointment/update-appointment-status.usecase");
 const update_appointment_patient_usecase_1 = require("../../use-case/appointment/update-appointment-patient.usecase");
+const cancel_appointment_usecase_1 = require("../../use-case/appointment/cancel-appointment.usecase");
 const appointment_1 = require("../../domain/entities/appointment");
 const jwt_guard_1 = require("../auth/jwt.guard");
 const crypto_1 = require("crypto");
@@ -29,13 +30,15 @@ let AppointmentController = class AppointmentController {
     finalizeAppointment;
     updateAppointmentStatus;
     updateAppointmentPatient;
+    cancelAppointment;
     findPatientAppointments;
-    constructor(createAppointment, findEmployeeAppointments, finalizeAppointment, updateAppointmentStatus, updateAppointmentPatient, findPatientAppointments) {
+    constructor(createAppointment, findEmployeeAppointments, finalizeAppointment, updateAppointmentStatus, updateAppointmentPatient, cancelAppointment, findPatientAppointments) {
         this.createAppointment = createAppointment;
         this.findEmployeeAppointments = findEmployeeAppointments;
         this.finalizeAppointment = finalizeAppointment;
         this.updateAppointmentStatus = updateAppointmentStatus;
         this.updateAppointmentPatient = updateAppointmentPatient;
+        this.cancelAppointment = cancelAppointment;
         this.findPatientAppointments = findPatientAppointments;
     }
     async create(body) {
@@ -44,12 +47,18 @@ let AppointmentController = class AppointmentController {
             date: new Date(body.date),
             startTime: body.startTime,
             endTime: body.endTime,
-            status: body.status || 'PENDENTE',
+            status: body.status || appointment_1.AppointmentStatus.AVAILABLE,
             scheduleId: body.scheduleId,
             patientId: body.patientId,
             employeeId: body.employeeId
         });
         return this.createAppointment.execute(appointment);
+    }
+    async getAllByEmployee(employeeId) {
+        return this.findEmployeeAppointments.execute(employeeId);
+    }
+    async getAllByEmployeeAndSchedule(employeeId, scheduleId) {
+        return this.findEmployeeAppointments.executeByEmployeeAndSchedule(employeeId, scheduleId);
     }
     async getByEmployee(employeeId, date) {
         return this.findEmployeeAppointments.execute(employeeId, date ? new Date(date) : undefined);
@@ -69,11 +78,14 @@ let AppointmentController = class AppointmentController {
         return this.findPatientAppointments.execute(patientId);
     }
     async getAvailableBySchedule(scheduleId) {
-        return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, 'DISPONIVEL');
+        return this.findEmployeeAppointments.executeByScheduleIdAndStatus(scheduleId, appointment_1.AppointmentStatus.AVAILABLE);
     }
     async getMyAppointments(req) {
         const employeeId = req.user.cpf || req.user.id;
         return this.findEmployeeAppointments.execute(employeeId);
+    }
+    async cancel(id) {
+        return this.cancelAppointment.execute(id);
     }
 };
 exports.AppointmentController = AppointmentController;
@@ -84,6 +96,21 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AppointmentController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)('employee/:employeeId/all'),
+    __param(0, (0, common_1.Param)('employeeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AppointmentController.prototype, "getAllByEmployee", null);
+__decorate([
+    (0, common_1.Get)('employee/schedule'),
+    __param(0, (0, common_1.Query)('employeeId')),
+    __param(1, (0, common_1.Query)('scheduleId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AppointmentController.prototype, "getAllByEmployeeAndSchedule", null);
 __decorate([
     (0, common_1.Get)('employee'),
     __param(0, (0, common_1.Query)('employeeId')),
@@ -137,6 +164,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AppointmentController.prototype, "getMyAppointments", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AppointmentController.prototype, "cancel", null);
 exports.AppointmentController = AppointmentController = __decorate([
     (0, common_1.Controller)('/api/appointments'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
@@ -145,6 +179,7 @@ exports.AppointmentController = AppointmentController = __decorate([
         finalize_appointment_usecase_1.FinalizeAppointmentUseCase,
         update_appointment_status_usecase_1.UpdateAppointmentStatusUseCase,
         update_appointment_patient_usecase_1.UpdateAppointmentPatientUseCase,
+        cancel_appointment_usecase_1.CancelAppointmentUseCase,
         find_patient_appointments_usecase_1.FindPatientAppointmentsUseCase])
 ], AppointmentController);
 //# sourceMappingURL=appointment.controller.js.map

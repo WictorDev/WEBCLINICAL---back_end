@@ -1,9 +1,14 @@
+export declare enum AppointmentStatus {
+    AVAILABLE = "AVAILABLE",
+    SCHEDULED = "SCHEDULED",
+    FINISHED = "FINISHED"
+}
 export interface AppointmentData {
     id: string;
     date: Date;
     startTime: string;
     endTime: string;
-    status: string;
+    status: AppointmentStatus;
     scheduleId: string;
     patientId?: string | null;
     employeeId: string;
@@ -18,8 +23,8 @@ export declare class Appointment {
     set startTime(startTime: string);
     get endTime(): string;
     set endTime(endTime: string);
-    get status(): string;
-    set status(status: string);
+    get status(): AppointmentStatus;
+    set status(status: AppointmentStatus);
     get scheduleId(): string;
     set scheduleId(scheduleId: string);
     get patientId(): string | undefined | null;
@@ -31,7 +36,7 @@ export declare class Appointment {
         date: Date;
         startTime: string;
         endTime: string;
-        status: string;
+        status: AppointmentStatus;
         scheduleId: string;
         patientId: string | null | undefined;
         employeeId: string;
@@ -41,9 +46,22 @@ export declare class Appointment {
         date: Date;
         startTime: string;
         endTime: string;
-        status: string;
+        status: AppointmentStatus;
         scheduleId: string;
         patientId: string | null | undefined;
         employeeId: string;
+    };
+}
+export interface AppointmentWithPatient {
+    id: string;
+    date: Date;
+    startTime: string;
+    endTime: string;
+    status: AppointmentStatus;
+    scheduleId: string;
+    patientId?: string | null;
+    employeeId: string;
+    patient?: {
+        name: string;
     };
 }

@@ -40,6 +40,12 @@ let CreateAppointmentUseCase = class CreateAppointmentUseCase {
         if (conflict) {
             throw new common_1.BadRequestException('Conflito de horário para este funcionário.');
         }
+        if (appointment.patientId) {
+            const patientAppointments = await this.appointmentRepository.findByPatientAndDate(appointment.patientId, appointment.date);
+            if (patientAppointments.length > 0) {
+                throw new common_1.BadRequestException('Paciente já possui um agendamento nesta data.');
+            }
+        }
         const newAppointment = await this.appointmentRepository.create(appointment);
         return newAppointment;
     }

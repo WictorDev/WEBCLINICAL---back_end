@@ -6,8 +6,9 @@ export declare class CreateScheduleUseCase {
     private readonly appointmentRepository;
     constructor(scheduleRepository: ScheduleRepository, appointmentRepository: AppointmentRepository);
     private hasTimeConflict;
+    private isPastDateTime;
     execute(data: {
-        date: Date;
+        date: string | Date;
         startTime: string;
         endTime: string;
         employeeId: string;

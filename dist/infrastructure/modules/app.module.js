@@ -21,6 +21,7 @@ const medical_record_module_1 = require("./medical-record.module");
 const prescription_module_1 = require("./prescription.module");
 const schedule_module_1 = require("./schedule.module");
 const appointment_module_1 = require("./appointment.module");
+const password_recovery_module_1 = require("./password-recovery.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,6 +41,7 @@ exports.AppModule = AppModule = __decorate([
             prescription_module_1.PrescriptionModule,
             schedule_module_1.ScheduleModule,
             appointment_module_1.AppointmentModule,
+            password_recovery_module_1.PasswordRecoveryModule,
         ],
         controllers: [],
         providers: [],

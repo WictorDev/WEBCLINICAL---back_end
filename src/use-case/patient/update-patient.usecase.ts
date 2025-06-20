@@ -16,7 +16,8 @@ export class UpdatePatientUseCase {
             name: data.name || patient.name,
             email: data.email || patient.email,
             password: data.password || patient.password,
-            typeId: data.typeId || patient.typeId
+            typeId: data.typeId || patient.typeId,
+            phoneNumber: data.phoneNumber || patient.phoneNumber,
         });
 
         return await this.patientRepository.update(cpf.toString(), updatedPatient);

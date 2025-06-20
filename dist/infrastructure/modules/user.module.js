@@ -34,6 +34,7 @@ const employee_type_module_1 = require("./employee-type.module");
 const prisma_employee_type_repository_1 = require("../db/repositories/prisma-employee-type.repository");
 const prisma_employee_repository_1 = require("../db/repositories/prisma-employee.repository");
 const delete_user_usecase_1 = require("../../use-case/user/delete-user.usecase");
+const email_service_1 = require("../../core/services/email.service");
 let UserModule = class UserModule {
 };
 exports.UserModule = UserModule;
@@ -42,7 +43,10 @@ exports.UserModule = UserModule = __decorate([
         imports: [
             prisma_module_1.PrismaModule,
             config_1.ConfigModule,
-            jwt_1.JwtModule,
+            jwt_1.JwtModule.register({
+                secret: process.env.JWT_SECRET || 'your-secret-key',
+                signOptions: { expiresIn: '24h' },
+            }),
             admin_module_1.AdminModule,
             employee_module_1.EmployeeModule,
             (0, common_1.forwardRef)(() => patient_module_1.PatientModule),
@@ -80,6 +84,7 @@ exports.UserModule = UserModule = __decorate([
             create_patient_usecase_1.CreatePatientUseCase,
             create_first_admin_usecase_1.CreateFirstAdminUseCase,
             delete_user_usecase_1.DeleteUserUseCase,
+            email_service_1.EmailService,
         ],
         exports: [
             user_repository_1.UserRepository,
@@ -97,6 +102,7 @@ exports.UserModule = UserModule = __decorate([
             create_patient_usecase_1.CreatePatientUseCase,
             create_first_admin_usecase_1.CreateFirstAdminUseCase,
             delete_user_usecase_1.DeleteUserUseCase,
+            email_service_1.EmailService,
         ],
     })
 ], UserModule);

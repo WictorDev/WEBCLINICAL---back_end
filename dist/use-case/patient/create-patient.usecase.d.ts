@@ -1,14 +1,20 @@
 import { PatientRepository } from 'src/domain/repositories/patient.repository';
-import { Patient } from 'src/domain/entities/patient';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
+import { EmailService } from 'src/core/services/email.service';
+import { JwtService } from '@nestjs/jwt';
 export declare class CreatePatientUseCase {
     private readonly patientRepository;
     private readonly typeRepository;
-    constructor(patientRepository: PatientRepository, typeRepository: TypeRepository);
+    private readonly emailService;
+    private readonly jwtService;
+    constructor(patientRepository: PatientRepository, typeRepository: TypeRepository, emailService: EmailService, jwtService: JwtService);
     execute(data: {
         cpf: string;
         name: string;
         email: string;
         password: string;
-    }): Promise<Patient>;
+        phoneNumber: string;
+    }): Promise<{
+        message: string;
+    }>;
 }

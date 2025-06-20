@@ -1,4 +1,5 @@
 import UniqueEntityCpf from "src/core/entities/unique-entity-cpf";
+import { PhoneFormatter } from "src/core/utils/phone-formatter";
 
 export interface PatientData {
   cpf: UniqueEntityCpf;
@@ -6,6 +7,7 @@ export interface PatientData {
   email: string;
   password: string;
   typeId: string;
+  phoneNumber: string;
 }
 
 export class Patient {
@@ -53,12 +55,24 @@ export class Patient {
     this.data.typeId = typeId;
   }
 
+  get phoneNumber(): string {
+    return this.data.phoneNumber;
+  }
+
+  set phoneNumber(phoneNumber: string) {
+    if (!phoneNumber) throw new Error("Telefone é obrigatório.");
+    
+    // Usar o utilitário para formatar o número
+    this.data.phoneNumber = PhoneFormatter.format(phoneNumber);
+  }
+
   toJSON() {
     return {
       cpf: this.cpf,
       name: this.name,
       email: this.email,
-      typeId: this.typeId
+      typeId: this.typeId,
+      phoneNumber: this.phoneNumber
     };
   }
 
@@ -68,7 +82,8 @@ export class Patient {
       name: data.name,
       email: data.email,
       password: data.password,
-      typeId: data.typeId
+      typeId: data.typeId,
+      phoneNumber: data.phoneNumber
     };
   }
 }

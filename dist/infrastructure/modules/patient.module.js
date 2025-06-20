@@ -16,10 +16,13 @@ const find_patient_usecase_1 = require("../../use-case/patient/find-patient.usec
 const find_patient_by_cpf_usecase_1 = require("../../use-case/patient/find-patient-by-cpf.usecase");
 const find_patient_by_email_usecase_1 = require("../../use-case/patient/find-patient-by-email.usecase");
 const update_patient_usecase_1 = require("../../use-case/patient/update-patient.usecase");
+const recovery_password_usecase_1 = require("../../use-case/patient/recovery-password.usecase");
+const confirm_patient_registration_usecase_1 = require("../../use-case/patient/confirm-patient-registration.usecase");
 const patient_repository_1 = require("../../domain/repositories/patient.repository");
 const type_module_1 = require("./type.module");
 const jwt_1 = require("@nestjs/jwt");
 const user_module_1 = require("./user.module");
+const email_service_1 = require("../../core/services/email.service");
 let PatientModule = class PatientModule {
 };
 exports.PatientModule = PatientModule;
@@ -28,7 +31,10 @@ exports.PatientModule = PatientModule = __decorate([
         imports: [
             prisma_module_1.PrismaModule,
             type_module_1.TypeModule,
-            jwt_1.JwtModule,
+            jwt_1.JwtModule.register({
+                secret: process.env.JWT_SECRET || 'your-secret-key',
+                signOptions: { expiresIn: '24h' },
+            }),
             (0, common_1.forwardRef)(() => user_module_1.UserModule)
         ],
         controllers: [patient_controller_1.PatientController],
@@ -43,6 +49,9 @@ exports.PatientModule = PatientModule = __decorate([
             find_patient_by_cpf_usecase_1.FindPatientByCpfUseCase,
             find_patient_by_email_usecase_1.FindPatientByEmailUseCase,
             update_patient_usecase_1.UpdatePatientUseCase,
+            recovery_password_usecase_1.RecoveryPasswordUseCase,
+            confirm_patient_registration_usecase_1.ConfirmPatientRegistrationUseCase,
+            email_service_1.EmailService,
         ],
         exports: [
             patient_repository_1.PatientRepository,
@@ -52,6 +61,8 @@ exports.PatientModule = PatientModule = __decorate([
             find_patient_by_cpf_usecase_1.FindPatientByCpfUseCase,
             find_patient_by_email_usecase_1.FindPatientByEmailUseCase,
             update_patient_usecase_1.UpdatePatientUseCase,
+            recovery_password_usecase_1.RecoveryPasswordUseCase,
+            confirm_patient_registration_usecase_1.ConfirmPatientRegistrationUseCase,
         ],
     })
 ], PatientModule);

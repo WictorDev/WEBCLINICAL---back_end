@@ -1,7 +1,7 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../../core/services/prisma.service';
 import { AppointmentRepository } from '../../../domain/repositories/appointment.repository';
-import { Appointment } from '../../../domain/entities/appointment';
+import { Appointment, AppointmentStatus, AppointmentWithPatient } from '../../../domain/entities/appointment';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       date: appointment.date,
       startTime: appointment.startTime,
       endTime: appointment.endTime,
-      status: appointment.status,
+      status: appointment.status as AppointmentStatus,
       scheduleId: appointment.scheduleId,
       patientId: appointment.patientId === null ? undefined : appointment.patientId,
       employeeId: appointment.employeeId
@@ -53,7 +53,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
         date: updated.date,
         startTime: updated.startTime,
         endTime: updated.endTime,
-        status: updated.status,
+        status: updated.status as AppointmentStatus,
         scheduleId: updated.scheduleId,
         patientId: data.patientId === null ? undefined : data.patientId,
         employeeId: updated.employeeId
@@ -89,6 +89,34 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     }));
   }
 
+  async findByPatientAndDate(patientId: string, date: Date): Promise<Appointment[]> {
+    const appointments = await this.prisma.appointment.findMany({
+      where: {
+        patientId,
+        date: {
+          gte: new Date(date.setHours(0, 0, 0, 0)),
+          lt: new Date(date.setHours(23, 59, 59, 999))
+        }
+      }
+    });
+
+    return appointments.map(appointment => {
+      if (!appointment.scheduleId) {
+        throw new Error('Appointment sem scheduleId não é permitido!');
+      }
+      return new Appointment({
+        id: appointment.id,
+        date: appointment.date,
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
+        status: appointment.status as AppointmentStatus,
+        scheduleId: appointment.scheduleId,
+        patientId: appointment.patientId === null ? undefined : appointment.patientId,
+        employeeId: appointment.employeeId
+      });
+    });
+  }
+
   async findByEmployee(employeeId: string, date?: Date): Promise<Appointment[]> {
     const where = date ? {
       employeeId,
@@ -109,7 +137,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
         date: appointment.date,
         startTime: appointment.startTime,
         endTime: appointment.endTime,
-        status: appointment.status,
+        status: appointment.status as AppointmentStatus,
         scheduleId: appointment.scheduleId,
         patientId: appointment.patientId === null ? undefined : appointment.patientId,
         employeeId: appointment.employeeId
@@ -139,7 +167,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
         date: created.date,
         startTime: created.startTime,
         endTime: created.endTime,
-        status: created.status,
+        status: created.status as AppointmentStatus,
         scheduleId: created.scheduleId,
         patientId: appointment.patientId === null ? undefined : appointment.patientId,
         employeeId: created.employeeId
@@ -157,7 +185,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     }
   }
 
-  async updateStatus(id: string, status: string): Promise<Appointment> {
+  async updateStatus(id: string, status: AppointmentStatus): Promise<Appointment> {
     try {
       const updated = await this.prisma.appointment.update({
         where: { id },
@@ -172,7 +200,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
         date: updated.date,
         startTime: updated.startTime,
         endTime: updated.endTime,
-        status: updated.status,
+        status: updated.status as AppointmentStatus,
         scheduleId: updated.scheduleId,
         patientId: updated.patientId === null ? undefined : updated.patientId,
         employeeId: updated.employeeId
@@ -185,7 +213,7 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     }
   }
 
-  async findByScheduleIdAndStatus(scheduleId: string, status: string): Promise<Appointment[]> {
+  async findByScheduleIdAndStatus(scheduleId: string, status: AppointmentStatus): Promise<Appointment[]> {
     const appointments = await this.prisma.appointment.findMany({
       where: {
         scheduleId,
@@ -201,11 +229,41 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
         date: appointment.date,
         startTime: appointment.startTime,
         endTime: appointment.endTime,
-        status: appointment.status,
+        status: appointment.status as AppointmentStatus,
         scheduleId: appointment.scheduleId,
         patientId: appointment.patientId === null ? undefined : appointment.patientId,
         employeeId: appointment.employeeId
       });
+    });
+  }
+
+  async findByEmployeeAndSchedule(employeeId: string, scheduleId: string): Promise<AppointmentWithPatient[]> {
+    const appointments = await this.prisma.appointment.findMany({
+      where: {
+        employeeId,
+        scheduleId
+      },
+      include: {
+        patient: {
+          select: { name: true }
+        }
+      }
+    });
+    return appointments.map(appointment => {
+      if (!appointment.scheduleId) {
+        throw new Error('Appointment sem scheduleId não é permitido!');
+      }
+      return {
+        id: appointment.id,
+        date: appointment.date,
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
+        status: appointment.status as AppointmentStatus,
+        scheduleId: appointment.scheduleId,
+        patientId: appointment.patientId === null ? undefined : appointment.patientId,
+        employeeId: appointment.employeeId,
+        patient: appointment.patient ? { name: appointment.patient.name } : undefined
+      };
     });
   }
 } 

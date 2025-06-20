@@ -23,6 +23,9 @@ let FindEmployeeAppointmentsUseCase = class FindEmployeeAppointmentsUseCase {
     async executeByScheduleIdAndStatus(scheduleId, status) {
         return this.appointmentRepository.findByScheduleIdAndStatus(scheduleId, status);
     }
+    async executeByEmployeeAndSchedule(employeeId, scheduleId) {
+        return this.appointmentRepository.findByEmployeeAndSchedule(employeeId, scheduleId);
+    }
 };
 exports.FindEmployeeAppointmentsUseCase = FindEmployeeAppointmentsUseCase;
 exports.FindEmployeeAppointmentsUseCase = FindEmployeeAppointmentsUseCase = __decorate([

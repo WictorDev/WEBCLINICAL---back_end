@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
-import { Appointment } from '../../domain/entities/appointment';
+import { Appointment, AppointmentStatus } from '../../domain/entities/appointment';
 
 @Injectable()
 export class UpdateAppointmentPatientUseCase {
@@ -12,7 +12,25 @@ export class UpdateAppointmentPatientUseCase {
       throw new NotFoundException('Agendamento não encontrado');
     }
 
+    // Verificar se o paciente já tem appointment na mesma data
+    const patientAppointments = await this.appointmentRepository.findByPatientAndDate(
+      patientId,
+      appointment.date
+    );
+    
+    // Excluir o appointment atual da verificação (se for o mesmo)
+    const otherAppointments = patientAppointments.filter(a => a.id !== id);
+    
+    if (otherAppointments.length > 0) {
+      throw new BadRequestException('Você já possui um agendamento nesta data.');
+    }
+
     appointment.patientId = patientId;
-    return this.appointmentRepository.update(id, { patientId });
+    appointment.status = AppointmentStatus.SCHEDULED;
+    
+    return this.appointmentRepository.update(id, { 
+      patientId,
+      status: AppointmentStatus.SCHEDULED
+    });
   }
 } 

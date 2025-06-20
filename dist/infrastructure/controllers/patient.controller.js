@@ -21,23 +21,26 @@ const jwt_guard_1 = require("../auth/jwt.guard");
 const swagger_1 = require("@nestjs/swagger");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const update_patient_usecase_1 = require("../../use-case/patient/update-patient.usecase");
-const type_repository_1 = require("../../domain/repositories/type.repository");
 const create_patient_usecase_1 = require("../../use-case/patient/create-patient.usecase");
 const public_decorator_1 = require("../auth/public.decorator");
+const recovery_password_usecase_1 = require("../../use-case/patient/recovery-password.usecase");
+const confirm_patient_registration_usecase_1 = require("../../use-case/patient/confirm-patient-registration.usecase");
 let PatientController = class PatientController {
-    typeRepository;
     createPatientUseCase;
     findPatientByCpfUseCase;
     findPatientByEmailUseCase;
     updatePatientUseCase;
     findAllPatientsUseCase;
-    constructor(typeRepository, createPatientUseCase, findPatientByCpfUseCase, findPatientByEmailUseCase, updatePatientUseCase, findAllPatientsUseCase) {
-        this.typeRepository = typeRepository;
+    recoveryPasswordUseCase;
+    confirmPatientRegistrationUseCase;
+    constructor(createPatientUseCase, findPatientByCpfUseCase, findPatientByEmailUseCase, updatePatientUseCase, findAllPatientsUseCase, recoveryPasswordUseCase, confirmPatientRegistrationUseCase) {
         this.createPatientUseCase = createPatientUseCase;
         this.findPatientByCpfUseCase = findPatientByCpfUseCase;
         this.findPatientByEmailUseCase = findPatientByEmailUseCase;
         this.updatePatientUseCase = updatePatientUseCase;
         this.findAllPatientsUseCase = findAllPatientsUseCase;
+        this.recoveryPasswordUseCase = recoveryPasswordUseCase;
+        this.confirmPatientRegistrationUseCase = confirmPatientRegistrationUseCase;
     }
     async findAll() {
         return this.findAllPatientsUseCase.execute();
@@ -59,8 +62,28 @@ let PatientController = class PatientController {
             throw error;
         }
     }
+    async confirmRegistration(body) {
+        try {
+            const patient = await this.confirmPatientRegistrationUseCase.execute(body.token);
+            return {
+                message: 'Cadastro confirmado com sucesso!',
+                patient: {
+                    cpf: patient.cpf.toString(),
+                    name: patient.name,
+                    email: patient.email,
+                    phoneNumber: patient.phoneNumber
+                }
+            };
+        }
+        catch (error) {
+            throw new common_1.BadRequestException(error.message);
+        }
+    }
     async update(cpf, data) {
         return await this.updatePatientUseCase.execute(new unique_entity_cpf_1.UniqueEntityCpf(cpf), data);
+    }
+    async recoveryPassword(email, data) {
+        return await this.recoveryPasswordUseCase.execute(email, data.password);
     }
 };
 exports.PatientController = PatientController;
@@ -93,6 +116,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PatientController.prototype, "register", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('/confirm-registration'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PatientController.prototype, "confirmRegistration", null);
+__decorate([
     (0, common_1.Put)(':cpf'),
     __param(0, (0, common_1.Param)('cpf')),
     __param(1, (0, common_1.Body)()),
@@ -100,15 +131,24 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PatientController.prototype, "update", null);
+__decorate([
+    (0, common_1.Put)(':email'),
+    __param(0, (0, common_1.Param)('email')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PatientController.prototype, "recoveryPassword", null);
 exports.PatientController = PatientController = __decorate([
     (0, swagger_1.ApiTags)('patients'),
     (0, common_1.Controller)('/api/patients'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
-    __metadata("design:paramtypes", [type_repository_1.TypeRepository,
-        create_patient_usecase_1.CreatePatientUseCase,
+    __metadata("design:paramtypes", [create_patient_usecase_1.CreatePatientUseCase,
         find_patient_by_cpf_usecase_1.FindPatientByCpfUseCase,
         find_patient_by_email_usecase_1.FindPatientByEmailUseCase,
         update_patient_usecase_1.UpdatePatientUseCase,
-        find_patient_usecase_1.FindPatientUseCase])
+        find_patient_usecase_1.FindPatientUseCase,
+        recovery_password_usecase_1.RecoveryPasswordUseCase,
+        confirm_patient_registration_usecase_1.ConfirmPatientRegistrationUseCase])
 ], PatientController);
 //# sourceMappingURL=patient.controller.js.map

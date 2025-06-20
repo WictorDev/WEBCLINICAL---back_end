@@ -85,6 +85,7 @@ model Patient {
   password String
   type     Type?  @relation(fields: [typeId], references: [id])
   typeId   String
+  phoneNumber String
   appointments Appointment[]
 }
 

@@ -9,4 +9,5 @@ export declare class PrismaPatientRepository implements PatientRepository {
     findByCpf(cpf: string): Promise<Patient | null>;
     findByEmail(email: string): Promise<Patient | null>;
     update(cpf: string, data: Partial<Patient>): Promise<Patient>;
+    recoveryPassword(email: string, password: string): Promise<void>;
 }

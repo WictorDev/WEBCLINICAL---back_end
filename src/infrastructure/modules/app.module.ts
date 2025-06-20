@@ -13,6 +13,7 @@ import { MedicalRecordModule } from './medical-record.module';
 import { PrescriptionModule } from './prescription.module';
 import { ScheduleModule } from './schedule.module';
 import { AppointmentModule } from './appointment.module';
+import { PasswordRecoveryModule } from './password-recovery.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AppointmentModule } from './appointment.module';
     PrescriptionModule,
     ScheduleModule,
     AppointmentModule,
+    PasswordRecoveryModule,
   ],
   controllers: [],
   providers: [],

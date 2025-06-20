@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Patient = void 0;
+const phone_formatter_1 = require("../../core/utils/phone-formatter");
 class Patient {
     data;
     constructor(data) {
@@ -45,12 +46,21 @@ class Patient {
             throw new Error("Tipo é obrigatório.");
         this.data.typeId = typeId;
     }
+    get phoneNumber() {
+        return this.data.phoneNumber;
+    }
+    set phoneNumber(phoneNumber) {
+        if (!phoneNumber)
+            throw new Error("Telefone é obrigatório.");
+        this.data.phoneNumber = phone_formatter_1.PhoneFormatter.format(phoneNumber);
+    }
     toJSON() {
         return {
             cpf: this.cpf,
             name: this.name,
             email: this.email,
-            typeId: this.typeId
+            typeId: this.typeId,
+            phoneNumber: this.phoneNumber
         };
     }
     static create(data) {
@@ -59,7 +69,8 @@ class Patient {
             name: data.name,
             email: data.email,
             password: data.password,
-            typeId: data.typeId
+            typeId: data.typeId,
+            phoneNumber: data.phoneNumber
         };
     }
 }

@@ -33,7 +33,7 @@ export class CreateAppointmentUseCase {
       throw new BadRequestException('Horário fora do período da agenda.');
     }
 
-    // Verificar conflito de horário
+    // Verificar conflito de horário para o funcionário
     const existing = await this.appointmentRepository.findByEmployee(
       appointment.employeeId,
       appointment.date
@@ -43,6 +43,17 @@ export class CreateAppointmentUseCase {
     );
     if (conflict) {
       throw new BadRequestException('Conflito de horário para este funcionário.');
+    }
+
+    // Verificar se o paciente já tem appointment na mesma data
+    if (appointment.patientId) {
+      const patientAppointments = await this.appointmentRepository.findByPatientAndDate(
+        appointment.patientId,
+        appointment.date
+      );
+      if (patientAppointments.length > 0) {
+        throw new BadRequestException('Paciente já possui um agendamento nesta data.');
+      }
     }
 
     // Criar o agendamento

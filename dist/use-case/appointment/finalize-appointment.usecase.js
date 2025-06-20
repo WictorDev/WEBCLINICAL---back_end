@@ -13,6 +13,7 @@ exports.FinalizeAppointmentUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const medical_record_repository_1 = require("../../domain/repositories/medical-record.repository");
 const appointment_repository_1 = require("../../domain/repositories/appointment.repository");
+const appointment_1 = require("../../domain/entities/appointment");
 let FinalizeAppointmentUseCase = class FinalizeAppointmentUseCase {
     medicalRecordRepository;
     appointmentRepository;
@@ -25,10 +26,10 @@ let FinalizeAppointmentUseCase = class FinalizeAppointmentUseCase {
         if (!appointment) {
             throw new Error('Agendamento não encontrado.');
         }
-        if (appointment.status !== 'CONFIRMADO') {
-            throw new Error('Apenas agendamentos confirmados podem ser finalizados.');
+        if (appointment.status !== appointment_1.AppointmentStatus.SCHEDULED) {
+            throw new Error('Apenas agendamentos agendados podem ser finalizados.');
         }
-        await this.appointmentRepository.updateStatus(appointmentId, 'FINALIZADO');
+        await this.appointmentRepository.updateStatus(appointmentId, appointment_1.AppointmentStatus.FINISHED);
         const record = await this.medicalRecordRepository.create({
             ...data,
             id: '',

@@ -13,6 +13,7 @@ exports.CancelAppointmentUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const appointment_repository_1 = require("../../domain/repositories/appointment.repository");
 const schedule_repository_1 = require("../../domain/repositories/schedule.repository");
+const appointment_1 = require("../../domain/entities/appointment");
 let CancelAppointmentUseCase = class CancelAppointmentUseCase {
     appointmentRepository;
     scheduleRepository;
@@ -25,8 +26,8 @@ let CancelAppointmentUseCase = class CancelAppointmentUseCase {
         if (!appointment) {
             throw new common_1.BadRequestException('Agendamento não encontrado.');
         }
-        if (appointment.status === 'CANCELADO') {
-            throw new common_1.BadRequestException('Agendamento já está cancelado.');
+        if (appointment.status === appointment_1.AppointmentStatus.AVAILABLE) {
+            throw new common_1.BadRequestException('Agendamento já está disponível.');
         }
         if (!appointment.scheduleId) {
             throw new common_1.BadRequestException('Agenda não encontrada para este agendamento.');
@@ -35,7 +36,10 @@ let CancelAppointmentUseCase = class CancelAppointmentUseCase {
         if (!schedule) {
             throw new common_1.BadRequestException('Agenda não encontrada.');
         }
-        await this.appointmentRepository.updateStatus(id, 'CANCELADO');
+        await this.appointmentRepository.update(id, {
+            status: appointment_1.AppointmentStatus.AVAILABLE,
+            patientId: null
+        });
     }
 };
 exports.CancelAppointmentUseCase = CancelAppointmentUseCase;

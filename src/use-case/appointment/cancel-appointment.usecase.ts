@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
 import { ScheduleRepository } from '../../domain/repositories/schedule.repository';
+import { AppointmentStatus } from '../../domain/entities/appointment';
 
 @Injectable()
 export class CancelAppointmentUseCase {
@@ -15,8 +16,8 @@ export class CancelAppointmentUseCase {
       throw new BadRequestException('Agendamento não encontrado.');
     }
 
-    if (appointment.status === 'CANCELADO') {
-      throw new BadRequestException('Agendamento já está cancelado.');
+    if (appointment.status === AppointmentStatus.AVAILABLE) {
+      throw new BadRequestException('Agendamento já está disponível.');
     }
 
     // Verificar se o scheduleId existe
@@ -30,12 +31,10 @@ export class CancelAppointmentUseCase {
       throw new BadRequestException('Agenda não encontrada.');
     }
 
-    // Atualizar o status do agendamento
-    await this.appointmentRepository.updateStatus(id, 'CANCELADO');
-
-    // Liberar a agenda (não é mais necessário atualizar appointmentId)
-    // await this.scheduleRepository.update(schedule.id, {
-    //   appointmentId: undefined
-    // });
+    // Atualizar o status do agendamento para AVAILABLE e remover o paciente
+    await this.appointmentRepository.update(id, {
+      status: AppointmentStatus.AVAILABLE,
+      patientId: null
+    });
   }
 } 

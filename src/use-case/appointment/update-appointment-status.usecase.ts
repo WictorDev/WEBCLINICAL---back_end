@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AppointmentRepository } from '../../domain/repositories/appointment.repository';
-import { Appointment } from '../../domain/entities/appointment';
+import { Appointment, AppointmentStatus } from '../../domain/entities/appointment';
 
 @Injectable()
 export class UpdateAppointmentStatusUseCase {
@@ -8,13 +8,7 @@ export class UpdateAppointmentStatusUseCase {
     private readonly appointmentRepository: AppointmentRepository
   ) {}
 
-  async execute(appointmentId: string, status: string): Promise<Appointment> {
-    // Validação do status
-    const validStatuses = ['PENDENTE', 'CONFIRMADO', 'FINALIZADO', 'CANCELADO'];
-    if (!validStatuses.includes(status)) {
-      throw new Error(`Status inválido. Use um dos seguintes: ${validStatuses.join(', ')}`);
-    }
-    
+  async execute(appointmentId: string, status: AppointmentStatus): Promise<Appointment> {
     // Verificar se o agendamento existe
     const appointment = await this.appointmentRepository.findById(appointmentId);
     
@@ -23,8 +17,8 @@ export class UpdateAppointmentStatusUseCase {
     }
     
     // Validações específicas por status
-    if (status === 'FINALIZADO' && appointment.status !== 'CONFIRMADO') {
-      throw new Error('Apenas agendamentos confirmados podem ser finalizados.');
+    if (status === AppointmentStatus.FINISHED && appointment.status !== AppointmentStatus.SCHEDULED) {
+      throw new Error('Apenas agendamentos agendados podem ser finalizados.');
     }
     
     // Atualizar o status

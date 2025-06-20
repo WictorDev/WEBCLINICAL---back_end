@@ -5,6 +5,7 @@ export interface PatientData {
     email: string;
     password: string;
     typeId: string;
+    phoneNumber: string;
 }
 export declare class Patient {
     private data;
@@ -18,11 +19,14 @@ export declare class Patient {
     set password(password: string);
     get typeId(): string;
     set typeId(typeId: string);
+    get phoneNumber(): string;
+    set phoneNumber(phoneNumber: string);
     toJSON(): {
         cpf: string;
         name: string;
         email: string;
         typeId: string;
+        phoneNumber: string;
     };
     static create(data: PatientData): {
         cpf: string;
@@ -30,5 +34,6 @@ export declare class Patient {
         email: string;
         password: string;
         typeId: string;
+        phoneNumber: string;
     };
 }
