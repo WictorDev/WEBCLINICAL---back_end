@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from 'src/infrastructure/modules/app.module';
 import * as cookieParser from 'cookie-parser';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,13 +18,22 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
+  // Enable global validation
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true, // strip unknown properties
+    forbidNonWhitelisted: true, // reject payloads with unknown props
+    transform: true, // enable class-transformer
+    transformOptions: { enableImplicitConversion: true },
+  }));
+
   app.enableCors({
-    origin: 'http://localhost:5173',
-    methods: 'GET,POST,PUT,DELETE,PATCH',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    methods: 'GET,POST,PUT,DELETE,PATCH,OPTIONS',
     allowedHeaders: 'Content-Type,Authorization',
     credentials: true,
   });
 
-  await app.listen(8080);
+  const port = Number(process.env.PORT) || 8080;
+  await app.listen(port);
 }
 bootstrap();

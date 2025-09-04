@@ -20,6 +20,8 @@ const findByCpf_user_usecase_1 = require("../../use-case/user/findByCpf-user.use
 const findByEmail_user_usecase_1 = require("../../use-case/user/findByEmail-user.usecase");
 const find_user_usecase_1 = require("../../use-case/user/find-user.usecase");
 const jwt_guard_1 = require("../auth/jwt.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
+const roles_guard_1 = require("../auth/roles.guard");
 const unique_entity_cpf_1 = require("../../core/entities/unique-entity-cpf");
 const swagger_1 = require("@nestjs/swagger");
 const type_repository_1 = require("../../domain/repositories/type.repository");
@@ -98,6 +100,7 @@ let UserController = class UserController {
 exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)(),
+    (0, roles_decorator_1.Roles)('Admin'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -149,7 +152,7 @@ __decorate([
 exports.UserController = UserController = __decorate([
     (0, swagger_1.ApiTags)('users'),
     (0, common_1.Controller)('/api/users'),
-    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [create_user_usecase_1.CreateUserUseCase,
         update_user_usecase_1.UpdateUserUseCase,
         findByCpf_user_usecase_1.FindUserByCpfUseCase,

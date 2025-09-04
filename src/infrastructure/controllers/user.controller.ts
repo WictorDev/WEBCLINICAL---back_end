@@ -15,6 +15,8 @@ import { FindUserByCpfUseCase } from 'src/use-case/user/findByCpf-user.usecase';
 import { FindUserByEmailUseCase } from 'src/use-case/user/findByEmail-user.usecase';
 import { FindUserUseCase } from 'src/use-case/user/find-user.usecase';
 import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
+import { Roles } from 'src/infrastructure/auth/roles.decorator';
+import { RolesGuard } from 'src/infrastructure/auth/roles.guard';
 import { UniqueEntityCpf } from 'src/core/entities/unique-entity-cpf';
 import { ApiTags } from '@nestjs/swagger';
 import { TypeRepository } from 'src/domain/repositories/type.repository';
@@ -22,7 +24,7 @@ import { CreateFirstAdminUseCase } from 'src/use-case/user/create-first-admin.us
 import { Public } from 'src/infrastructure/auth/public.decorator';
 @ApiTags('users')
 @Controller('/api/users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
@@ -35,6 +37,7 @@ export class UserController {
   ) {}
 
   @Get()
+  @Roles('Admin')
   async findAll() {
     return this.findUserUseCase.execute();
   }

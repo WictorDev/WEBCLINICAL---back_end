@@ -15,6 +15,7 @@ const config_1 = require("@nestjs/config");
 const auth_controller_1 = require("../controllers/auth.controller");
 const prisma_service_1 = require("../../core/services/prisma.service");
 const jwt_guard_1 = require("../auth/jwt.guard");
+const roles_guard_1 = require("../auth/roles.guard");
 const core_1 = require("@nestjs/core");
 let AuthModule = class AuthModule {
 };
@@ -36,8 +37,8 @@ exports.AuthModule = AuthModule = __decorate([
                 }),
             }),
         ],
-        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_guard_1.JwtAuthGuard, core_1.Reflector],
-        exports: [auth_service_1.AuthService, jwt_guard_1.JwtAuthGuard, jwt_1.JwtModule],
+        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, core_1.Reflector],
+        exports: [auth_service_1.AuthService, jwt_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, jwt_1.JwtModule],
         controllers: [auth_controller_1.AuthController],
     })
 ], AuthModule);

@@ -4,6 +4,18 @@ import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/infrastructure/auth/public.decorator';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/infrastructure/auth/jwt.guard';
+import { IsString, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+class LoginDto {
+  @IsString()
+  @Transform(({ value }) => (value ? String(value).trim() : value))
+  identifier!: string;
+
+  @IsString()
+  @MinLength(6)
+  password!: string;
+}
 
 @ApiTags('auth')
 @Controller('/api/auth')
@@ -13,7 +25,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  async login(@Body() loginData: { identifier: string; password: string }, @Res() res: Response) {
+  async login(@Body() loginData: LoginDto, @Res() res: Response) {
     try {
       console.log('Controller - Recebendo login:', loginData);
       const result = await this.authService.login(loginData);

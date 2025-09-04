@@ -18,6 +18,22 @@ const auth_service_1 = require("../../core/services/auth.service");
 const swagger_1 = require("@nestjs/swagger");
 const public_decorator_1 = require("../auth/public.decorator");
 const jwt_guard_1 = require("../auth/jwt.guard");
+const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
+class LoginDto {
+    identifier;
+    password;
+}
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_transformer_1.Transform)(({ value }) => (value ? String(value).trim() : value)),
+    __metadata("design:type", String)
+], LoginDto.prototype, "identifier", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(6),
+    __metadata("design:type", String)
+], LoginDto.prototype, "password", void 0);
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -76,7 +92,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [LoginDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([

@@ -53,11 +53,15 @@ docker run --name mysql-webclinical -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABAS
 
 ### 3. Configure o arquivo .env
 
-Crie um arquivo `.env` na raiz da pasta SERVER com o seguinte conteúdo:
+Crie um arquivo `.env` na raiz da pasta SERVER com o seguinte conteúdo (exemplo mínimo):
 
 ```
+NODE_ENV=development
+PORT=8080
+CORS_ORIGIN=http://localhost:5173
 DATABASE_URL="mysql://root:root@localhost:3306/webclinical?schema=public"
 JWT_SECRET="seu-segredo-jwt-aqui"
+JWT_EXPIRATION=1h
 ```
 
 ### 4. Execute as migrações do Prisma
@@ -73,6 +77,53 @@ npm run start:dev
 ```
 
 O servidor estará disponível em `http://localhost:3000`
+
+## 🐳 Rodando com Docker
+
+1. Configure o `.env` com a URL do banco (PostgreSQL recomendado):
+
+```
+DATABASE_URL=postgresql://postgres:postgres@db:5432/webclinical?schema=public
+PORT=3000
+CORS_ORIGIN=http://localhost:5173
+JWT_SECRET=changeme
+JWT_EXPIRES_IN=1d
+```
+
+2. Suba os serviços:
+
+```bash
+docker-compose up -d
+```
+
+3. Gere o client e rode migrações:
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+4. App disponível:
+
+```
+http://localhost:3000
+```
+
+### Usando MySQL
+
+Altere no `.env`:
+
+```
+DATABASE_URL=mysql://root:root@db:3306/webclinical
+```
+
+E suba com:
+
+```bash
+DB_IMAGE=mysql:8.4 DB_PORT=3306 docker-compose up -d
+```
+
+O script `npm run prisma:sync` ajusta automaticamente o provider do Prisma com base no `DATABASE_URL`.
 
 ## 📚 Documentação da API
 

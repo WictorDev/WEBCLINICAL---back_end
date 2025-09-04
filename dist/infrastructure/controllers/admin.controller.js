@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const create_admin_usecase_1 = require("../../use-case/admin/create-admin.usecase");
 const delete_admin_usecase_1 = require("../../use-case/admin/delete-admin.usecase");
 const jwt_guard_1 = require("../auth/jwt.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
+const roles_guard_1 = require("../auth/roles.guard");
 let AdminController = class AdminController {
     createAdminUseCase;
     deleteAdminUseCase;
@@ -35,6 +37,7 @@ let AdminController = class AdminController {
 exports.AdminController = AdminController;
 __decorate([
     (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)('Admin'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -42,6 +45,7 @@ __decorate([
 ], AdminController.prototype, "create", null);
 __decorate([
     (0, common_1.Delete)(':cpf'),
+    (0, roles_decorator_1.Roles)('Admin'),
     __param(0, (0, common_1.Param)('cpf')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -49,7 +53,7 @@ __decorate([
 ], AdminController.prototype, "delete", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('/api/admins'),
-    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [create_admin_usecase_1.CreateAdminUseCase,
         delete_admin_usecase_1.DeleteAdminUseCase])
 ], AdminController);

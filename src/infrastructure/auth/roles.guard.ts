@@ -1,0 +1,36 @@
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { ROLES_KEY, AppRole } from './roles.decorator';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<AppRole[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    // If no role metadata, allow access (guard is noop)
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true;
+    }
+
+    const request = context.switchToHttp().getRequest();
+    const user = request.user as { tipos?: string[] } | undefined;
+
+    if (!user || !Array.isArray(user.tipos)) {
+      throw new ForbiddenException('User roles not found');
+    }
+
+    const userRoles = user.tipos as string[];
+    const hasRole = requiredRoles.some((role) => userRoles.includes(role));
+    if (!hasRole) {
+      throw new ForbiddenException('Insufficient role');
+    }
+    return true;
+  }
+}
+
+
